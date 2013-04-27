@@ -2,7 +2,7 @@
 #include "Consts.h"
 #include "TorJagDrive.h"
 
-TorTest::TorTest(DriverStationLCD *dsIn, TorJagDrive *JagDriveIn) {
+TorTest::TorTest(Joystick& theStick, DriverStationLCD *dsIn, TorJagDrive *JagDriveIn) : stick(theStick){
   ds = dsIn;
   myJagDrive = JagDriveIn;
   
@@ -250,8 +250,64 @@ void TorTest::testTorClimber()
 
   
   ds->Printf(DriverStationLCD::kUser_Line6, 1, "Testing Climber");
-
-  liftJag1.Set(0.25);
+  while (true){
+  if (initPosSwitch.Get() == 0) //initial switch
+    {
+      ds->Printf(DriverStationLCD::kUser_Line1,1, "Initial Switch On");
+      //liftJag1.Set(0.0);
+      //liftJag2.Set(0.0);
+    }
+  else
+    {
+      ds->Printf(DriverStationLCD::kUser_Line1,1, "Initial Switch Off");
+      liftJag1.Set(0.25);
+      liftJag2.Set(-0.25);
+    }
+  if (stick.GetRawButton(3)) //retract button
+    {
+      ds->Printf(DriverStationLCD::kUser_Line3,1, "Manual Retract");
+      liftJag1.Set(-0.25);
+      liftJag2.Set(0.25);
+    }
+  else
+    {
+      ds->Printf(DriverStationLCD::kUser_Line3,1, " ManualR Off");
+    }
+  if (stick.GetRawButton(4)) //extend button
+    {
+      ds->Printf(DriverStationLCD::kUser_Line3,1, "Manual Extend");
+      liftJag1.Set(0.25);
+      liftJag2.Set(-0.25);
+    }
+  else
+    {
+      ds->Printf(DriverStationLCD::kUser_Line3,1, "ManualE Off");
+    }
+  if (stick.GetRawButton(1)) //cut forklift motors
+    {
+      liftJag1.Set(0.0);
+      liftJag2.Set(0.0);
+    }
+  if (limitSwitchLift.Get() == 0) //lift switch
+    {
+      ds->Printf(DriverStationLCD::kUser_Line2,1, "Lift On");
+    }
+  else
+    {
+      ds->Printf(DriverStationLCD::kUser_Line2,1, "Lift Off");
+    }
+  if (limitSwitchPull.Get() == 0) //pull switch
+    {
+      ds->Printf(DriverStationLCD::kUser_Line2,1, "Pull On");
+    }
+  else
+    {
+      ds->Printf(DriverStationLCD::kUser_Line2,1, "Pull Off");
+    }
+  ds->UpdateLCD();
+  
+  }
+  /*liftJag1.Set(0.25);
   liftJag2.Set(-0.25);
   while(initPosSwitch.Get()== 0){                       // move until intitial position limit switch is hit
       Wait(.01);
@@ -296,7 +352,7 @@ void TorTest::testTorClimber()
 
       liftJag1.Set(0.0);
       liftJag2.Set(0.0);
-  }
+  }*/
 }
 
 void TorTest::testPicker()

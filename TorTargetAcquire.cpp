@@ -64,6 +64,10 @@ void TorTargetAcquire::GetTarget() //TODO
           m_target->targetType = TargetId::High;
           m_target->isValid = true;
         }
+      else
+        {
+          m_target->isValid = false;
+        }
 
 //      m_target->distance = particles->size(); // debug code until we have a reason to return Distance
 
@@ -90,10 +94,10 @@ void TorTargetAcquire::GetTarget() //TODO
           m_target->distance = 1.0;
       else if (scores[0].imageWidth > 120) //  distance is 7-12ft
             m_target->distance = 2.0;
-      else                                 // distance is greater than 12ft
+      else if (scores[0].imageWidth > 40)                                // distance is greater than 12ft
         m_target->distance = 3.0;
-      
-      
+      else                                                              // small width indicates pyramid target (4" wide)
+        m_target->distance = 4.0;
     } //end !(particles empty)
 
 } // end GetTarget
@@ -152,16 +156,16 @@ void TorTargetAcquire::GetImage() //grabs clean image
   rawImage = m_camera.GetImage();                          
     
   BinaryImage *initialFilterImage;
-//  initialFilterImage = rawImage->ThresholdHSV(60, 150, 90, 255, 20, 255); //keeps green; original settings
-  initialFilterImage = rawImage->ThresholdHSV(60, 120, 90, 255, 20, 255); // backlight and one led light, this works well
+  initialFilterImage = rawImage->ThresholdHSV(60, 150, 90, 255, 20, 255); //keeps green; original settings
+//  initialFilterImage = rawImage->ThresholdHSV(60, 120, 90, 255, 20, 255); // backlight and one led light, this works well
 
-  //initialFilterImage->Write("/Initial.bmp");
+  initialFilterImage->Write("/Initial.bmp");
   
   BinaryImage *filledImage = initialFilterImage->ConvexHull(false); //fills in rect
   //filledImage->Write("/ConvexHull.bmp");
   
   image = filledImage->ParticleFilter(criteria, 1); //clean-up/
-//  image->Write("/Clean.bmp");
+  image->Write("/Clean.bmp");
   
   //delete images
   delete rawImage;
@@ -299,6 +303,5 @@ TargetIdType TorTargetAcquire::GetType() {
 bool TorTargetAcquire::isTarget() {
   
       return m_target->isValid;
-  
 }
 

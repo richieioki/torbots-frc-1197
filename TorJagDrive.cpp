@@ -6,10 +6,10 @@ TorJagDrive::TorJagDrive(Jaguar& left1,Jaguar& left2, Jaguar& right1, Jaguar& ri
 {
   numOfJags = 4;
 }
+
 TorJagDrive::TorJagDrive(Jaguar& left, Jaguar& right) : m_left1(left), m_left2 (left), m_right1(right), m_right2(right)
 {
-  numOfJags = 2;
-  
+  numOfJags = 2;  
 }
 
 void TorJagDrive::SetDrive(float leftSpeed, float rightSpeed)
@@ -49,3 +49,4 @@ void TorJagDrive::SetRight(float speed)
   //m_right1.Set(speed);
   //m_right2.Set(speed);
 }
+

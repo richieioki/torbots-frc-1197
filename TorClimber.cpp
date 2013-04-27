@@ -23,6 +23,8 @@ TorClimber::TorClimber(Joystick& theJoystick, TorbotDrive& drive, TorShooter& to
   // set speeds here. one motor is inverted from the other. this ensures we maintain this inverted relationship
   motorSpeed = 0.5;
   postInitSpeed = 1.0;
+  
+  timer = new Timer();
 }
 
 
@@ -71,6 +73,10 @@ bool TorClimber::ManageState() {
     liftHands(motorSpeed);
     while (!checkLimits(2)){                                            // move until intitial position limit switch is hit
         Wait(0.01);
+        if (!m_joystick.GetRawButton(Consts::CLIMB_BUTTON))
+          {
+            break;
+          }
         if(checkLimits(1)) {
             break;
         }
@@ -84,11 +90,16 @@ bool TorClimber::ManageState() {
 
     // grab bar with hands and pull down the feet up to the same bar
   case Pull:
+    
     mds.Printf(DriverStationLCD::kUser_Line4, 1, "State = Pull");
           mds.UpdateLCD();
     pullHands();
     while(!checkLimits(0)) {				// Feet are in the up position, pull hands down (if bottom limit is hit, stop)
         Wait(0.01);
+        if (!m_joystick.GetRawButton(Consts::CLIMB_BUTTON))
+          {
+            break;
+          }
     }
 //    while(checkLimits(0)) {				// Feet have made contact with the bar (down position), wait for feet to clear bar (if bottom limit is hit, stop)
 //        Wait(0.01);
@@ -107,6 +118,10 @@ bool TorClimber::ManageState() {
     liftHands(postInitSpeed);
     while(!checkLimits(1)) {                               // Hands are in the up position, lift hands (if top limit is hit, stop)
         Wait(0.01);
+        if (!m_joystick.GetRawButton(Consts::CLIMB_BUTTON))
+          {
+            break;
+          }
     }
     liftJag1->Set(0.0);
     liftJag2->Set(0.0);
@@ -160,7 +175,9 @@ bool TorClimber::checkLimits(int limitType) {
     return (topForkLift->Get() == 0);						// 1 = top limit
   else if (limitType == 2)
     return (initPosSwitch->Get() == 0);						// 2 = intitial position limit
-  else	
+  else	if(m_joystick.GetRawButton(Consts::CLIMB_BUTTON)) 
+    return true;
+  else
     return false;
 }
 
@@ -201,13 +218,37 @@ void TorClimber::liftHands(float speed) {
   liftJag2->Set(-speed);
 }
 
-void TorClimber::pullHands() {
-  liftJag1->Set(-postInitSpeed);
-  liftJag2->Set(postInitSpeed);
+void TorClimber::pullHands(bool override) {
+  if (!override)
+    {
+      liftJag1->Set(-postInitSpeed);
+      liftJag2->Set(postInitSpeed);
+    }
+  else //manually pull them down
+    {
+      liftJag1->Set(-0.25);
+      liftJag2->Set(0.25);
+    }
 }
 
 void TorClimber::shootIntoGoal() {
   //TODO write logic to shoot discs once at top
 
   Abort(); //execute abort method to keep the robot at the top.
+}
+
+void TorClimber::reset() {
+  level = 0;
+  pullHands();
+  
+  timer->Stop();
+  timer->Reset();
+  timer->Start();
+  while(!checkLimits(0) && timer->Get() < 3.0) {
+      Wait(0.1);
+  }
+  liftJag1->Set(-0.0);
+  liftJag2->Set(0.0);
+  timer->Stop();
+  timer->Reset();  
 }

@@ -28,22 +28,23 @@ namespace Consts
   const double SHOOTER_ARM_LOADING = 230.0;//332.0;
   const double SHOOTER_ARM_STRAIGHT = 430.0;
   const double SHOOTER_ARM_TARGETING = 570.0;
-  const double SHOOTER_ARM_CLIMBING = 700.0; // 850 really, but use 700 so se don't go over the top in debug
+  const double SHOOTER_ARM_CLIMBING = 890.0; // 850 really, but use 700 so se don't go over the top in debug
     
   
   const double CAM_TO_POT = 2.1587;//2.778;      // 1000 pot pts/360 degrees constant
   const float stickDeadZone = 0.2;      //if the joystick's value is less than this, it will be considered 0
-  const double ARM_THETA_OFFSET = 13.0; //degrees; shooter will convert to degrees to POT value
-  const double DRIVE_THETA_OFFSET = 5.0; // degrees; px * Cam_fov in degrees/320 px
+  const double ARM_THETA_OFFSET = 5.0; //px; shooter will convert to degrees to POT value
+  const double DRIVE_THETA_OFFSET = 10.0; // degrees; px * Cam_fov in degrees/320 px
   
   //Encoder distance variables
   const float wheelCircumference = 4.0*3.1416; //(inches)
 // protobot
-  const float wheelGearRatio_High = 1.0/11.7;
-  const float wheelGearRatio_Low = 1.0/26.7;
+//  const float wheelGearRatio_High = 1.0/11.7;
+//  const float wheelGearRatio_Low = 1.0/26.7;
+
   // live bot
-//  const float wheelGearRatio_High = 1.0/9.0;
-//  const float wheelGearRatio_Low = 1.0/21.0;
+    const float wheelGearRatio_High = 1.0/9.0;
+    const float wheelGearRatio_Low = 1.0/21.0;
 
   const float encoderTicks = 360.0; //tick count on the encoder
 
@@ -59,6 +60,8 @@ namespace Consts
   const int PICKUP_BUTTON = 3;
   const int CLIMB_BUTTON = 11;
   const int MANUAL_TRIGGER_BUTTON = 1;          // joystick 2 trigger
+  const int FORKLIFT_PULL_BUTTON = 11;
+  const int FORKLIFT_LIFT_BUTTON = 10;
   
   // WIRING CHANNELS
   //Solenoids
@@ -70,7 +73,7 @@ namespace Consts
   //Analog Channels
   // POTs
   const int SHOOTER_ARM_POT = 5; // old LPOT=4
-//  const int SHOOTER_ARM_RPOT = 5;
+  //  const int SHOOTER_ARM_RPOT = 5;
   const int SHOOTER_ARM_POT_MOD = 1;    // MODULE
   const int FEEDER_POT_MOD = 1;     //Made by Alex
   const int FEEDER_POT = 3;
@@ -78,9 +81,9 @@ namespace Consts
   const int FEEDER_POT_MAX = 1024;
   
   // JAGs
-  const int LEFT1_DRIVE_JAG = 1;
+  const int LEFT1_DRIVE_JAG = 4; //1; 1= proto
   const int LEFT2_DRIVE_JAG = 2;
-  const int RIGHT1_DRIVE_JAG = 3;
+  const int RIGHT1_DRIVE_JAG = 3; //3; 3= proto
   const int RIGHT2_DRIVE_JAG = 4;
 
   const int LEFT1_DRIVE_JAG_MOD = 1;
@@ -169,8 +172,8 @@ namespace Consts
   const int FEEDER_DISK_ORIENT_MOD = 1;
   const int FEEDER_DISK_ORIENT = 11;
 
-  const int MAG_TOP_SWITCH_MOD = 1;
-  const int MAG_TOP_SWITCH = 11;
+//  const int MAG_TOP_SWITCH_MOD = 1;
+//  const int MAG_TOP_SWITCH = 11;
   
 //Edge profile constants used for hollowness score calculation
 //#define XMAXSIZE 24

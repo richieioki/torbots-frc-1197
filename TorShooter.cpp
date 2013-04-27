@@ -120,7 +120,7 @@ void TorShooter::ManageState()
     // target was found and Shooter Arm is moving to target; wait until it reaches its setpoint, then change state
   case Moving:
 
-    ds.Printf(DriverStationLCD::kUser_Line4, 1, "Pot=%d sPt=%5.3f", m_shooterArmPOT.GetAverageValue(),ShooterArmSetPoint);
+//    ds.Printf(DriverStationLCD::kUser_Line4, 1, "Pot=%d sPt=%5.3f", m_shooterArmPOT.GetAverageValue(),ShooterArmSetPoint);
     ds.UpdateLCD();
 
     if ((abs(m_shooterArmPOT.GetAverageValue()) >= (int)(fabs(ShooterArmSetPoint)*0.99)) && (abs(m_shooterArmPOT.GetAverageValue()) <= (int)(fabs(ShooterArmSetPoint)*1.01)) ) 
@@ -243,14 +243,26 @@ bool TorShooter::Target()
       // calc offsets based on distance range
       //yOffSet = myTorTarget->GetDistance() * Consts::ARM_THETA_OFFSET * Consts::CAM_TO_POT;
       if ((int)myTorTarget->GetDistance() == 1)
-        yOffSet = 5.5 * Consts::CAM_TO_POT;            // in closest range, cut y offset in half to aim a bit lower
+        {
+          yOffSet = 5.0 * Consts::CAM_TO_POT;            // in closest range, cut y offset in half to aim a bit lower
+          xOffSet = Consts::DRIVE_THETA_OFFSET*0.5;
+        }
       else if((int)myTorTarget->GetDistance() == 2)
-        yOffSet = Consts::ARM_THETA_OFFSET * Consts::CAM_TO_POT;
-      else
-        yOffSet = Consts::ARM_THETA_OFFSET*1.5 * Consts::CAM_TO_POT;
-              
-      xOffSet = Consts::DRIVE_THETA_OFFSET;
-  
+        {
+          yOffSet = Consts::ARM_THETA_OFFSET * Consts::CAM_TO_POT;
+          xOffSet = Consts::DRIVE_THETA_OFFSET;
+        }
+      else if((int)myTorTarget->GetDistance() == 3)
+        {
+          yOffSet = Consts::ARM_THETA_OFFSET*1.5 * Consts::CAM_TO_POT;
+          xOffSet = Consts::DRIVE_THETA_OFFSET*1.5;
+        }
+      else      // assume it must be the pyramid so use the same offsets as the middle shot
+        {
+          yOffSet = Consts::ARM_THETA_OFFSET * Consts::CAM_TO_POT;
+          xOffSet = Consts::DRIVE_THETA_OFFSET;
+        }
+
       //ShooterTurnSetPoint = m_drive.TurnToTheta(0.25, myTorTarget->GetXTheta(), false);   // turn 25% power, to XTheta angle, do not wait
       ShooterTurnSetPoint = myTorTarget->GetXTheta() - xOffSet; // subtract xOffSet to compensate for camera position off to left side of shooter
       ShooterArmYTheta = m_shooterArmPOT.GetAverageValue() - (Consts::CAM_TO_POT*myTorTarget->GetYTheta()) + yOffSet;     // subtract from current position and add offset to compensate for camera position
@@ -353,32 +365,18 @@ double TorShooter::GetArmPosition()
 }
 
 
-// Move the shooter arm a certain number of degrees (theta)
-// typically used for targeting
-// takes the YTheta value from the target object
-//void TorShooter::MoveArm(double theta)
-//{
-//  double CamToPotConversion = 2.778;    // 360 degrees / 1000 pot pts constant
-//  ShooterArmSetPoint = (double)m_shooterArmPOT.GetAverageValue() - (CamToPotConversion*theta);     // subtract from current position; to move up is negative theta
-//
-//  if (state != TorShooter::Moving)
-//      state = TorShooter::Moving;
-//          
-//} // end Move
-
-
 
 bool TorShooter::isMotorReady()
 {
   bool isReady = false;
-  double maxSpeed = 80.0;
+  double maxSpeed = 85.0;
   
   // check speedcontroller speeds to see if they are up to the proper speeds
   // timer and counter are reset in the Start() method
   if (timer->Get() > 0.1)                       // don't check until 0.1 seconds have gone by since the reset
     {
       speed = shooterCounter1->GetSpeed(timer->Get());
-      if (speed >= (0.97*maxSpeed))
+      if (speed >= (0.98*maxSpeed))
         {
           // speed in range, set flag and return
           isReady = true;
@@ -387,39 +385,22 @@ bool TorShooter::isMotorReady()
       timer->Reset();
       shooterCounter1->Reset();
 
-      ds.Printf(DriverStationLCD::kUser_Line1, 1,"speed = %5.1f %d", speed, (int)(speed/maxSpeed));
+      ds.Printf(DriverStationLCD::kUser_Line1, 1,"speed = %5.1f %d pct", speed, (int)(speed/maxSpeed));
       ds.UpdateLCD();
 
-    } // if min time elapsed
-
-  
-  // test code
-//  timer->Start();
-//  frontShootMotor->Set(-0.9);
-//  rearShootMotor->Set(-0.9);
-
-//  timer->Reset();
-//  shooterCounter1->Reset();
-//  
-//  Wait(0.1);
-//  speed = shooterCounter1->GetSpeed(timer->Get());
-
-  
-
+    } // end if min time elapsed
 
   return (isReady);
 
 }
+
 
 // returns true if shooter is ready to shoot
 // feeder must have a disk in the ready position
 // and shooter motor must be up to speed
 bool TorShooter::isReadyToShoot()
 {
-
   // ask feeder if it is ready; pass true, telling feeder to get ready by moving existing disks to the ready position
-  // check if motor is up to speed
-  // when both are true, we're ready to shoot
 
   //ds.Printf(DriverStationLCD::kUser_Line5, 1, "%d xPt:%3.2f yPt:%3.2", (int)myTorTarget->GetDistance(), ShooterTurnSetPoint, ShooterArmSetPoint );
   return (m_feeder.isReadyToShoot(manualTriggerButton));         // && this->isMotorReady());
@@ -436,9 +417,9 @@ TorShooter::shooterState TorShooter::GetState()
 
 double TorShooter::GetArmSetPoint()
 {
-    
-  return ShooterArmSetPoint;
+      return ShooterArmSetPoint;
 }
+
 
 double TorShooter::GetTurnSetPoint()
 {
