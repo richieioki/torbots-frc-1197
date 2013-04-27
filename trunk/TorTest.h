@@ -6,7 +6,7 @@
 class TorTest {
 	
 public:
-	TorTest(DriverStationLCD *dsIn, TorJagDrive *JagDriveIn);
+	TorTest(Joystick& theStick, DriverStationLCD *dsIn, TorJagDrive *JagDriveIn);
 	void testDrive();
 	void testCompressor();
 	void testFire();
@@ -28,6 +28,7 @@ private:
 	DriverStation *driverStation;
 	TorJagDrive *myJagDrive;
 	Timer *timer;
+	Joystick& stick;
 	float timeStart;
 
 };

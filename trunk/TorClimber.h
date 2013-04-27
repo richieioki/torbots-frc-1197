@@ -13,9 +13,10 @@ public:
 	bool ManageState(); //executes a while look that references the state machine
 	bool checkLimits(int limit); //checks if we have hit a limit switch triggering an abort
 	void Abort(); //stops all motors and puts the robot in an infinite loop
-	void pullHands(); //Pulls the hands down
+	void pullHands(bool override = false); //Pulls the hands down
 	void liftHands(float speed); //Lift the hands up
 	void pullDown();
+	void reset();
 
 private:
 
@@ -24,8 +25,6 @@ private:
 	enum State {
 		Init, Pull, Lift, Shoot, Stop
 	};
-	
-	
 	
 	void shootIntoGoal();
 	

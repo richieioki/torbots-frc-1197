@@ -1,12 +1,12 @@
 #include "TorFeeder.h"
 
-TorFeeder::TorFeeder(DriverStationLCD& theDS) : ds(theDS)
+TorFeeder::TorFeeder(DriverStationLCD& theDS, DriverStation& theDSOut) : ds(theDS), dsOut(theDSOut)
 {
   diskSensor = new DigitalInput(Consts::FEEDER_DISK_SENSOR_MOD, Consts::FEEDER_DISK_SENSOR);		// break beam sensor in the bottom slot where the disk is loaded from the picker
   diskOrientionSensor = new DigitalInput(Consts::FEEDER_DISK_ORIENT_MOD, Consts::FEEDER_DISK_ORIENT);	// limit switch in feeder to determine if disk is upside down
   elevator = new Jaguar(Consts::FEEDER_ELEVATOR_MOD, Consts::FEEDER_ELEVATOR_JAG);                      // motor to move feeder
   elevatorPOT = new AnalogChannel(Consts::FEEDER_POT_MOD, Consts::FEEDER_POT);			        // POT to keep track of the feeder position
-  feederReadySensor = new DigitalInput(Consts::FEEDER_READY_SENSOR_MOD, Consts::FEEDER_READY_SENSOR);
+  feederReadySensor = new DigitalInput(Consts::FEEDER_READY_SENSOR_MOD, Consts::FEEDER_READY_SENSOR);   //top of feeder sensor
 
   
   // init feeder array
@@ -15,12 +15,22 @@ TorFeeder::TorFeeder(DriverStationLCD& theDS) : ds(theDS)
       feederDisks[i] = false;
       diskOrientation[i] = true;
     }
+  updateDisks();
   NumDisks = 0;
   readyToFire = false;
 
   timer = new Timer();
 }  //Constructor
 
+
+// update the digital outputs on the driver station to reflect the disk positions
+void TorFeeder::updateDisks()
+{  
+  for (int slot = 1; slot<=4; slot++)
+    {
+      dsOut.SetDigitalOut(slot+4, getFeeder(slot));
+    }
+}
 
 
 // called by Picker object to check if there is room to load another disk
@@ -40,10 +50,24 @@ void TorFeeder::resetDisks()
         feederDisks[i] = false;
         diskOrientation[i] = true;
       }
+  updateDisks();
   NumDisks = 0;
   resetFeederToLoad();
 }
 
+
+bool TorFeeder::getFeeder(int position)
+{
+  if (position <= 4 && position > 0)
+    {
+      return feederDisks[position-1];
+    }
+  else
+    {
+      return false;
+    }
+  
+}
 
 
 
@@ -80,7 +104,7 @@ bool TorFeeder::checkDiskLoader ()
       NumDisks++;
       feederDisks[3] = true;
       diskOrientation[3] = diskOrientionSensor->Get() == 0;     // if sensor==0, orientation is true/right-side up
-
+      updateDisks();
       return true;
     }
   else
@@ -180,13 +204,12 @@ void TorFeeder::Raise1 ()
     }
   feederDisks[3] = false;									// bottom slot is empty now that we moved everything up
   diskOrientation[3] = true;								// default to true=right side up
-
 }
 
 
 void TorFeeder::resetFeederToLoad()
 {
-  int TargetPOT = 810;
+  int TargetPOT = 517;
   int margin = 5;
 
   timer->Stop();
@@ -234,6 +257,8 @@ void TorFeeder::ShotDisk() {
   else
     resetFeederToLoad();
 
+  updateDisks();
+    
 }
 
 // called from autonomous main to initialize the feed data structures with the appropriate number of disks
@@ -246,9 +271,11 @@ void TorFeeder::InitalizeAuto(int numberDisks)
       diskOrientation[i] = true;							// default to true=right side up
     }
   NumDisks = numberDisks;
-
+  updateDisks();
   readyToFire = true;
 }
+
+
 int TorFeeder::getFeederSensor()
 {
   return feederReadySensor->Get();
