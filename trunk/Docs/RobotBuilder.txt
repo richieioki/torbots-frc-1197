@@ -1,0 +1,8 @@
+Robot Builder comes with the WPI library and Windriver software. It should be installed on our programming laptop already. Here are some resources to learn more about it:
+
+Brad Miller's Youtube channel from WPI, RobotBuilder Tutorials:
+http://www.youtube.com/channel/UC9E9uWt4GHEQnDijlTYN5Sw
+
+WPI's ScreenStepsLive page for RobotBuilder
+http://wpilib.screenstepslive.com/s/3120/m/7882
+
