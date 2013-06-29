@@ -24,7 +24,7 @@ public:
 	void updateDisks();
 	//what are the states that the feeder has?
 	void GetState ();
-	
+		
 private:
 
 	//disc information
