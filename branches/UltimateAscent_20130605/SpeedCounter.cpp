@@ -10,6 +10,7 @@ SpeedCounter::SpeedCounter(UINT32 channel) : Counter(channel)
 //destructor
 SpeedCounter::~SpeedCounter()
 {
+
 	
 }
 
