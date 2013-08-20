@@ -11,6 +11,7 @@ SpeedCounter::SpeedCounter(UINT32 channel) : Counter(channel)
 SpeedCounter::~SpeedCounter()
 {
 	
+
 }
 
 //from PIDSource
