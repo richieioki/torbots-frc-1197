@@ -1,5 +1,8 @@
 #include "WPILib.h"
 #include "Autonomous.h"
+#include "TorbotDrive.h"
+#include "TorJagDrive.h"
+#include "Consts.h"
 
 /**
  * This is a demo program showing the use of the RobotBase class.
@@ -11,7 +14,16 @@ class RobotDemo : public SimpleRobot
 {
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
-	Autonomous *autonomous; //Needs to be initialized.
+	TorbotDrive *myTorbotDrive;
+	TorJagDrive *myJagDrive;
+	Encoder *wheelEncoderLeft;
+	Encoder *wheelEncoderRight;
+	Jaguar *leftDriveJag;
+	Jaguar *rightDriveJag;
+	Gyro *gyro;
+	Solenoid *hangSolenoid;
+	Compressor *compressor;
+	//Autonomous *autonomous; //Needs to be initialized.
 
 public:
 	RobotDemo():
@@ -19,6 +31,17 @@ public:
 		stick(1)		// as they are declared above.
 	{
 		myRobot.SetExpiration(0.1);
+		compressor = new Compressor(1, 1); //change ports for actual bot
+		compressor->Start();
+		hangSolenoid = new Solenoid (Consts::PICKUP_ARM_SOLENOID);
+		leftDriveJag = new Jaguar(1, 4);
+		rightDriveJag = new Jaguar(1, 3);
+		wheelEncoderLeft = new Encoder(2, 5, 2, 6); //a channel, b channel
+		wheelEncoderRight = new Encoder(1, 3, 1, 4); //a channel, b channel
+		gyro = new Gyro(1, 1);
+		gyro->Reset();
+		myJagDrive = new TorJagDrive(*leftDriveJag, *rightDriveJag);
+		myTorbotDrive = new TorbotDrive(stick, *myJagDrive, *gyro, *wheelEncoderRight);
 		
 		//intialize varibles
 	}
@@ -28,7 +51,7 @@ public:
 	 */
 	void Autonomous()
 	{
-	  autonomous->runAutonomous();
+	  //autonomous->runAutonomous();
 	}
 
 	/**
@@ -39,10 +62,27 @@ public:
 	  /*
 	   * Order of while loop
 	   * 1: check if states should have changed
-	   * 2: evaluate inputs
+	   * 2: evaluate and execute inputs
 	   * 3: execute states
 	   */
-	  
+	  myTorbotDrive->resetEncoder();
+	  gyro->Reset();
+	  compressor->Start();
+	  bool shiftToggle = false;
+	  while (IsOperatorControl() && IsEnabled())
+	    {
+	      myTorbotDrive->ArcadeDrive(true);
+	      if (stick.GetRawButton(3))
+	        {
+	          shiftToggle = true;
+	        }
+	      else if (stick.GetRawButton(5))
+	        {
+	          shiftToggle = false;
+	        }
+	      myTorbotDrive->shiftGear(shiftToggle);
+	      
+	    }
 	  
 	}
 	
