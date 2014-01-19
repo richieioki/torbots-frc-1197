@@ -120,12 +120,16 @@ public:
 		int verticalTargets[MAX_PARTICLES];
 		int horizontalTargets[MAX_PARTICLES];
 		int verticalTargetCount, horizontalTargetCount;
-		Threshold threshold(105, 137, 230, 255, 133, 183);      //HSV threshold criteria, ranges are in that order ie. Hue is 60-100
+		Threshold threshold (60, 150, 90, 255, 20, 255); //ORIGINAL VALS(105, 137, 230, 255, 133, 183);      //HSV threshold criteria, ranges are in that order ie. Hue is 60-100
+		Threshold testThreshold (0, 359, 0, 255, 0, 255);
 		ParticleFilterCriteria2 criteria[] = {
 		    {IMAQ_MT_AREA, AREA_MINIMUM, 65535, false, false}
 		};      	
 		
 		AxisCamera &camera = AxisCamera::GetInstance();
+		camera.WriteResolution(AxisCamera::kResolution_320x240);
+		camera.WriteBrightness(50);
+		camera.WriteCompression(20);
 		ColorImage *image;
 		//image = new RGBImage("/testImage.jpg");         // get the sample image from the cRIO flash
 
@@ -135,23 +139,42 @@ public:
 		while(IsOperatorControl() && IsEnabled()) {
 		    
 		    image = camera.GetImage();                            //To get the images from the camera comment the line above and uncomment this one
-		    //image->Write("/raw.bmp");
+		    image->Write("/raw.bmp");
 
-		    BinaryImage *thresholdImage = image->ThresholdHSV(threshold);   // get just the green target pixels
+		    BinaryImage *thresholdImage = image->ThresholdRGB(threshold);   // get just the green target pixels
 		    thresholdImage->Write("/threshold.bmp");        
 		    //test image
 		    //BinaryImage *rawImage = image->ThresholdRGB(0,255,0,255,0,255);
 		    //rawImage->Write("/raw.bmp");
-		    ds->Printf(DriverStationLCD::kUser_Line2, 2, "Image Printed");
+		    BinaryImage *filledImage = thresholdImage->ConvexHull(false); //fill in particles
+		    filledImage->Write("/filled.bmp");
+		    
+		    ds->Printf(DriverStationLCD::kUser_Line2, 2, "Image 1 Printed");
 		    ds->UpdateLCD();
 		    BinaryImage *filteredImage = thresholdImage->ParticleFilter(criteria, 1);       //Remove small particles
 		    filteredImage->Write("/Filtered.bmp");
-		    
+		    ds->Printf(DriverStationLCD::kUser_Line3, 2, "Image 2 Printed");
+		    ds->UpdateLCD();
 		    
 		    delete filteredImage;
 		    delete thresholdImage;
 		    delete image;
-		                            
+		    ds->Printf(DriverStationLCD::kUser_Line4, 2, "Image Deleted");
+		    ds->UpdateLCD();
+		    
+		    if (stick.GetY() > 0 && fabs(stick.GetY()) > 0.05)
+		      {
+		        jag3->Set(-0.3);
+		      }
+		    else if (stick.GetY() < 0 && fabs(stick.GetY()) > 0.05)
+		      {
+		        jag3->Set(0.3);
+		      }
+		    else
+		      {
+		        jag3->Set(0.0);
+		      }
+		                           
 		}
 	}	
 				
