@@ -3,7 +3,6 @@
 #include "Consts.h"
 #include "WPILib.h"
 #include "TorJagDrive.h"
-#include "DrivePIDOutput.h"
 #include "Math.h"
 
 class TorbotDrive
@@ -29,6 +28,7 @@ private:
   TorJagDrive& m_jagDrive;
   Gyro& m_gyro;
   float m_speed;
+  bool isLowGear;
 //  PIDController *drivePID;
 //  PIDController *turnPID;
   Encoder& m_encoder;

@@ -8,6 +8,8 @@ TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive, Gyr
   m_encoder.Start();
   
   shiftSolenoid = new Solenoid(Consts::SHIFT_SOLENOID);
+
+  isLowGear = false;
 }
 
 void TorbotDrive::ArcadeDrive(bool squaredInputs)
@@ -15,7 +17,7 @@ void TorbotDrive::ArcadeDrive(bool squaredInputs)
 //  m_encoder.Reset();
   float stickX = 0.0;
   float stickY = 0.0;
-  bool shiftButton = false; //Button 2
+  //bool shiftButton = false; //Button 2
 
   float leftMotorSpeed;
   float rightMotorSpeed;
@@ -23,7 +25,7 @@ void TorbotDrive::ArcadeDrive(bool squaredInputs)
 // get negative of the stick controls. forward on stick gives negative value  
   stickX = -m_joystick.GetX();
   stickY = -m_joystick.GetY();
-  shiftButton = m_joystick.GetRawButton(Consts::SHIFT_BUTTON);
+  //shiftButton = m_joystick.GetRawButton(Consts::SHIFT_BUTTON);
 
   // adjust joystick by dead zone
   if (fabs(stickX) <= Consts::stickDeadZone)
@@ -44,7 +46,7 @@ void TorbotDrive::ArcadeDrive(bool squaredInputs)
 
   
   // shift high/low drive gear
-  if (shiftButton)
+  if (isLowGear)
     {
       shiftSolenoid->Set(true);
     }
@@ -199,6 +201,7 @@ void TorbotDrive::resetEncoder() {
 void TorbotDrive::shiftGear(bool lowGearFlag)
 {
       shiftSolenoid->Set(lowGearFlag);  
+      isLowGear = lowGearFlag;
 }
 
 float TorbotDrive::getRawTicks() {
