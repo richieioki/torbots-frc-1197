@@ -14,17 +14,15 @@ public:
   enum shooterState {
     Init, Loading, Loaded, Running
   };
-  enum cageState {
-    Load, Drive, Pass, Shoot
-  };
   TorShooter(Joystick& myJoystick);
   void Fire();
   void Run();
   
   bool IsLoaded();
-  void MoveCage(cageState cg);
-  cageState GetCageState();
   shooterState GetShooterState();
+  void MoveLoaderDown(bool downFlag);
+  bool TorShooter::IsLoaderDown();
+  void MoveShooter(float speed);
   
   void SetJagSpeed(float speed);
   float GetJagSpeed();
@@ -33,8 +31,6 @@ public:
 
 private:
   void ManageState();
-  void MoveShooterDown(bool downFlag);
-  void MoveLoaderDown(bool downFlag);
   
   Joystick& m_stick;
   
@@ -47,12 +43,12 @@ private:
   bool shooterDown;
   
   shooterState state;
-  cageState cage;
   Jaguar *topWheelJag;
   Jaguar *topWheelJag1;
   Jaguar *bottomWheelJag;
   Jaguar *bottomWheelJag1;
   Jaguar *loaderBarJag;
+  Jaguar *cageJag;
   Solenoid *loadSolenoid;
   Solenoid *fireSolenoid;
 };

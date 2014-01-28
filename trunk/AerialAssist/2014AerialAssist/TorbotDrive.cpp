@@ -1,28 +1,34 @@
 #include "TorbotDrive.h"
 
 
-TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive, Gyro& gyro, Encoder& encoder) 
+/*TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive, Gyro& gyro, Encoder& encoder) 
 : m_joystick(theJoystick), m_jagDrive(theTorJagDrive), m_gyro(gyro), m_encoder(encoder)
 {
   m_encoder.Reset();
   m_encoder.Start();
   
-  shiftSolenoid = new Solenoid(Consts::SHIFT_SOLENOID);
+  //shiftSolenoid = new Solenoid(Consts::SHIFT_SOLENOID);
 
+  isLowGear = false;
+}*/
+
+TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive)
+: m_joystick(theJoystick), m_jagDrive(theTorJagDrive)
+{
   isLowGear = false;
 }
 
 void TorbotDrive::ArcadeDrive(bool squaredInputs)
 {
-//  m_encoder.Reset();
+  //  m_encoder.Reset();
   float stickX = 0.0;
   float stickY = 0.0;
   //bool shiftButton = false; //Button 2
 
   float leftMotorSpeed;
   float rightMotorSpeed;
-  
-// get negative of the stick controls. forward on stick gives negative value  
+
+  // get negative of the stick controls. forward on stick gives negative value  
   stickX = -m_joystick.GetX();
   stickY = -m_joystick.GetY();
   //shiftButton = m_joystick.GetRawButton(Consts::SHIFT_BUTTON);
@@ -44,16 +50,16 @@ void TorbotDrive::ArcadeDrive(bool squaredInputs)
   if (stickY < -1.0)
     stickY = -1.0;
 
-  
+
   // shift high/low drive gear
-  if (isLowGear)
-    {
-      shiftSolenoid->Set(true);
-    }
-  else
-    {
-      shiftSolenoid->Set(false);
-    }
+  //  if (isLowGear)
+  //    {
+  //      shiftSolenoid->Set(true);
+  //    }
+  //  else
+  //    {
+  //      shiftSolenoid->Set(false);
+  //    }
 
 
   // square the inputs to produce an exponential power curve
@@ -71,12 +77,12 @@ void TorbotDrive::ArcadeDrive(bool squaredInputs)
         stickY = -(stickY*stickY);
     }
 
-  
-  // old code
-//  leftMotorSpeed = -1*(stickY - stickX)/2;
-//  rightMotorSpeed = -1*(stickY + stickX)/2;
 
-  
+  // old code
+  //  leftMotorSpeed = -1*(stickY - stickX)/2;
+  //  rightMotorSpeed = -1*(stickY + stickX)/2;
+
+
   if (stickY > 0.0)
     {
       if (stickX > 0.0)
@@ -103,15 +109,12 @@ void TorbotDrive::ArcadeDrive(bool squaredInputs)
           rightMotorSpeed = -max(-stickY, -stickX);
         }
     }
-
   // set the motor speed
   m_jagDrive.SetDrive(leftMotorSpeed, rightMotorSpeed);
-
-
 } // end arcadeDrive
 
 
-void TorbotDrive::DriveToTheta(float theta, float motorSpeed, float distanceInches)
+/*void TorbotDrive::DriveToTheta(float theta, float motorSpeed, float distanceInches)
 {
   float angleError = 0.0;
   float angleTarget;
@@ -206,5 +209,5 @@ void TorbotDrive::shiftGear(bool lowGearFlag)
 
 float TorbotDrive::getRawTicks() {
   return (float)m_encoder.GetRaw();
-}
+}*/
 

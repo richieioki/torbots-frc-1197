@@ -21,7 +21,7 @@ class TorAutonomous {
   
   private:
     
-    void AutoMode1(); //just drive forward
+    void AutoMode1(); 
     void AutoMode2(); //target and fire, left.  Then drive forward
     void AutoMode3(); //target and fire right.  Then drive forward
     void AutoMode4(); //target and fire center.  Then drive forward
