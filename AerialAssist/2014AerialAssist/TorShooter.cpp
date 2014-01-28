@@ -9,25 +9,25 @@ TorShooter::TorShooter(Joystick& myJoystick)
   bottomWheelJag1 = new Jaguar(Consts::BOTTOM2_SHOOTER_JAG_MOD, Consts::BOTTOM2_SHOOTER_JAG);
   
   loaderBarJag = new Jaguar(Consts::LOADER_BAR_JAG_MOD, Consts::LOADER_BAR_JAG);
+  cageJag = new Jaguar(Consts::CAGE_JAG_MOD, Consts::CAGE_JAG);
   loadSolenoid = new Solenoid(Consts::LOAD_SOLENOID);
   fireSolenoid = new Solenoid(Consts::FIRE_SOLENOID);
 
   state = Init;
+  ManageState();
   runButton = false;
   fireButton = false;
   loadOverride = false;
   
-  loaderDown = false;
-  shooterDown = true;
-  cage = Pass;
+  MoveLoaderDown(false);
 }
 void TorShooter::Fire()
 {
   fireButton = m_stick.GetRawButton(Consts::FIRE_BUTTON);
-  if (state == Running && fireButton && (cage == Shoot || cage == Pass))
+  if (state == Running && fireButton)
     {
       fireSolenoid->Set(!Consts::SHOOTER_PISTON_EXTENDED); //retract pistons
-      Wait(0.3); //give the piston time to retract before extending
+      Wait(1.0); //give the piston time to retract before extending
       fireSolenoid->Set(Consts::SHOOTER_PISTON_EXTENDED); //extend pistons
       loadOverride = false;
       ManageState();
@@ -40,7 +40,7 @@ void TorShooter::Run()
   if ((state == Loaded || state == Running) && runButton)
     {
       SetJagSpeed(Consts::SHOOTER_FIRE_SPEED);
-      if (cage == Pass)
+      if (loaderDown && IsLoaded())
         {
           loaderBarJag->Set(Consts::LOADER_BAR_SPEED);
         }
@@ -49,9 +49,21 @@ void TorShooter::Run()
   else if ((state == Loading) && runButton)
     {
       SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
-      loaderBarJag->Set(Consts::LOADER_BAR_SPEED);
+      loaderBarJag->Set(-1 * Consts::LOADER_BAR_SPEED);
       loadSolenoid->Set(Consts::LOADER_PISTON_EXTENDED); // extend loader pistons
       ManageState();
+    }
+  else
+    {
+      SetJagSpeed(0.0);
+      if (IsLoaded())
+        {
+          state = Loaded;
+        }
+      else
+        {
+          state = Loading;
+        }
     }
 }
 bool TorShooter::IsLoaded()
@@ -65,58 +77,22 @@ bool TorShooter::IsLoaded()
   
   return isLoaded || loadOverride;
 }
-void TorShooter::MoveCage(cageState cg)
-{
-  if (cg == Load)
-    {
-      MoveShooterDown(true); 
-      MoveLoaderDown(true);
-    }
-  else if (cg == Drive)
-    {
-      MoveLoaderDown(false);
-    }
-  else if (cg == Pass)
-    {
-      MoveShooterDown(true);
-      MoveLoaderDown(true);
-    }
-  else if (cg == Shoot)
-    {
-      MoveShooterDown(false);
-      MoveLoaderDown(true);
-    }
-  cage = cg;
-}
-void TorShooter::MoveShooterDown(bool downFlag)
-{
-  if (downFlag && !shooterDown)
-    {
-      //move shooter down
-    }
-  else if (!downFlag && shooterDown)
-    {
-      //move shooter up
-    }
-}
 void TorShooter::MoveLoaderDown(bool downFlag)
 {
-  if (downFlag && !loaderDown)
-    {
-      loadSolenoid->Set(Consts::LOADER_PISTON_EXTENDED); //extend loader pistons
-    }
-  else if (!downFlag && loaderDown)
-    {
-      loadSolenoid->Set(!Consts::LOADER_PISTON_EXTENDED); //retract loader pistons
-    }
+  loaderDown = downFlag;
+  loadSolenoid->Set(!downFlag);
 }
-TorShooter::cageState TorShooter::GetCageState()
+void TorShooter::MoveShooter(float speed)
 {
-  return cage;
+  cageJag->Set(speed);
 }
 TorShooter::shooterState TorShooter::GetShooterState()
 {
   return state;
+}
+bool TorShooter::IsLoaderDown()
+{
+  return loaderDown;
 }
 void TorShooter::SetJagSpeed(float speed)
 {
@@ -124,6 +100,10 @@ void TorShooter::SetJagSpeed(float speed)
   topWheelJag1->Set(speed);
   bottomWheelJag->Set(speed);
   bottomWheelJag1->Set(speed);
+  if (speed == 0)
+    {
+      loaderBarJag->Set(speed);
+    }
   currentJagSpeed = speed;
 }
 float TorShooter::GetJagSpeed()
@@ -145,10 +125,6 @@ void TorShooter::ManageState()
       if (IsLoaded())
         {
           state = Loaded;
-          if (cage == Load || cage == Pass)
-            {
-              MoveCage(Shoot);
-            }
         }
       else
         {
@@ -158,9 +134,13 @@ void TorShooter::ManageState()
     }
   case Loading:
     {
-      if (IsLoaded() && !runButton)
+      if (IsLoaded())
         {
           state = Loaded;
+          while (!m_stick.GetRawButton(Consts::RUN_BUTTON))
+            {
+              Wait(0.1);
+            }
           SetJagSpeed(0.0);
         }
       break;
@@ -175,10 +155,10 @@ void TorShooter::ManageState()
     }
   case Running:
     {
+      runButton = m_stick.GetRawButton(Consts::RUN_BUTTON);
       if(!IsLoaded())
         {
           state = Loading;
-          MoveCage(Load);
         }
       else if (!runButton)
         {
