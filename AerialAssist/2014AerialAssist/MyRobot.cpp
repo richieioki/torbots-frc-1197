@@ -137,101 +137,29 @@ public:
     //    myTorbotDrive->resetEncoder();
     //    gyro->Reset();
     bool shiftToggle = false;
-    TorShooter::shooterState shooterState;
     while (IsOperatorControl() && IsEnabled())
       {
-        //        myTorbotDrive->ArcadeDrive(true);
-        //
-        //        if(stick.GetRawButton(1)) { //if trigger set motors to run fast
-        //            topWheelJag->Set(0.8);
-        //            topWheelJag1->Set(0.8); 
-        //            bottomWheelJag->Set(0.8); 
-        //            bottomWheelJag1->Set(0.8); 
-        //            pickupJag->Set(0.0);
-        //        } else if(stick.GetRawButton(2)) {
-        //            pickupJag->Set(-0.65);
-        //            topWheelJag->Set(-0.35);
-        //            topWheelJag1->Set(-0.35);
-        //            bottomWheelJag->Set(-0.35); 
-        //            bottomWheelJag1->Set(-0.35);
-        //        } else {
-        //            pickupJag->Set(0.0);
-        //            topWheelJag->Set(0.0);
-        //            topWheelJag1->Set(0.0); 
-        //            bottomWheelJag->Set(0.0); 
-        //            bottomWheelJag1->Set(0.0); 
-        //        }
-        //
-        //        if(stick.GetRawButton(11)) {
-        //            armJag->Set(0.45);
-        //        } else if(stick.GetRawButton(12)) {
-        //            armJag->Set(-0.45);
-        //        } else {
-        //            armJag->Set(-0.0);
-        //        }
-        //
-        //        if(stick.GetRawButton(3)) {
-        //            pickupBOOL = !pickupBOOL;
-        //        }        
-        //        if(stick.GetRawButton(4)) {
-        //            shootingBOOL = !shootingBOOL;
-        //        }        
-        //        pickupSOL->Set(pickupBOOL);
-        //        shootingSOL->Set(shootingBOOL);
-        //
-        //        if (stick.GetRawButton(5))
-        //          {
-        //            shiftToggle = true; //slow gear
-        //          }
-        //        else
-        //          {
-        //            shiftToggle = false; //fast gear
-        //          }
-        //        shiftSOL->Set(shiftToggle);
-        shooterState = myShooter->GetShooterState();
         ds->Clear();
-        switch (shooterState)
-        {
-        case TorShooter::Init:
+        if (myShooter->IsLoaded())
           {
-            ds->Printf(DriverStationLCD::kUser_Line1, 1, "Init   ");
-            break;
+            ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loaded");
           }
-        case TorShooter::Loading:
+        else
           {
             ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loading");
-            break;
           }
-        case TorShooter::Loaded:
-          {
-            ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loaded ");
-            break;
-          }
-        case TorShooter::Running:
-          {
-            ds->Printf(DriverStationLCD::kUser_Line1, 1, "Running");
-            break;
-          }
-        default:
-          {
-            //this code should never be reached
-            break;
-          }
-        }
+
         ds->UpdateLCD();
-        if (true)
+        myTorbotDrive->ArcadeDrive(true);
+        if (stick.GetRawButton(Consts::SHIFT_BUTTON))
           {
-            myTorbotDrive->ArcadeDrive(true);
-            if (stick.GetRawButton(Consts::SHIFT_BUTTON))
-              {
-                shiftToggle = true; //slow gear
-              }
-            else
-              {
-                shiftToggle = false; //fast gear
-              }
-            shiftSOL->Set(shiftToggle);
+            shiftToggle = true; //slow gear
           }
+        else
+          {
+            shiftToggle = false; //fast gear
+          }
+        shiftSOL->Set(shiftToggle);
 
         if (stick.GetRawButton(Consts::LOAD_BUTTON))
           {
@@ -241,8 +169,8 @@ public:
           {
             myShooter->MoveLoaderDown(false);
           }
-          
-        
+
+
         if (stick.GetRawButton(Consts::SHOOTER_UP_BUTTON))
           {
             myShooter->MoveShooter(0.65);
@@ -255,7 +183,7 @@ public:
           {
             myShooter->MoveShooter(0.0);
           }
-         
+
         myShooter->Run(); //runs shooter wheels, torshooter code will handle firing as well
 
 

@@ -9,7 +9,7 @@ namespace Consts
   const float stickDeadZone = 0.2;      //if the joystick's value is less than this, it will be considered 0
   
   //Shooter speed variables
-  const float SHOOTER_FIRE_SPEED = 0.8;
+  const float SHOOTER_FIRE_SPEED = 0.55; //55% is best with full battery against one point goal
   const float SHOOTER_LOAD_SPEED = -0.4;
   
   const float LOADER_BAR_SPEED = 1.0;

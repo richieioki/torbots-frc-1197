@@ -11,15 +11,11 @@
 
 class TorShooter {
 public:
-  enum shooterState {
-    Init, Loading, Loaded, Running
-  };
   TorShooter(Joystick& myJoystick);
   void Fire();
   void Run();
   
   bool IsLoaded();
-  shooterState GetShooterState();
   void MoveLoaderDown(bool downFlag);
   bool TorShooter::IsLoaderDown();
   void MoveShooter(float speed);
@@ -29,9 +25,7 @@ public:
   
   void ManualFire();
 
-private:
-  void ManageState();
-  
+private:  
   Joystick& m_stick;
   
   float currentJagSpeed;
@@ -42,7 +36,6 @@ private:
   bool loaderDown;
   bool shooterDown;
   
-  shooterState state;
   Jaguar *topWheelJag;
   Jaguar *topWheelJag1;
   Jaguar *bottomWheelJag;
