@@ -44,6 +44,7 @@ private:
   double scoreRectangularity(ParticleAnalysisReport *report);
   double ratioToScore(double ratio);
   bool hotOrNot(TargetReport target);
+  ColorImage* ImageAcquire();
   //void GetImage();
   
   
