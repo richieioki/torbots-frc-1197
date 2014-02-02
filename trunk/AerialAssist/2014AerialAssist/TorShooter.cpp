@@ -1,7 +1,7 @@
 #include "TorShooter.h"
 
-TorShooter::TorShooter(Joystick& myJoystick)
-: m_stick(myJoystick)
+TorShooter::TorShooter(Joystick& myJoystick1, Joystick& myJoystick2)
+: m_stick(myJoystick1), tartarus(myJoystick2)
 {
   topWheelJag = new Jaguar(Consts::TOP1_SHOOTER_JAG_MOD, Consts::TOP1_SHOOTER_JAG);
   topWheelJag1 = new Jaguar(Consts::TOP2_SHOOTER_JAG_MOD, Consts::TOP2_SHOOTER_JAG);
@@ -22,6 +22,7 @@ TorShooter::TorShooter(Joystick& myJoystick)
 void TorShooter::Fire()
 {
   fireButton = m_stick.GetRawButton(Consts::FIRE_BUTTON);
+  m_stick.GetThrottle();
   if (currentJagSpeed != 0.0 && IsLoaded() && fireButton)
     {
       fireSolenoid->Set(!Consts::SHOOTER_PISTON_EXTENDED); //retract pistons
@@ -36,7 +37,7 @@ void TorShooter::Run()
   fireButton = m_stick.GetRawButton(Consts::FIRE_BUTTON);
   if (IsLoaded() && runButton)
     {
-      SetJagSpeed(Consts::SHOOTER_FIRE_SPEED);
+      SetJagSpeed(ShooterSpeed());
       if (loaderDown && IsLoaded())
         {
           loaderBarJag->Set(Consts::LOADER_BAR_SPEED);
@@ -97,6 +98,11 @@ void TorShooter::SetJagSpeed(float speed)
 float TorShooter::GetJagSpeed()
 {
   return currentJagSpeed;
+}
+float TorShooter::ShooterSpeed()
+{
+  throttleValue = m_stick.GetTwist(); //1 is down, -1 is up
+  return (((1.0 - throttleValue) / 2.0) * (0.9 - Consts::BASE_SHOOTER_FIRE_SPEED)) + Consts::BASE_SHOOTER_FIRE_SPEED;
 }
 void TorShooter::ManualFire()
 {
