@@ -11,7 +11,7 @@
 
 class TorShooter {
 public:
-  TorShooter(Joystick& myJoystick);
+  TorShooter(Joystick& myJoystick1, Joystick& myJoystick2);
   void Fire();
   void Run();
   
@@ -23,10 +23,13 @@ public:
   void SetJagSpeed(float speed);
   float GetJagSpeed();
   
+  float ShooterSpeed();
+  
   void ManualFire();
 
 private:  
   Joystick& m_stick;
+  Joystick& tartarus;
   
   float currentJagSpeed;
   bool runButton;
@@ -35,6 +38,8 @@ private:
   
   bool loaderDown;
   bool shooterDown;
+  
+  float throttleValue;
   
   Jaguar *topWheelJag;
   Jaguar *topWheelJag1;

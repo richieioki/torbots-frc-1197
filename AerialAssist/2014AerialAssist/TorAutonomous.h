@@ -21,10 +21,10 @@ class TorAutonomous {
   
   private:
     
-    void AutoMode1(); 
-    void AutoMode2(); //target and fire, left.  Then drive forward
-    void AutoMode3(); //target and fire right.  Then drive forward
-    void AutoMode4(); //target and fire center.  Then drive forward
+    void AutoMode1(); //everything works
+    void AutoMode2(); //camera doesn't work
+    void AutoMode3(); 
+    void AutoMode4(); 
     
     TorShooter shooter;
     bool jagsRunning;
