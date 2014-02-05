@@ -12,6 +12,7 @@ public:
 //  TorbotDrive(Joystick& theJosytick, TorJagDrive& jagDrive, Gyro& gyro, Encoder& encoder);
   TorbotDrive(Joystick& theJosytick, TorJagDrive& jagDrive);
   void ArcadeDrive(bool squaredInputs);
+  void setShifters(bool shiftToggle);
 //  void DriveToTheta(float theta, float motorSpeed, float distanceInches);
 //  void DriveStraight(float motorSpeed, float distanceInches);
 //  float TurnToTheta (float motorSpeed, float destTheta, bool waitFinish);
