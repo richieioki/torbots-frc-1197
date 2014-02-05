@@ -44,7 +44,7 @@ class RobotDemo : public SimpleRobot
 
   Solenoid *pickupSOL;
   Solenoid *shootingSOL;
-  Solenoid *shiftSOL;
+  //Solenoid *shiftSOL;
 
   Gyro *gyro;
   Compressor *compressor;
@@ -54,8 +54,8 @@ class RobotDemo : public SimpleRobot
 public:
   RobotDemo():
     //myRobot(1, 2),	// these must be initialized in the same order
-    stick(1),		// as they are declared above.
-    tartarus(2)
+    stick(Consts::STICK_PORT),		// as they are declared above.
+    tartarus(Consts::TARTARUS_PORT)
   {
     ds = DriverStationLCD::GetInstance();
     compressor = new Compressor(Consts::PRESSURE_SWITCH_CHANNEL, Consts::COMPRESSOR_RELAY_CHANNEL);
@@ -74,7 +74,7 @@ public:
     myShooter = new TorShooter(stick, tartarus);
     myAutonomous = new TorAutonomous(*myShooter);
 
-    shiftSOL = new Solenoid(Consts::SHIFT_SOLENOID);
+    //shiftSOL = new Solenoid(Consts::SHIFT_SOLENOID);
   }
 
   /**
@@ -100,7 +100,7 @@ public:
      */
     //    myTorbotDrive->resetEncoder();
     //    gyro->Reset();
-    bool shiftToggle = false;
+    
     float shooterSpeed;
     while (IsOperatorControl() && IsEnabled())
       {
@@ -117,7 +117,8 @@ public:
         ds->Printf(DriverStationLCD::kUser_Line2, 1, "Shooter Speed: %f.0 \%", shooterSpeed * 100);
         ds->UpdateLCD();
         myTorbotDrive->ArcadeDrive(true);
-        if (stick.GetRawButton(Consts::SHIFT_BUTTON))
+        /*
+        if (tartarus.GetRawButton(Consts::SHIFT_BUTTON) || stick.GetRawButton(Consts::S_SHIFT_BUTTON))
           {
             shiftToggle = true; //slow gear
           }
@@ -125,25 +126,26 @@ public:
           {
             shiftToggle = false; //fast gear
           }
-        shiftSOL->Set(shiftToggle);
-
-        if (stick.GetRawButton(Consts::LOAD_BUTTON))
+        */
+        myTorbotDrive->setShifters((tartarus.GetRawButton(Consts::SHIFT_BUTTON) || stick.GetRawButton(Consts::S_SHIFT_BUTTON)));
+        
+        if (tartarus.GetRawButton(Consts::LOADER_DOWN_BUTTON) || stick.GetRawButton(Consts::S_LOADER_DOWN_BUTTON))
           {
-            myShooter->MoveLoaderDown(true);
+            myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
           }
-        else if (stick.GetRawButton(Consts::DRIVE_BUTTON))
+        else if (tartarus.GetRawButton(Consts::LOADER_UP_BUTTON) || stick.GetRawButton(Consts::S_LOADER_UP_BUTTON))
           {
-            myShooter->MoveLoaderDown(false);
+            myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED);
           }
 
 
-        if (stick.GetRawButton(Consts::SHOOTER_UP_BUTTON))
+        if (tartarus.GetRawButton(Consts::SHOOTER_UP_BUTTON) || stick.GetRawButton(Consts::S_SHOOTER_UP_BUTTON))
           {
-            myShooter->MoveShooter(0.65);
+            myShooter->MoveShooter(Consts::CAGE_MOVE_SPEED);
           }
-        else if (stick.GetRawButton(Consts::SHOOTER_DOWN_BUTTON) && myShooter->IsLoaderDown())
+        else if ((tartarus.GetRawButton(Consts::SHOOTER_DOWN_BUTTON) || stick.GetRawButton(Consts::S_SHOOTER_DOWN_BUTTON)) && myShooter->IsLoaderDown())
           {
-            myShooter->MoveShooter(-0.65);
+            myShooter->MoveShooter(-Consts::CAGE_MOVE_SPEED);
           }
         else
           {

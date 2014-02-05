@@ -63,7 +63,7 @@ bool TorShooter::IsLoaded()
 {
   //return true if ball is in cage
   bool isLoaded = false;
-  if (m_stick.GetRawButton(Consts::LOAD_OVERRIDE_BUTTON))
+  if (m_stick.GetRawButton(Consts::S_LOAD_OVERRIDE_BUTTON) || tartarus.GetRawButton(Consts::LOAD_OVERRIDE_BUTTON))
     {
       loadOverride = true;
     }

@@ -13,10 +13,11 @@ namespace Consts
   const float SHOOTER_LOAD_SPEED = -0.4;
   
   const float LOADER_BAR_SPEED = 1.0;
+  const float CAGE_MOVE_SPEED = 0.65; //positive is up
   
   //Shooter Booleans
   const bool SHOOTER_PISTON_EXTENDED = false; //needs to be changed for actual bot
-  const bool LOADER_PISTON_EXTENDED = false; //needs to be changed for actual bot
+  const bool LOADER_PISTON_EXTENDED = true; //needs to be changed for actual bot
   
   //Encoder distance variables
   const float wheelCircumference = 4.0*3.1416; //(inches)
@@ -30,12 +31,23 @@ namespace Consts
   const int STICK_PORT = 1;
   const int RUN_BUTTON = 1; //trigger
   const int FIRE_BUTTON = 2; //side thumb button
-  const int SHIFT_BUTTON = 3; //shift to slow gear if held down
-  const int LOAD_BUTTON = 8; //change state to load
-  const int DRIVE_BUTTON = 7; //change state to drive
-  const int LOAD_OVERRIDE_BUTTON = 4; //override checking cage to see if loaded
-  const int SHOOTER_UP_BUTTON = 11;
-  const int SHOOTER_DOWN_BUTTON = 12;
+  
+  const int S_SHIFT_BUTTON = 3; //shift to slow gear if held down
+  const int S_LOADER_DOWN_BUTTON = 8; //change state to load
+  const int S_LOADER_UP_BUTTON = 7; //change state to drive
+  const int S_LOAD_OVERRIDE_BUTTON = 4; //override checking cage to see if loaded
+  const int S_SHOOTER_UP_BUTTON = 11;
+  const int S_SHOOTER_DOWN_BUTTON = 12;
+  
+  
+  //TARTARUS BUTTONS
+  const int TARTARUS_PORT = 2;
+  const int SHIFT_BUTTON = 8;
+  const int LOAD_OVERRIDE_BUTTON = 13;
+  const int LOADER_DOWN_BUTTON = 14;
+  const int LOADER_UP_BUTTON = 9;
+  const int SHOOTER_DOWN_BUTTON = 15;
+  const int SHOOTER_UP_BUTTON = 10;
   
   // WIRING CHANNELS
   //Solenoids

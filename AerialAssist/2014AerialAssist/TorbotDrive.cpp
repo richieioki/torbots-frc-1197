@@ -16,6 +16,7 @@ TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive)
 : m_joystick(theJoystick), m_jagDrive(theTorJagDrive)
 {
   isLowGear = false;
+  shiftSolenoid = new Solenoid(Consts::SHIFT_SOLENOID);
 }
 
 void TorbotDrive::ArcadeDrive(bool squaredInputs)
@@ -113,6 +114,11 @@ void TorbotDrive::ArcadeDrive(bool squaredInputs)
   m_jagDrive.SetDrive(leftMotorSpeed, rightMotorSpeed);
 } // end arcadeDrive
 
+
+void TorbotDrive::setShifters(bool shiftToggle)
+{
+  shiftSolenoid->Set(shiftToggle);
+}
 
 /*void TorbotDrive::DriveToTheta(float theta, float motorSpeed, float distanceInches)
 {
