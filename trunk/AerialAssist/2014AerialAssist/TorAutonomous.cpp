@@ -1,7 +1,7 @@
 #include "TorAutonomous.h"
 
-TorAutonomous::TorAutonomous(TorShooter& myShooter)
-: shooter(myShooter)
+TorAutonomous::TorAutonomous(TorShooter& myShooter, TorbotDrive& myTorbotDrive)
+: shooter(myShooter), torbotDrive(myTorbotDrive)
 {
   jagsRunning = false;
 }
@@ -16,7 +16,7 @@ void TorAutonomous::AutoFire()
       shooter.ManualFire();
     }
 }
-void TorAutonomous::RunJags()
+void TorAutonomous::RunShooter()
 {
   shooter.MoveShooter(0.45);
   Wait(0.8); //replace once we have pot values
@@ -24,7 +24,7 @@ void TorAutonomous::RunJags()
   shooter.SetJagSpeed(shooter.ShooterSpeed());
   jagsRunning = true;
 }
-void TorAutonomous::StopJags()
+void TorAutonomous::StopShooter()
 {
   shooter.SetJagSpeed(0.0);
   jagsRunning = false;
@@ -35,7 +35,7 @@ void TorAutonomous::AutoMode1() //everything works
   time_t end;
   double timer; //number of seconds taken to travel
   time(&start); //start timer
-  RunJags();
+  RunShooter();
   //    myTorbotDrive->DriveStraight(0.6, 180.5f); //drive all the way to target
   time(&end);
   timer = difftime(end, start);
@@ -61,7 +61,8 @@ void TorAutonomous::AutoMode1() //everything works
 }
 void TorAutonomous::AutoMode2()
 {
-  RunJags();
-  //drive forward 180.5 inches to target
+  RunShooter();
+  //torbotDrive.DriveStraight(Consts::AUTO_DRIVE_SPEED, Consts:AUTO_DRIVE_DIST); //drive forward 180.5 inches to target
+  //TODO IMPLEMENT DRIVESTRAIGHT IN TORBOTDRIVE
   AutoFire();
 }

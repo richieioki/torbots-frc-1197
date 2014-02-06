@@ -72,7 +72,7 @@ public:
     myJagDrive = new TorJagDrive(*leftDriveJag, *rightDriveJag);
     myTorbotDrive = new TorbotDrive(stick, *myJagDrive); //, *gyro, *wheelEncoderRight);
     myShooter = new TorShooter(stick, tartarus);
-    myAutonomous = new TorAutonomous(*myShooter);
+    myAutonomous = new TorAutonomous(*myShooter, *myTorbotDrive);
 
     //shiftSOL = new Solenoid(Consts::SHIFT_SOLENOID);
   }
@@ -105,6 +105,11 @@ public:
     while (IsOperatorControl() && IsEnabled())
       {
         ds->Clear();
+        
+        /*********************************************************
+                                  DS INFO
+         *********************************************************/        
+        
         if (myShooter->IsLoaded())
           {
             ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loaded");
@@ -116,18 +121,21 @@ public:
         shooterSpeed = myShooter->ShooterSpeed();
         ds->Printf(DriverStationLCD::kUser_Line2, 1, "Shooter Speed: %f.0 \%", shooterSpeed * 100);
         ds->UpdateLCD();
+        
+        
+        /*********************************************************
+                                  DRIVING
+         *********************************************************/
         myTorbotDrive->ArcadeDrive(true);
-        /*
-        if (tartarus.GetRawButton(Consts::SHIFT_BUTTON) || stick.GetRawButton(Consts::S_SHIFT_BUTTON))
-          {
-            shiftToggle = true; //slow gear
-          }
-        else
-          {
-            shiftToggle = false; //fast gear
-          }
-        */
+        
+        /*********************************************************
+                                  SHIFTING
+         *********************************************************/
+        
         myTorbotDrive->setShifters((tartarus.GetRawButton(Consts::SHIFT_BUTTON) || stick.GetRawButton(Consts::S_SHIFT_BUTTON)));
+        
+        
+        
         
         if (tartarus.GetRawButton(Consts::LOADER_DOWN_BUTTON) || stick.GetRawButton(Consts::S_LOADER_DOWN_BUTTON))
           {
