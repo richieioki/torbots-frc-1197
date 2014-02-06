@@ -1,6 +1,7 @@
 #pragma once
 
 #include "TorShooter.h"
+#include "Consts.h"
 
 /*
  * Holds autonomous functions, also should have some sort of way to switch between autonomous function
@@ -11,13 +12,13 @@ class TorAutonomous {
   
   public:
     
-    TorAutonomous(TorShooter &shooter);
+    TorAutonomous(TorShooter& myShooter, TorbotDrive& myTorbotDrive);
     ~TorAutonomous();
     void runAutonomous();  //is called to run the various auto modes.  Function must access
     
     void AutoFire();
-    void RunJags();
-    void StopJags();
+    void RunShooter();
+    void StopShooter();
   
   private:
     
@@ -26,7 +27,8 @@ class TorAutonomous {
     void AutoMode3(); 
     void AutoMode4(); 
     
-    TorShooter shooter;
+    TorShooter& shooter;
+    TorbotDrive& torbotDrive; 
     bool jagsRunning;
     
 };

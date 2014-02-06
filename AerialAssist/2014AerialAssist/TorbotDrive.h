@@ -10,9 +10,10 @@ class TorbotDrive
 public:
 
 //  TorbotDrive(Joystick& theJosytick, TorJagDrive& jagDrive, Gyro& gyro, Encoder& encoder);
-  TorbotDrive(Joystick& theJosytick, TorJagDrive& jagDrive);
+  TorbotDrive(Joystick& theJoystick, TorJagDrive& jagDrive);
   void ArcadeDrive(bool squaredInputs);
   void setShifters(bool shiftToggle);
+  //TODO Make DriveStraight work
 //  void DriveToTheta(float theta, float motorSpeed, float distanceInches);
 //  void DriveStraight(float motorSpeed, float distanceInches);
 //  float TurnToTheta (float motorSpeed, float destTheta, bool waitFinish);

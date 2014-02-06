@@ -15,17 +15,25 @@ namespace Consts
   const float LOADER_BAR_SPEED = 1.0;
   const float CAGE_MOVE_SPEED = 0.65; //positive is up
   
+  
+  //Autonomous Variables
+  
+  const float AUTO_DRIVE_SPEED = 0.8;
+  const float AUTO_DRIVE_DIST = 180.5;
+  
   //Shooter Booleans
   const bool SHOOTER_PISTON_EXTENDED = false; //needs to be changed for actual bot
   const bool LOADER_PISTON_EXTENDED = true; //needs to be changed for actual bot
   
+ 
   //Encoder distance variables
   const float wheelCircumference = 4.0*3.1416; //(inches)
-
+  
   const float wheelGearRatio_High = 1.0/9.0;
   const float wheelGearRatio_Low = 1.0/21.0;
 
   const float encoderTicks = 360.0; //tick count on the encoder
+  
 
   //JOYSTICK BUTTONS
   const int STICK_PORT = 1;
