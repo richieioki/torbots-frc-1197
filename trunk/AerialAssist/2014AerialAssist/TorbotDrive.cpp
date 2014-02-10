@@ -1,27 +1,28 @@
 #include "TorbotDrive.h"
 
 
-/*TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive, Gyro& gyro, Encoder& encoder) 
+TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive, Gyro& gyro, Encoder& encoder) 
 : m_joystick(theJoystick), m_jagDrive(theTorJagDrive), m_gyro(gyro), m_encoder(encoder)
 {
   m_encoder.Reset();
   m_encoder.Start();
   
-  //shiftSolenoid = new Solenoid(Consts::SHIFT_SOLENOID);
+  shiftSolenoid = new Solenoid(Consts::SHIFT_SOLENOID);
 
   isLowGear = false;
-}*/
-
+}
+/*
 TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive)
 : m_joystick(theJoystick), m_jagDrive(theTorJagDrive)
 {
   isLowGear = false;
   shiftSolenoid = new Solenoid(Consts::SHIFT_SOLENOID);
 }
+*/
 
 void TorbotDrive::ArcadeDrive(bool squaredInputs)
 {
-  //  m_encoder.Reset();
+  m_encoder.Reset();
   float stickX = 0.0;
   float stickY = 0.0;
   //bool shiftButton = false; //Button 2
@@ -120,7 +121,7 @@ void TorbotDrive::setShifters(bool shiftToggle)
   shiftSolenoid->Set(shiftToggle);
 }
 
-/*void TorbotDrive::DriveToTheta(float theta, float motorSpeed, float distanceInches)
+void TorbotDrive::DriveToTheta(float theta, float motorSpeed, float distanceInches)
 {
   float angleError = 0.0;
   float angleTarget;
@@ -144,9 +145,9 @@ void TorbotDrive::setShifters(bool shiftToggle)
   timeCurr = timer->Get();
   
   // Arbitrary adjustment made from empirical data 9/15/13
-  float distanceAdjustment = (distanceInches / 8.0) + (motorSpeed - 0.1) * 12.5;
+  // float distanceAdjustment = (distanceInches / 8.0) + (motorSpeed - 0.1) * 12.5;
   
-  while (fabs(getDistance()) < (fabs(distanceInches) - distanceAdjustment) )
+  while (fabs(getDistance()) < fabs(distanceInches))
     {
       angleError = m_gyro.GetAngle()-angleTarget;       // error off of adjusted target heading
       motorAdjust = angleError/5.0; // percent of error range (5degrees) 
@@ -163,7 +164,7 @@ void TorbotDrive::setShifters(bool shiftToggle)
       Wait(0.05); // wait so we don't update continously. update 20 times per second
       
       // if this run takes more than 3 seconds, we probably ran into something. Stop and backup.
-      if ((timer->Get() - timeCurr) >= 3.0)                                                     // should not take more than 3 seconds
+      if ((timer->Get() - timeCurr) >= 10.0)                                                     // should not take more than 3 seconds
         {
           // stop, back up a bit and exit this loop
           m_jagDrive.SetDrive(0.0,0.0);                                                         // stop
@@ -215,5 +216,5 @@ void TorbotDrive::shiftGear(bool lowGearFlag)
 
 float TorbotDrive::getRawTicks() {
   return (float)m_encoder.GetRaw();
-}*/
+}
 

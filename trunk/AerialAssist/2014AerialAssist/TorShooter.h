@@ -19,6 +19,8 @@ public:
   void MoveLoaderDown(bool downFlag);
   bool TorShooter::IsLoaderDown();
   void MoveShooter(float speed);
+  void SetCagePos(bool raiseFlag);
+  void SetCagePos();
   
   void SetJagSpeed(float speed);
   float GetJagSpeed();
@@ -38,15 +40,17 @@ private:
   
   bool loaderDown;
   bool shooterDown;
+  bool isShooterInit;
   
   float throttleValue;
   
-  Jaguar *topWheelJag;
-  Jaguar *topWheelJag1;
-  Jaguar *bottomWheelJag;
-  Jaguar *bottomWheelJag1;
-  Jaguar *loaderBarJag;
-  Jaguar *cageJag;
+  Talon *topWheelJag;
+  Talon *topWheelJag1;
+  Talon *bottomWheelJag;
+  Talon *bottomWheelJag1;
+  Talon *loaderBarJag;
+  Talon *cageJag;
   Solenoid *loadSolenoid;
   Solenoid *fireSolenoid;
+  AnalogChannel *shooterArmPOT;
 };
