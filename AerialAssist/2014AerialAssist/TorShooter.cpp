@@ -1,22 +1,26 @@
 #include "TorShooter.h"
+#include <cmath>
 
 TorShooter::TorShooter(Joystick& myJoystick1, Joystick& myJoystick2)
 : m_stick(myJoystick1), tartarus(myJoystick2)
 {
-  topWheelJag = new Jaguar(Consts::TOP1_SHOOTER_JAG_MOD, Consts::TOP1_SHOOTER_JAG);
-  topWheelJag1 = new Jaguar(Consts::TOP2_SHOOTER_JAG_MOD, Consts::TOP2_SHOOTER_JAG);
-  bottomWheelJag = new Jaguar(Consts::BOTTOM1_SHOOTER_JAG_MOD, Consts::BOTTOM1_SHOOTER_JAG);
-  bottomWheelJag1 = new Jaguar(Consts::BOTTOM2_SHOOTER_JAG_MOD, Consts::BOTTOM2_SHOOTER_JAG);
-  
-  loaderBarJag = new Jaguar(Consts::LOADER_BAR_JAG_MOD, Consts::LOADER_BAR_JAG);
-  cageJag = new Jaguar(Consts::CAGE_JAG_MOD, Consts::CAGE_JAG);
+  topWheelJag = new Talon(Consts::TOP1_SHOOTER_JAG);
+  topWheelJag1 = new Talon(Consts::TOP2_SHOOTER_JAG);
+  bottomWheelJag = new Talon(Consts::BOTTOM1_SHOOTER_JAG);
+  bottomWheelJag1 = new Talon(Consts::BOTTOM2_SHOOTER_JAG);
+
+  loaderBarJag = new Talon(Consts::LOADER_BAR_JAG);
+  cageJag = new Talon(Consts::CAGE_JAG);
   loadSolenoid = new Solenoid(Consts::LOAD_SOLENOID);
   fireSolenoid = new Solenoid(Consts::FIRE_SOLENOID);
+
+  //shooterArmPOT = new AnalogChannel(Consts::SHOOTER_ARM_POT); //TODO: Uncomment this
 
   runButton = false;
   fireButton = false;
   loadOverride = false;
-  
+  isShooterInit = false;
+
   MoveLoaderDown(false);
 }
 void TorShooter::Fire()
@@ -42,7 +46,7 @@ void TorShooter::Run()
         {
           loaderBarJag->Set(Consts::LOADER_BAR_SPEED);
         }
-      
+
       if (fireButton)
         {
           Fire();
@@ -67,7 +71,11 @@ bool TorShooter::IsLoaded()
     {
       loadOverride = true;
     }
-  
+  else if (m_stick.GetRawButton(Consts::S_UNLOAD_OVERRIDE_BUTTON) || tartarus.GetRawButton(Consts::UNLOAD_OVERRIDE_BUTTON))
+    {
+      loadOverride = false;
+    }
+
   return isLoaded || loadOverride;
 }
 void TorShooter::MoveLoaderDown(bool downFlag)
@@ -79,6 +87,42 @@ void TorShooter::MoveShooter(float speed)
 {
   cageJag->Set(speed);
 }
+void TorShooter::SetCagePos(bool raiseFlag)
+{
+  shooterDown = !raiseFlag;
+  isShooterInit = true;
+}
+void TorShooter::SetCagePos()
+{
+  if (isShooterInit)//wont run unless shooterdown has been initialized
+    {
+      int goal;
+      if (!shooterDown)
+        {
+          goal = Consts::SHOOTER_ARM_UP;
+        }
+      else
+        {
+          goal = Consts::SHOOTER_ARM_DOWN;
+        }
+      if (shooterArmPOT->GetAverageValue() - goal < Consts::POT_THRESHOLD && shooterArmPOT->GetAverageValue() - goal > -Consts::POT_THRESHOLD)
+        {
+          MoveShooter(0);
+        }
+      else if (shooterArmPOT->GetAverageValue() > goal && shooterDown)
+        {
+          MoveShooter(-Consts::CAGE_MOVE_SPEED);
+        }
+      else if (shooterArmPOT->GetAverageValue() < goal && !shooterDown)
+        {
+          MoveShooter(Consts::CAGE_MOVE_SPEED);
+        }
+      else
+        {
+          MoveShooter(0);
+        }
+    }
+}
 bool TorShooter::IsLoaderDown()
 {
   return loaderDown;
@@ -86,9 +130,9 @@ bool TorShooter::IsLoaderDown()
 void TorShooter::SetJagSpeed(float speed)
 {
   topWheelJag->Set(speed);
-  topWheelJag1->Set(speed);
+  topWheelJag1->Set(-speed);
   bottomWheelJag->Set(speed);
-  bottomWheelJag1->Set(speed);
+  bottomWheelJag1->Set(-speed);
   if (speed == 0.0)
     {
       loaderBarJag->Set(speed);

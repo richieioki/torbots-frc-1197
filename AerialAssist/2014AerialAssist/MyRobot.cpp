@@ -58,23 +58,25 @@ public:
     tartarus(Consts::TARTARUS_PORT)
   {
     ds = DriverStationLCD::GetInstance();
+    ds->Clear();
     compressor = new Compressor(Consts::PRESSURE_SWITCH_CHANNEL, Consts::COMPRESSOR_RELAY_CHANNEL);
     compressor->Start();
     leftDriveJag = new Jaguar(Consts::LEFT1_DRIVE_JAG);
-    //leftDriveJag1 = new Jaguar(Consts::LEFT2_DRIVE_JAG_MOD, Consts::LEFT2_DRIVE_JAG);
+    leftDriveJag1 = new Jaguar(Consts::LEFT2_DRIVE_JAG);
     rightDriveJag = new Jaguar(Consts::RIGHT1_DRIVE_JAG);
-    //rightDriveJag1 = new Jaguar(Consts::RIGHT2_DRIVE_JAG_MOD, Consts::RIGHT2_DRIVE_JAG);
+    rightDriveJag1 = new Jaguar(Consts::RIGHT2_DRIVE_JAG);
 
-    //    wheelEncoderLeft = new Encoder(Consts::LEFT_ENCODER_MOD, Consts::LEFT_ENCODER_MSB, Consts::LEFT_ENCODER_MOD, Consts::LEFT_ENCODER_LSB); //a channel, b channel
-    //    wheelEncoderRight = new Encoder(Consts::RIGHT_ENCODER_MOD, Consts::RIGHT_ENCODER_MSB, Consts::RIGHT_ENCODER_MOD, Consts::RIGHT_ENCODER_LSB); //a channel, b channel
-    //    gyro = new Gyro(Consts::GYRO_MOD, Consts::GYRO_CHANNEL);
-    //    gyro->Reset();
-    myJagDrive = new TorJagDrive(*leftDriveJag, *rightDriveJag);
-    myTorbotDrive = new TorbotDrive(stick, *myJagDrive); //, *gyro, *wheelEncoderRight);
+    wheelEncoderLeft = new Encoder(Consts::LEFT_ENCODER_MSB, Consts::LEFT_ENCODER_LSB); //a channel, b channel
+    wheelEncoderRight = new Encoder(Consts::RIGHT_ENCODER_MSB, Consts::RIGHT_ENCODER_LSB); //a channel, b channel
+    gyro = new Gyro(Consts::GYRO_CHANNEL);
+    gyro->Reset();
+    
+    myJagDrive = new TorJagDrive(*leftDriveJag, *leftDriveJag1, *rightDriveJag, *rightDriveJag1);
+    
+    myTorbotDrive = new TorbotDrive(stick, *myJagDrive, *gyro, *wheelEncoderRight);
+    
     myShooter = new TorShooter(stick, tartarus);
-    myAutonomous = new TorAutonomous(*myShooter, *myTorbotDrive);
-
-    //shiftSOL = new Solenoid(Consts::SHIFT_SOLENOID);
+    //myAutonomous = new TorAutonomous(*myShooter, *myTorbotDrive);
   }
 
   /**
@@ -82,7 +84,8 @@ public:
    */
   void Autonomous()
   {
-    myAutonomous->runAutonomous();
+    //myAutonomous->runAutonomous();
+    myTorbotDrive->DriveStraight(Consts::AUTO_DRIVE_SPEED, Consts::AUTO_DRIVE_DIST); //test drive 180.5 inches
   }
 
   /**
@@ -92,24 +95,17 @@ public:
   {
 
     ds->Clear();
-    /*
-     * Order of while loop
-     * 1: check if states should have changed
-     * 2: evaluate and execute inputs
-     * 3: execute states
-     */
     //    myTorbotDrive->resetEncoder();
     //    gyro->Reset();
     
     float shooterSpeed;
     while (IsOperatorControl() && IsEnabled())
       {
-        ds->Clear();
         
         /*********************************************************
                                   DS INFO
          *********************************************************/        
-        
+        ds->Clear();
         if (myShooter->IsLoaded())
           {
             ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loaded");
@@ -128,11 +124,11 @@ public:
          *********************************************************/
         myTorbotDrive->ArcadeDrive(true);
         
+        
         /*********************************************************
                                   SHIFTING
          *********************************************************/
-        
-        myTorbotDrive->setShifters((tartarus.GetRawButton(Consts::SHIFT_BUTTON) || stick.GetRawButton(Consts::S_SHIFT_BUTTON)));
+        myTorbotDrive->shiftGear((tartarus.GetRawButton(Consts::SHIFT_BUTTON) || stick.GetRawButton(Consts::S_SHIFT_BUTTON)));
         
         
         
@@ -150,19 +146,28 @@ public:
         if (tartarus.GetRawButton(Consts::SHOOTER_UP_BUTTON) || stick.GetRawButton(Consts::S_SHOOTER_UP_BUTTON))
           {
             myShooter->MoveShooter(Consts::CAGE_MOVE_SPEED);
+            //myShooter->SetCagePos(true);
           }
-        else if ((tartarus.GetRawButton(Consts::SHOOTER_DOWN_BUTTON) || stick.GetRawButton(Consts::S_SHOOTER_DOWN_BUTTON)) && myShooter->IsLoaderDown())
+        else if ((tartarus.GetRawButton(Consts::SHOOTER_DOWN_BUTTON) || stick.GetRawButton(Consts::S_SHOOTER_DOWN_BUTTON)))
           {
-            myShooter->MoveShooter(-Consts::CAGE_MOVE_SPEED);
-          }
+            myShooter->MoveShooter(-Consts::CAGE_MOVE_SPEED); 
+            //myShooter->SetCagePos(false);
+          } 
         else
           {
             myShooter->MoveShooter(0.0);
           }
 
         myShooter->Run(); //runs shooter wheels, torshooter code will handle firing as well
+        //myShooter->SetCagePos();
 
-
+        if(stick.GetRawButton(10)) {
+            myShooter->SetJagSpeed(1.0);
+        } else if(stick.GetRawButton(1)) {
+            myShooter->SetJagSpeed(-1.00);
+        } else {
+            myShooter->SetJagSpeed(0.0);
+        }
 
       }
 
