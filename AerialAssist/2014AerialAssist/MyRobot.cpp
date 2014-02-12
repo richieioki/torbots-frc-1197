@@ -26,6 +26,8 @@ class RobotDemo : public SimpleRobot
   Encoder *wheelEncoderLeft;
   Encoder *wheelEncoderRight;
 
+  LiveWindow *lw;
+
   //Drive Jags
   Jaguar *leftDriveJag;
   Jaguar *leftDriveJag1;
@@ -40,7 +42,7 @@ class RobotDemo : public SimpleRobot
 
   //Pickup/Arm Jags
   Jaguar *pickupJag;
-  Jaguar *armJag;
+  Talon *armJag;
 
   Solenoid *pickupSOL;
   Solenoid *shootingSOL;
@@ -48,6 +50,10 @@ class RobotDemo : public SimpleRobot
 
   Gyro *gyro;
   Compressor *compressor;
+
+  AnalogChannel *armPOT;
+
+  PIDController *myShooterArmPID;
 
   bool pickupBOOL, shootingBOOL;
 
@@ -59,6 +65,8 @@ public:
   {
     ds = DriverStationLCD::GetInstance();
     ds->Clear();
+
+
     compressor = new Compressor(Consts::PRESSURE_SWITCH_CHANNEL, Consts::COMPRESSOR_RELAY_CHANNEL);
     compressor->Start();
     leftDriveJag = new Jaguar(Consts::LEFT1_DRIVE_JAG);
@@ -66,16 +74,38 @@ public:
     rightDriveJag = new Jaguar(Consts::RIGHT1_DRIVE_JAG);
     rightDriveJag1 = new Jaguar(Consts::RIGHT2_DRIVE_JAG);
 
+    armJag = new Talon(Consts::CAGE_JAG);
+
     wheelEncoderLeft = new Encoder(Consts::LEFT_ENCODER_MSB, Consts::LEFT_ENCODER_LSB); //a channel, b channel
     wheelEncoderRight = new Encoder(Consts::RIGHT_ENCODER_MSB, Consts::RIGHT_ENCODER_LSB); //a channel, b channel
     gyro = new Gyro(Consts::GYRO_CHANNEL);
     gyro->Reset();
-    
+
     myJagDrive = new TorJagDrive(*leftDriveJag, *leftDriveJag1, *rightDriveJag, *rightDriveJag1);
-    
+
     myTorbotDrive = new TorbotDrive(stick, *myJagDrive, *gyro, *wheelEncoderRight);
-    
-    myShooter = new TorShooter(stick, tartarus);
+
+    armPOT = new AnalogChannel(2);
+
+    myShooter = new TorShooter(stick, tartarus, *armJag);
+
+
+
+    myShooterArmPID = new PIDController(0.05, 0.003, 0.0, armPOT, armJag, 0.05);  //TODO Tune PID    // PID controller for moving the shooter
+    myShooterArmPID->SetContinuous(false);
+    myShooterArmPID->SetInputRange(Consts::SHOOTER_ARM_MIN, Consts::SHOOTER_ARM_LOADING);
+    myShooterArmPID->SetOutputRange(0.75, -0.75); //gravity helps on the way down
+    //    // init shooter arm setpoint to its current position so it does not move initially when we enable PID
+    myShooterArmPID->SetSetpoint(armPOT->GetAverageValue());    // set point is where it is when started, down
+
+    myShooterArmPID->SetPercentTolerance(10.0);
+    myShooterArmPID->Enable();
+
+    //lw = LiveWindow::GetInstance();
+
+    //lw->AddActuator("Arm", "arm motor", armJag);
+    //lw->AddActuator("Arm", "arm pot", armPOT);
+
     //myAutonomous = new TorAutonomous(*myShooter, *myTorbotDrive);
   }
 
@@ -94,19 +124,19 @@ public:
   void OperatorControl()
   {
 
-    ds->Clear();
+    //    ds->Clear();
     //    myTorbotDrive->resetEncoder();
     //    gyro->Reset();
-    
+
     float shooterSpeed;
     while (IsOperatorControl() && IsEnabled())
       {
-        
+
         /*********************************************************
                                   DS INFO
          *********************************************************/        
         ds->Clear();
-        if (myShooter->IsLoaded())
+        /*if (myShooter->IsLoaded())
           {
             ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loaded");
           }
@@ -114,25 +144,26 @@ public:
           {
             ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loading");
           }
+         */
         shooterSpeed = myShooter->ShooterSpeed();
         ds->Printf(DriverStationLCD::kUser_Line2, 1, "Shooter Speed: %f.0 \%", shooterSpeed * 100);
         ds->UpdateLCD();
-        
-        
+
+
+
         /*********************************************************
                                   DRIVING
          *********************************************************/
         myTorbotDrive->ArcadeDrive(true);
-        
-        
+        ds->Printf(DriverStationLCD::kUser_Line1, 1, "Test");
+        ds->UpdateLCD();
+
         /*********************************************************
                                   SHIFTING
          *********************************************************/
-        myTorbotDrive->shiftGear((tartarus.GetRawButton(Consts::SHIFT_BUTTON) || stick.GetRawButton(Consts::S_SHIFT_BUTTON)));
-        
-        
-        
-        
+        myTorbotDrive->shiftGear(tartarus.GetRawButton(Consts::SHIFT_BUTTON));
+
+
         if (tartarus.GetRawButton(Consts::LOADER_DOWN_BUTTON) || stick.GetRawButton(Consts::S_LOADER_DOWN_BUTTON))
           {
             myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
@@ -144,30 +175,62 @@ public:
 
 
         if (tartarus.GetRawButton(Consts::SHOOTER_UP_BUTTON) || stick.GetRawButton(Consts::S_SHOOTER_UP_BUTTON))
+          //put cage in firing position
           {
-            myShooter->MoveShooter(Consts::CAGE_MOVE_SPEED);
+            //myShooter->MoveShooter(Consts::CAGE_MOVE_SPEED);
             //myShooter->SetCagePos(true);
+            if(!myShooterArmPID->IsEnabled())
+              {
+                myShooterArmPID->Enable();
+              }
+            myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_SHOOTING); 
           }
         else if ((tartarus.GetRawButton(Consts::SHOOTER_DOWN_BUTTON) || stick.GetRawButton(Consts::S_SHOOTER_DOWN_BUTTON)))
+          //put cage in loading position
           {
-            myShooter->MoveShooter(-Consts::CAGE_MOVE_SPEED); 
+            //myShooter->MoveShooter(-Consts::CAGE_MOVE_SPEED); 
             //myShooter->SetCagePos(false);
-          } 
-        else
-          {
-            myShooter->MoveShooter(0.0);
+            if(!myShooterArmPID->IsEnabled())
+              {
+                myShooterArmPID->Enable();
+              }
+            myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LOADING);
           }
+        
+        if (myShooterArmPID->OnTarget())
+          {
+            myShooterArmPID->Disable();
+          }
+        ds->Printf(DriverStationLCD::kUser_Line3, 1,"armPOT: %d \%", armPOT->GetAverageValue());
+        ds->UpdateLCD();
+
+
+        /**********************************
+         * MANUAL CAGE CONTROL
+         **********************************/
+
+        /*if (stick.GetRawButton(2)) //move up
+          {
+            myShooterArmPID->Disable();
+            myShooter->MoveShooter(Consts::CAGE_MOVE_SPEED);
+          }
+        else if (stick.GetRawButton(5))
+          {
+            myShooterArmPID->Disable();
+            myShooter->MoveShooter(-Consts::CAGE_MOVE_SPEED);
+          }*/
+
 
         myShooter->Run(); //runs shooter wheels, torshooter code will handle firing as well
         //myShooter->SetCagePos();
 
-        if(stick.GetRawButton(10)) {
+        /*if(stick.GetRawButton(10)) {
             myShooter->SetJagSpeed(1.0);
         } else if(stick.GetRawButton(1)) {
             myShooter->SetJagSpeed(-1.00);
         } else {
             myShooter->SetJagSpeed(0.0);
-        }
+        }*/
 
       }
 
@@ -177,7 +240,12 @@ public:
    * Runs during test mode
    */
   void Test() {
-
+    lw->SetEnabled(true);
+    while(true)
+      {
+        lw->Run();
+        
+      }
   }
 };
 

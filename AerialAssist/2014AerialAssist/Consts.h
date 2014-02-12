@@ -39,23 +39,27 @@ namespace Consts
   const int RUN_BUTTON = 1; //trigger
   const int FIRE_BUTTON = 2; //side thumb button
   
-  const int S_SHIFT_BUTTON = 3; //shift to slow gear if held down
+ // const int S_SHIFT_BUTTON = 3; //shift to slow gear if held down
   const int S_LOADER_DOWN_BUTTON = 8; //change state to load
   const int S_LOADER_UP_BUTTON = 7; //change state to drive
   const int S_LOAD_OVERRIDE_BUTTON = 4; //override checking cage to see if loaded
-  const int S_UNLOAD_OVERRIDE_BUTTON = 6;
+  const int S_UNLOAD_OVERRIDE_BUTTON = 3;
   const int S_SHOOTER_UP_BUTTON = 11;
   const int S_SHOOTER_DOWN_BUTTON = 12;
   
   //TARTARUS BUTTONS
   const int TARTARUS_PORT = 2;
-  const int SHIFT_BUTTON = 1;
-  const int LOAD_OVERRIDE_BUTTON = 6;
-  const int UNLOAD_OVERRIDE_BUTTON = 7;
-  const int LOADER_DOWN_BUTTON = 2;
-  const int LOADER_UP_BUTTON = 3;
-  const int SHOOTER_DOWN_BUTTON = 4;
-  const int SHOOTER_UP_BUTTON = 5;
+  const int SHIFT_BUTTON = 8;
+  //const int LOAD_OVERRIDE_BUTTON = 6;
+  //const int UNLOAD_OVERRIDE_BUTTON = 7;
+  const int LOADER_DOWN_BUTTON = 14;
+  const int LOADER_UP_BUTTON = 9;
+  const int SHOOTER_DOWN_BUTTON = 15;
+  const int SHOOTER_UP_BUTTON = 10;
+  const int SHOOTER_SWEET_SPOT = 13;
+  const int SHOOTER_SWEET_SPOT_UP = 1;
+  const int SHOOTER_SWEET_SPOT_DOWN = 2;
+  
   
   
   // WIRING CHANNELS
@@ -63,10 +67,6 @@ namespace Consts
   const int SHIFT_SOLENOID = 3;
   const int LOAD_SOLENOID = 1;
   const int FIRE_SOLENOID = 2;
-
-  //Analog Channels
-  // POTs
-  //const int SHOOTER_ARM_POT; //TODO: declare value once installed
   
   // JAGs
   const int LEFT1_DRIVE_JAG = 1;
@@ -82,6 +82,18 @@ namespace Consts
   const int LOADER_BAR_JAG = 9; //pickup
   
   const int CAGE_JAG = 10;
+  
+ //Shooter Arm Potentiometer Values
+  
+  const float SHOOTER_ARM_INIT = 328.0;
+  const float SHOOTER_ARM_LOADING = 420.0; //erryday
+  const float SHOOTER_ARM_MIN = 165.0;
+  const float SHOOTER_ARM_SHOOTING = 215.0;
+  
+  
+  
+  
+  
   
 //  const int ARM_JAG = 10;
   

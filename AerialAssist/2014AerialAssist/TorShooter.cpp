@@ -1,8 +1,8 @@
 #include "TorShooter.h"
 #include <cmath>
 
-TorShooter::TorShooter(Joystick& myJoystick1, Joystick& myJoystick2)
-: m_stick(myJoystick1), tartarus(myJoystick2)
+TorShooter::TorShooter(Joystick& myJoystick1, Joystick& myJoystick2, Talon& myArmJag)
+: m_stick(myJoystick1), tartarus(myJoystick2), cageJag(myArmJag)
 {
   topWheelJag = new Talon(Consts::TOP1_SHOOTER_JAG);
   topWheelJag1 = new Talon(Consts::TOP2_SHOOTER_JAG);
@@ -10,7 +10,7 @@ TorShooter::TorShooter(Joystick& myJoystick1, Joystick& myJoystick2)
   bottomWheelJag1 = new Talon(Consts::BOTTOM2_SHOOTER_JAG);
 
   loaderBarJag = new Talon(Consts::LOADER_BAR_JAG);
-  cageJag = new Talon(Consts::CAGE_JAG);
+  //cageJag = new Talon(Consts::CAGE_JAG);
   loadSolenoid = new Solenoid(Consts::LOAD_SOLENOID);
   fireSolenoid = new Solenoid(Consts::FIRE_SOLENOID);
 
@@ -27,7 +27,7 @@ void TorShooter::Fire()
 {
   fireButton = m_stick.GetRawButton(Consts::FIRE_BUTTON);
   m_stick.GetThrottle();
-  if (currentJagSpeed != 0.0 && IsLoaded() && fireButton)
+  if (currentJagSpeed != 0.0 && fireButton)         //if (currentJagSpeed != 0.0 && IsLoaded() && fireButton)
     {
       fireSolenoid->Set(!Consts::SHOOTER_PISTON_EXTENDED); //retract pistons
       Wait(1.0); //give the piston time to retract before extending
@@ -39,10 +39,10 @@ void TorShooter::Run()
 {
   runButton = m_stick.GetRawButton(Consts::RUN_BUTTON);
   fireButton = m_stick.GetRawButton(Consts::FIRE_BUTTON);
-  if (IsLoaded() && runButton)
+  if (runButton)    //if (IsLoaded() && runButton)
     {
       SetJagSpeed(ShooterSpeed());
-      if (loaderDown && IsLoaded())
+      if (loaderDown)       //if (loaderDown && IsLoaded())
         {
           loaderBarJag->Set(Consts::LOADER_BAR_SPEED);
         }
@@ -52,17 +52,20 @@ void TorShooter::Run()
           Fire();
         }
     }
-  else if ((!IsLoaded()) && runButton)
+ /* else if ((!IsLoaded()) && runButton)         //else if ((!IsLoaded()) && runButton)
     {
       SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
       loaderBarJag->Set(-1 * Consts::LOADER_BAR_SPEED);
       loadSolenoid->Set(Consts::LOADER_PISTON_EXTENDED); // extend loader pistons
     }
+    */
   else
     {
       SetJagSpeed(0.0);
     }
 }
+
+/*
 bool TorShooter::IsLoaded()
 {
   //return true if ball is in cage
@@ -78,6 +81,7 @@ bool TorShooter::IsLoaded()
 
   return isLoaded || loadOverride;
 }
+*/
 void TorShooter::MoveLoaderDown(bool downFlag)
 {
   loaderDown = downFlag;
@@ -85,7 +89,7 @@ void TorShooter::MoveLoaderDown(bool downFlag)
 }
 void TorShooter::MoveShooter(float speed)
 {
-  cageJag->Set(speed);
+  cageJag.Set(speed);
 }
 void TorShooter::SetCagePos(bool raiseFlag)
 {

@@ -11,7 +11,7 @@
 
 class TorShooter {
 public:
-  TorShooter(Joystick& myJoystick1, Joystick& myJoystick2);
+  TorShooter(Joystick& myJoystick1, Joystick& myJoystick2, Talon& myArmJag);
   void Fire();
   void Run();
   
@@ -49,7 +49,7 @@ private:
   Talon *bottomWheelJag;
   Talon *bottomWheelJag1;
   Talon *loaderBarJag;
-  Talon *cageJag;
+  Talon& cageJag;
   Solenoid *loadSolenoid;
   Solenoid *fireSolenoid;
   AnalogChannel *shooterArmPOT;
