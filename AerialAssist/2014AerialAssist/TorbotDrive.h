@@ -11,7 +11,7 @@ public:
 
 //  TorbotDrive(Joystick& theJosytick, TorJagDrive& jagDrive, Gyro& gyro, Encoder& encoder);
   TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive);
-  TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive, Gyro& theGyro, Encoder&  theEncoder); //second constructor w/ gyro/encoder added
+  TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive, Gyro& theGyro, Encoder&  theEncoder, DriverStationLCD& ds); //second constructor w/ gyro/encoder added
   //TODO Related encoder code for this second constructor needs to be uncommented when encoders and gyro are ready and added
   void ArcadeDrive(bool squaredInputs);
   void setShifters(bool shiftToggle);
@@ -37,4 +37,5 @@ private:
   Encoder& m_encoder;
   Solenoid *shiftSolenoid;
   Solenoid *shiftSolenoid2;
+  DriverStationLCD& m_ds;
 };

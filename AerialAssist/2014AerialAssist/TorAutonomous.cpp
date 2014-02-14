@@ -14,14 +14,12 @@ void TorAutonomous::AutoFire()
 {
   if (jagsRunning)
     {
-      shooter.ManualFire();
+      shooter.Fire();
     }
 }
 void TorAutonomous::RunShooter()
 {
-  shooter.MoveShooter(0.45);
-  Wait(0.8); //replace once we have pot values
-  shooter.MoveShooter(0);
+  //set arm to shooting position
   shooter.SetJagSpeed(shooter.ShooterSpeed());
   jagsRunning = true;
 }

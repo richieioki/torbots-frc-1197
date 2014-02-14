@@ -11,23 +11,18 @@
 
 class TorShooter {
 public:
-  TorShooter(Joystick& myJoystick1, Joystick& myJoystick2, Talon& myArmJag);
+  TorShooter(Joystick& myJoystick1, Joystick& myJoystick2);
   void Fire();
   void Run();
   
   bool IsLoaded();
   void MoveLoaderDown(bool downFlag);
-  bool TorShooter::IsLoaderDown();
-  void MoveShooter(float speed);
-  void SetCagePos(bool raiseFlag);
-  void SetCagePos();
+  bool IsLoaderDown();
   
   void SetJagSpeed(float speed);
   float GetJagSpeed();
   
   float ShooterSpeed();
-  
-  void ManualFire();
 
 private:  
   Joystick& m_stick;
@@ -35,8 +30,8 @@ private:
   
   float currentJagSpeed;
   bool runButton;
-  bool fireButton;
-  bool loadOverride;
+  bool passButton;
+  bool catchButton;
   
   bool loaderDown;
   bool shooterDown;
@@ -49,8 +44,6 @@ private:
   Talon *bottomWheelJag;
   Talon *bottomWheelJag1;
   Talon *loaderBarJag;
-  Talon& cageJag;
   Solenoid *loadSolenoid;
   Solenoid *fireSolenoid;
-  AnalogChannel *shooterArmPOT;
 };
