@@ -20,6 +20,7 @@ public:
   bool IsLoaderDown();
   
   void SetJagSpeed(float speed);
+  void SetLoaderBarSpeed(float speed);
   float GetJagSpeed();
   
   float ShooterSpeed();

@@ -96,7 +96,7 @@ public:
     //    // init shooter arm setpoint to its current position so it does not move initially when we enable PID
     myShooterArmPID->SetSetpoint(armPOT->GetAverageValue());    // set point is where it is when started, down
 
-    myShooterArmPID->SetPercentTolerance(7.0);
+    myShooterArmPID->SetPercentTolerance(3.5);
     myShooterArmPID->Enable();
 
     //myAutonomous = new TorAutonomous(*myShooter, *myTorbotDrive);
@@ -110,6 +110,22 @@ public:
     //myAutonomous->runAutonomous();
 //    ds->Printf(DriverStationLCD::kUser_Line1, 1, "Encoder: %f", wheelEncoderRight->GetRaw());
 //    ds->UpdateLCD();
+    
+    myShooter->SetJagSpeed(0.0);
+    myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
+    if(!myShooterArmPID->IsEnabled())
+      {
+        myShooterArmPID->Enable();
+      }
+    myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LOADING);
+    while(!myShooterArmPID->OnTarget())
+          {
+
+          }
+        myShooterArmPID->Disable();
+    
+    myShooter->SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
+    myShooter->SetLoaderBarSpeed(Consts::LOADER_BAR_SPEED);
 
     myTorbotDrive->DriveStraight(Consts::AUTO_DRIVE_SPEED, Consts::AUTO_DRIVE_DIST); //test drive 180.5 inches
     
@@ -128,6 +144,7 @@ public:
       }
     myShooterArmPID->Disable();
     //do nothing until shooter is in position and then disable the PID
+    myShooter->SetLoaderBarSpeed(0.0);
     
     myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED);
     //moves the loader bar up
@@ -156,10 +173,8 @@ public:
       }
     myShooterArmPID->Disable();
     //turn off pid once in shooting position
-    
-
   }
-
+  
   /**
    * Runs the motors with arcade steering. 
    */
@@ -238,6 +253,7 @@ public:
         else if (tartarus.GetRawButton(Consts::PREP_SHOOT))
           {
             
+            myShooter->SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
             if(!myShooterArmPID->IsEnabled())
               {
                 myShooterArmPID->Enable();

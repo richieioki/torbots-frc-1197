@@ -107,6 +107,11 @@ void TorShooter::SetJagSpeed(float speed)
     }
   currentJagSpeed = speed;
 }
+void TorShooter::SetLoaderBarSpeed (float speed)
+{
+  loaderBarJag->Set(speed);
+}
+
 float TorShooter::GetJagSpeed()
 {
   return currentJagSpeed;

@@ -5,7 +5,7 @@ namespace Consts
   const float stickDeadZone = 0.2;      //if the joystick's value is less than this, it will be considered 0
 
   //Shooter speed variables
-  const float BASE_SHOOTER_FIRE_SPEED = 0.57; //55% is best with full battery against one point goal
+  const float BASE_SHOOTER_FIRE_SPEED = 0.55; //55% is best with full battery against one point goal
   const float MAX_SHOOTER_FIRE_SPEED = 0.90;
   const float SHOOTER_LOAD_SPEED = -0.4;
 
@@ -41,7 +41,7 @@ namespace Consts
   const int STICK_PORT = 1;
   const int RUN_BUTTON = 1; //trigger
   const int PASS_BUTTON = 6;
-  const int CATCH_BUTTON = 5;
+  const int CATCH_BUTTON = 4;
 
   // const int S_SHIFT_BUTTON = 3; //shift to slow gear if held down
   const int S_LOADER_DOWN_BUTTON = 8; //change state to load
