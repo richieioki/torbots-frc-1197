@@ -22,7 +22,7 @@ TorbotDrive::TorbotDrive(Joystick& theJoystick, TorJagDrive& theTorJagDrive)
 
 void TorbotDrive::ArcadeDrive(bool squaredInputs)
 {
-  m_encoder.Reset();
+  //m_encoder.Reset();
   float stickX = 0.0;
   float stickY = 0.0;
   //bool shiftButton = false; //Button 2
@@ -198,6 +198,8 @@ void TorbotDrive::DriveStraight(float motorSpeed, float distanceInches)
   DriveToTheta(currentAngle, motorSpeed, distanceInches); // maintain currentAngle
   
 }
+
+
 
 
 float TorbotDrive::getDistance() {

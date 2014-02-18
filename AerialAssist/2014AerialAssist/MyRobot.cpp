@@ -111,6 +111,8 @@ public:
 //    ds->Printf(DriverStationLCD::kUser_Line1, 1, "Encoder: %f", wheelEncoderRight->GetRaw());
 //    ds->UpdateLCD();
     
+    ds->Printf(DriverStationLCD::kUser_Line5, 1, "Encoder Left: %d", wheelEncoderLeft->GetRaw());
+    ds->UpdateLCD();
     myShooter->SetJagSpeed(0.0);
     myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
     if(!myShooterArmPID->IsEnabled())
@@ -127,7 +129,11 @@ public:
     myShooter->SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
     myShooter->SetLoaderBarSpeed(Consts::LOADER_BAR_SPEED);
 
+    ds->Printf(DriverStationLCD::kUser_Line5, 1, "Encoder Left: %d", wheelEncoderLeft->GetRaw());
+    ds->UpdateLCD();
     myTorbotDrive->DriveStraight(Consts::AUTO_DRIVE_SPEED, Consts::AUTO_DRIVE_DIST); //test drive 180.5 inches
+    
+    
     
     if(!myShooterArmPID->IsEnabled())
       {
@@ -144,6 +150,8 @@ public:
       }
     myShooterArmPID->Disable();
     //do nothing until shooter is in position and then disable the PID
+      
+     
     myShooter->SetLoaderBarSpeed(0.0);
     
     myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED);
@@ -172,7 +180,7 @@ public:
 
       }
     myShooterArmPID->Disable();
-    //turn off pid once in shooting position
+    //turn off pid once in loading position 
   }
   
   /**
@@ -186,6 +194,8 @@ public:
     //    gyro->Reset();
 
     float shooterSpeed;
+    
+    
     while (IsOperatorControl() && IsEnabled())
       {
 
@@ -193,6 +203,14 @@ public:
                                   DS INFO
          *********************************************************/        
         ds->Clear();
+        
+       
+           ds->Printf(DriverStationLCD::kUser_Line5, 1, "LE: %d", wheelEncoderLeft->GetRaw());
+           ds->Printf(DriverStationLCD::kUser_Line4, 1, "RE: %d", wheelEncoderRight->GetRaw());
+           
+          // ds->Printf(DriverStationLCD::kUser_Line6, 1, "Gyro: %f", gyro->GetAngle());
+           ds->UpdateLCD();
+           
         /*if (myShooter->IsLoaded())
           {
             ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loaded");
@@ -252,7 +270,8 @@ public:
           }
         else if (tartarus.GetRawButton(Consts::PREP_SHOOT))
           {
-            
+      //    if(myShooter->ShooterSpeed()<.90)
+        //    {
             myShooter->SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
             if(!myShooterArmPID->IsEnabled())
               {
@@ -260,7 +279,17 @@ public:
               }
             myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_SHOOTING);
             myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED);
-           
+       //   }
+        /*  else {
+              myShooter->SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
+              if(!myShooterArmPID->IsEnabled())
+                {
+                  myShooterArmPID->Enable();
+                }
+              myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LONG_SHOT);
+              myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
+
+          } */
 
           }
 
@@ -299,7 +328,7 @@ public:
             myShooterArmPID->Disable();
             if(!myShooter->IsLoaderDown() && !stick.GetRawButton(Consts::CATCH_BUTTON)) {
                 myShooter->SetJagSpeed(myShooter->ShooterSpeed());
-                ds->Printf(DriverStationLCD::kUser_Line4, 1, "somethingsomething");
+               // ds->Printf(DriverStationLCD::kUser_Line4, 1, "somethingsomething");
             }
           }
         else

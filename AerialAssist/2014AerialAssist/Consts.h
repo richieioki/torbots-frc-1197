@@ -14,7 +14,7 @@ namespace Consts
 
 
   //Autonomous Variables
-  const float AUTO_DRIVE_SPEED = 0.6;
+  const float AUTO_DRIVE_SPEED = 0.7;
   const float AUTO_DRIVE_DIST = 180.5; //180.5
 
   //Shooter Booleans
@@ -27,7 +27,8 @@ namespace Consts
   const float SHOOTER_ARM_LOADING = 420.0; //blaze it
   const float SHOOTER_ARM_MIN = 165.0;
   const float SHOOTER_ARM_SHOOTING = 205.0;
-
+  const float SHOOTER_ARM_LONG_SHOT = 300.0;
+  
   //Encoder distance variables
   const float wheelCircumference = 4.0*3.1416; //(inches)
 
@@ -55,9 +56,9 @@ namespace Consts
   const int SHIFT_BUTTON = 2; //8 on physical Tartarus
   const int PREP_LOAD = 7;    //14 on physical tartarus
   const int PREP_SHOOT = 3;     //9 on physical tartarus
-  const int SHOOTER_DOWN_BUTTON = 8;  //15 on physical tartarus
-  const int SHOOTER_UP_BUTTON = 4;   //10 on physical tartarus
-  const int SHOOTER_SWEET_SPOT = 6; //13 on physical tartarus
+ // const int SHOOTER_DOWN_BUTTON = 8;  //15 on physical tartarus
+ // const int SHOOTER_UP_BUTTON = 4;   //10 on physical tartarus
+ // const int SHOOTER_SWEET_SPOT = 6; //13 on physical tartarus
 
 
   // WIRING CHANNELS
@@ -88,8 +89,8 @@ namespace Consts
   const int ARM_POT_CHANNEL = 2;
 
   //Encoders
-  const int RIGHT_ENCODER_MSB = 4; //a channel
-  const int RIGHT_ENCODER_LSB = 5; //b channel
+  const int RIGHT_ENCODER_MSB = 6; //a channel
+  const int RIGHT_ENCODER_LSB = 7; //b channel
 
   const int LEFT_ENCODER_MSB = 2; //a channel
   const int LEFT_ENCODER_LSB = 3; //b channel

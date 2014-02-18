@@ -43,8 +43,8 @@ void TorShooter::Run()
       }
     } 
   else if (passButton) {
-
-      SetJagSpeed(ShooterSpeed());
+     
+      SetJagSpeed(0.9);
 
       loaderBarJag->Set(-Consts::LOADER_BAR_SPEED);
       Fire();
@@ -118,6 +118,7 @@ float TorShooter::GetJagSpeed()
 }
 float TorShooter::ShooterSpeed()
 {
+ 
   throttleValue = m_stick.GetTwist(); //1 is down, -1 is up
   return (((1.0 - throttleValue) / 2.0) * (Consts::MAX_SHOOTER_FIRE_SPEED - Consts::BASE_SHOOTER_FIRE_SPEED)) + Consts::BASE_SHOOTER_FIRE_SPEED;
 }
