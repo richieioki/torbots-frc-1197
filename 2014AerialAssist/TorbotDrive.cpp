@@ -133,26 +133,19 @@ void TorbotDrive::DriveToTheta(float theta, float motorSpeed, float distanceInch
   timer->Reset();
   timer->Start();
  
-  //m_gyro.Reset(); //Richie added this as a "fix" but it ended up breaking the code so i removed it
-  angleTarget = theta;          // adjusted target angle; add current ange to desired angle. resetting may not set to 0.0 exactly
-
-//  ds->Printf(DriverStationLCD::kUser_Line1, 1, "gyro: %2.2f AE: %4.2f", m_gyro.GetAngle(), angleError);
-//  ds->UpdateLCD();
+  angleTarget = theta;  // adjusted target angle; add current ange to desired angle. resetting may not set to 0.0 exactly
 
   // drive the desired distance
   resetEncoder();
 
-  timeCurr = timer->Get();
   
-  // Arbitrary adjustment made from empirical data 9/15/13
-  // float distanceAdjustment = (distanceInches / 8.0) + (motorSpeed - 0.1) * 12.5;
   m_ds.Clear();
     
   while (fabs(getDistance()) < fabs(distanceInches))
     {
         
       angleError = m_gyro.GetAngle()-angleTarget;       // error off of adjusted target heading
-      motorAdjust = angleError/10.0; // percent of error range (5degrees) 
+      motorAdjust = angleError/10.0; // percent of error range (5 degrees) 
 
       m_ds.Printf(DriverStationLCD::kUser_Line1, 1, "gyro: %2.2f AE: %4.2f", m_gyro.GetAngle(), angleError);
       m_ds.Printf(DriverStationLCD::kUser_Line2, 1, "distance: %f", getDistance());
@@ -162,10 +155,7 @@ void TorbotDrive::DriveToTheta(float theta, float motorSpeed, float distanceInch
       m_jagDrive.SetLeft(motorSpeed*(1.0-motorAdjust));
       m_jagDrive.SetRight(motorSpeed*(1.0+motorAdjust));
       
-      // test drive constant speed, no adjust, to unit test the motor speed
-//      motorSpeed = 1.0;
-//      m_jagDrive.SetLeft(motorSpeed);
-//      m_jagDrive.SetRight(motorSpeed);
+   
             
       Wait(0.05); // wait so we don't update continously. update 20 times per second
       
@@ -205,7 +195,7 @@ void TorbotDrive::DriveStraight(float motorSpeed, float distanceInches)
 float TorbotDrive::getDistance() {
   float encoderDistance;
   
-  encoderDistance = ((float)m_encoder.GetRaw()*Consts::wheelCircumference*Consts::wheelGearRatio_High)/(250*4);  //(Consts::encoderTicks*4);
+  encoderDistance = ((float)m_encoder.GetRaw()*Consts::wheelCircumference*Consts::wheelGearRatio_High)/((Consts::encoderTicks*4));
   
   return encoderDistance;
 }

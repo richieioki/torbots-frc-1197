@@ -16,7 +16,6 @@ DriverStationLCD *ds;
  */ 
 class RobotDemo : public SimpleRobot
 {
-  //RobotDrive myRobot; // robot drive system
   Joystick stick; // only joystick
   Joystick tartarus; //left-handed gaming pad
   TorbotDrive *myTorbotDrive;
@@ -25,8 +24,6 @@ class RobotDemo : public SimpleRobot
   TorAutonomous *myAutonomous;
   Encoder *wheelEncoderLeft;
   Encoder *wheelEncoderRight;
-
-  LiveWindow *lw;
 
   //Drive Jags
   Jaguar *leftDriveJag;
@@ -76,8 +73,8 @@ public:
 
     armJag = new Talon(Consts::CAGE_JAG);
 
-    wheelEncoderLeft = new Encoder(Consts::LEFT_ENCODER_MSB, Consts::LEFT_ENCODER_LSB); //a channel, b channel
-    wheelEncoderRight = new Encoder(Consts::RIGHT_ENCODER_MSB, Consts::RIGHT_ENCODER_LSB); //a channel, b channel
+    wheelEncoderLeft = new Encoder(1,Consts::LEFT_ENCODER_MSB,1, Consts::LEFT_ENCODER_LSB); //a channel, b channel
+    wheelEncoderRight = new Encoder(1,Consts::RIGHT_ENCODER_MSB,1, Consts::RIGHT_ENCODER_LSB); //a channel, b channel
     gyro = new Gyro(Consts::GYRO_CHANNEL);
     gyro->Reset();
 
@@ -106,13 +103,13 @@ public:
    * Drive left & right motors for 2 seconds then stop
    */
   void Autonomous()
-  { 
-    //myAutonomous->runAutonomous();
-//    ds->Printf(DriverStationLCD::kUser_Line1, 1, "Encoder: %f", wheelEncoderRight->GetRaw());
-//    ds->UpdateLCD();
-    
-    ds->Printf(DriverStationLCD::kUser_Line5, 1, "Encoder Left: %d", wheelEncoderLeft->GetRaw());
-    ds->UpdateLCD();
+  {
+
+
+    /*************************************************************
+     *                   AUTO STAGE 1: LOADING
+     *************************************************************/ 
+
     myShooter->SetJagSpeed(0.0);
     myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
     if(!myShooterArmPID->IsEnabled())
@@ -121,109 +118,95 @@ public:
       }
     myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LOADING);
     while(!myShooterArmPID->OnTarget())
-          {
+      {
 
-          }
-        myShooterArmPID->Disable();
-    
+      }
+    myShooterArmPID->Disable();
+
     myShooter->SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
     myShooter->SetLoaderBarSpeed(Consts::LOADER_BAR_SPEED);
 
     ds->Printf(DriverStationLCD::kUser_Line5, 1, "Encoder Left: %d", wheelEncoderLeft->GetRaw());
     ds->UpdateLCD();
     myTorbotDrive->DriveStraight(Consts::AUTO_DRIVE_SPEED, Consts::AUTO_DRIVE_DIST); //test drive 180.5 inches
-    
-    
-    
-    if(!myShooterArmPID->IsEnabled())
+
+    /************************************************************
+     *                  AUTO STAGE 2: SHOOTING
+     ************************************************************/
+
+    if(!myShooterArmPID->IsEnabled()) //make sure the pid is enabled
       {
         myShooterArmPID->Enable();
       }
-    //make sure the pid is enabled
-    
-    myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_SHOOTING);
-    //set the target POT value in the shooting position
-    
+
+    myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_SHOOTING); //set the target POT value in the shooting position
+
     while(!myShooterArmPID->OnTarget())
       {
 
       }
-    myShooterArmPID->Disable();
-    //do nothing until shooter is in position and then disable the PID
-      
-     
+    myShooterArmPID->Disable(); //do nothing until shooter is in position and then disable the PID
+
+
     myShooter->SetLoaderBarSpeed(0.0);
-    
-    myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED);
-    //moves the loader bar up
-    
+
+    myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED); //moves the loader bar up
+
     myShooter->SetJagSpeed(myShooter->ShooterSpeed());
-    Wait(2.0);
-    //wait for jags to get up to speed
+    Wait(Consts::AUTO_JAG_WAIT_TIME); //wait for jags to get up to speed
 
     myShooter->Fire();
-    myShooter->SetJagSpeed(0.0);
-    //turn off the jags after firing
+    myShooter->SetJagSpeed(0.0); //turn off the jags after firing
+
+    /*****************************************************************
+     *                  AUTO STAGE 3: AMERICA
+     *****************************************************************/
     
-    myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
-    //move loader back down
+    ds->Clear();
+    ds->Printf(DriverStationLCD::kUser_Line1, 1, "AMERICA");
+    ds->UpdateLCD();
     
+
+    /*****************************************************************
+     *                  AUTO STAGE 4: LOADING POSITION
+     *****************************************************************/
+
+    myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED); //move loader back down
+
     if(!myShooterArmPID->IsEnabled())
       {
         myShooterArmPID->Enable();
       }
-    myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LOADING);
-    //move shooter arm back to loading position
-    
+    myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LOADING); //move shooter arm back to loading position
+
     while(!myShooterArmPID->OnTarget())
       {
 
       }
-    myShooterArmPID->Disable();
-    //turn off pid once in loading position 
+    myShooterArmPID->Disable(); //turn off pid once in loading position
+
   }
-  
-  /**
-   * Runs the motors with arcade steering. 
-   */
+
   void OperatorControl()
   {
 
-    //    ds->Clear();
-    //    myTorbotDrive->resetEncoder();
-    //    gyro->Reset();
-
     float shooterSpeed;
-    
-    
+
     while (IsOperatorControl() && IsEnabled())
       {
 
         /*********************************************************
                                   DS INFO
-         *********************************************************/        
-        ds->Clear();
-        
-       
-           ds->Printf(DriverStationLCD::kUser_Line5, 1, "LE: %d", wheelEncoderLeft->GetRaw());
-           ds->Printf(DriverStationLCD::kUser_Line4, 1, "RE: %d", wheelEncoderRight->GetRaw());
-           
-          // ds->Printf(DriverStationLCD::kUser_Line6, 1, "Gyro: %f", gyro->GetAngle());
-           ds->UpdateLCD();
-           
-        /*if (myShooter->IsLoaded())
-          {
-            ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loaded");
-          }
-        else
-          {
-            ds->Printf(DriverStationLCD::kUser_Line1, 1, "Loading");
-          }
-         */
+         *********************************************************/
         shooterSpeed = myShooter->ShooterSpeed();
+        ds->Clear();
+        ds->Printf(DriverStationLCD::kUser_Line5, 1, "LE: %d", wheelEncoderLeft->GetRaw());
+        ds->Printf(DriverStationLCD::kUser_Line4, 1, "RE: %d", wheelEncoderRight->GetRaw());
+        ds->Printf(DriverStationLCD::kUser_Line3, 1,"armPOT: %d \%", armPOT->GetAverageValue());
+        ds->Printf(DriverStationLCD::kUser_Line6, 1, "Gyro: %f", gyro->GetAngle());        
         ds->Printf(DriverStationLCD::kUser_Line2, 1, "Shooter Speed: %f.0 \%", shooterSpeed * 100);
         ds->UpdateLCD();
-        
+
 
 
 
@@ -251,7 +234,7 @@ public:
           {
             myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED);
           }
-        
+
         /************************************************************
          *                          ACTION STATES
          ************************************************************/
@@ -265,13 +248,9 @@ public:
                 myShooterArmPID->Enable();
               }
             myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LOADING);
-            
-
           }
         else if (tartarus.GetRawButton(Consts::PREP_SHOOT))
           {
-      //    if(myShooter->ShooterSpeed()<.90)
-        //    {
             myShooter->SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
             if(!myShooterArmPID->IsEnabled())
               {
@@ -279,82 +258,46 @@ public:
               }
             myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_SHOOTING);
             myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED);
-       //   }
-        /*  else {
-              myShooter->SetJagSpeed(Consts::SHOOTER_LOAD_SPEED);
-              if(!myShooterArmPID->IsEnabled())
-                {
-                  myShooterArmPID->Enable();
-                }
-              myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LONG_SHOT);
-              myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
-
-          } */
-
           }
 
 
-/*****************************************************************
- *                               SHOOTER OVERRIDE
- ****************************************************************/
+        /*****************************************************************
+         *                      SHOOTER OVERRIDE
+         ****************************************************************/
 
 
-        if (stick.GetRawButton(Consts::S_SHOOTER_UP_BUTTON))
-          //put cage in firing position
+        if (stick.GetRawButton(Consts::S_SHOOTER_UP_BUTTON)) //put cage in firing position
           {
-            //myShooter->MoveShooter(Consts::CAGE_MOVE_SPEED);
-            //myShooter->SetCagePos(true);
             if(!myShooterArmPID->IsEnabled())
               {
                 myShooterArmPID->Enable();
               }
             myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_SHOOTING); 
           }
-        else if ((stick.GetRawButton(Consts::S_SHOOTER_DOWN_BUTTON)))
-          //put cage in loading position
+        else if ((stick.GetRawButton(Consts::S_SHOOTER_DOWN_BUTTON))) //put cage in loading position
           {
-            //myShooter->MoveShooter(-Consts::CAGE_MOVE_SPEED); 
-            //myShooter->SetCagePos(false);
+
             if(!myShooterArmPID->IsEnabled())
               {
                 myShooterArmPID->Enable();
               }
             myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LOADING);
           }
-          
-        
+
+
         if (myShooterArmPID->OnTarget())
           {
             myShooterArmPID->Disable();
-            if(!myShooter->IsLoaderDown() && !stick.GetRawButton(Consts::CATCH_BUTTON)) {
+            if(!myShooter->IsLoaderDown() && !stick.GetRawButton(Consts::CATCH_BUTTON)) 
+              {
                 myShooter->SetJagSpeed(myShooter->ShooterSpeed());
-               // ds->Printf(DriverStationLCD::kUser_Line4, 1, "somethingsomething");
-            }
+              }
           }
         else
           {
             myShooterArmPID->Enable();
           }
-        ds->Printf(DriverStationLCD::kUser_Line3, 1,"armPOT: %d \%", armPOT->GetAverageValue());
-        ds->UpdateLCD();
 
-
-        /**********************************
-         * MANUAL CAGE CONTROL
-         **********************************/
-
-     /*   if (stick.GetRawButton(Consts::SHOOTER_SWEET_SPOT_UP)) //move up
-          {
-            myShooterArmPID->Disable();
-            myShooter->MoveShooter(Consts::CAGE_MOVE_SPEED);
-          }
-        else if (stick.GetRawButton(Consts::SHOOTER_SWEET_SPOT_DOWN))
-          {
-            myShooterArmPID->Disable();
-            myShooter->MoveShooter(-Consts::CAGE_MOVE_SPEED);
-          }
-          */
-        
         myShooter->Run(); //runs shooter wheels, torshooter code will handle firing as well
       }
 
@@ -363,16 +306,89 @@ public:
   /**
    * Runs during test mode
    */
-  void Test() {
-    
-    
-    lw->SetEnabled(true);
-    while(true)
+  void Test() 
+  {
+    gyro->Reset();
+    myShooterArmPID->Disable();
+    ds->Clear();
+    ds->Printf(DriverStationLCD::kUser_Line1, 1, "Gyro: %f", gyro->GetAngle());
+    ds->Printf(DriverStationLCD::kUser_Line2, 1, "POT: %d", armPOT->GetAverageValue());
+    ds->Printf(DriverStationLCD::kUser_Line3, 1, "LE: %d", wheelEncoderLeft->GetRaw());
+    ds->Printf(DriverStationLCD::kUser_Line4, 1, "RE: %d", wheelEncoderRight->GetRaw());
+    ds->UpdateLCD();
+    myTorbotDrive->DriveStraight(0.5f, 26.75f); //drive length of robot
+    Wait(1.5);
+    myTorbotDrive->DriveStraight(0.5f, -26.75f);
+    Wait(1.5);
+    myTorbotDrive->DriveToTheta(gyro->GetAngle() + 90.0, 0.5f, 0.0f);
+    Wait(1.5);
+    myTorbotDrive->DriveToTheta(gyro->GetAngle() - 180.0, 0.5f, 0.0f);
+    Wait(1.5);
+    myShooterArmPID->Enable();
+    myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_SHOOTING);
+    myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED);
+    while(!myShooterArmPID->OnTarget())
       {
-        lw->Run();
         
       }
+    myShooterArmPID->Disable();
+    myShooter->SetJagSpeed(myShooter->ShooterSpeed());
+    Wait(2.0);
+    myShooter->Fire();
+    Wait(0.5);
+    myShooter->SetJagSpeed(0.0);
+    myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_LOADING);
+    myShooter->MoveLoaderDown(Consts::LOADER_PISTON_EXTENDED);
+    myShooterArmPID->Enable();
+    while(!myShooterArmPID->OnTarget())
+      {
+            
+      }
+    myShooterArmPID->Disable();
+    
   }
+
 };
 
 START_ROBOT_CLASS(RobotDemo);
+
+/* 
+
+ *   *   *   *   *   * ||||||||||||||||||||||||||||||||
+   *   *   *   *   *   ||||||||||||||||||||||||||||||||
+ *   *   *   *   *   * 
+   *   *   *   *   *   ||||||||||||||||||||||||||||||||
+ *   *   *   *   *   * ||||||||||||||||||||||||||||||||
+   *   *   *   *   *   
+ *   *   *   *   *   * ||||||||||||||||||||||||||||||||
+   *   *   *   *   *   ||||||||||||||||||||||||||||||||
+ *   *   *   *   *   * 
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ |||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+O say can you see, by the dawn’s early light,
+What so proudly we hail’d at the twilight’s last gleaming,
+Whose broad stripes and bright stars through the perilous fight
+O’er the ramparts we watch’d were so gallantly streaming?
+And the rocket’s red glare, the bombs bursting in air,
+Gave proof through the night that our flag was still there,
+O say does that star-spangled banner yet wave
+O’er the land of the free and the home of the brave?
+
+  ***   **   **  *****  ***   *****   ****   ***
+ *   *  * * * *  *      *  *    *    **     *   *
+ *****  *  *  *  ***    ***     *    *      *****
+ *   *  *     *  *      * *     *    **     *   *
+ *   *  *     *  *****  *  *  *****   ****  *   *
+ 
+ */
