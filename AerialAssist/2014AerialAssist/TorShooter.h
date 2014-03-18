@@ -24,6 +24,7 @@ public:
   float GetJagSpeed();
   
   float ShooterSpeed();
+  void LoaderDownOverride(bool ld);
 
 private:  
   Joystick& m_stick;
