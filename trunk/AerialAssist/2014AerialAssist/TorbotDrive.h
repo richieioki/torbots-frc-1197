@@ -27,6 +27,7 @@ public:
   void resetEncoder();
   void shiftGear(bool lowGearFlag);
   float getRawTicks();
+  void ReverseArcadeDrive(bool squaredInputs);
 
 private:
   Joystick& m_joystick;

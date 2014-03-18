@@ -16,6 +16,7 @@ namespace Consts
   //Autonomous Variables
   const float AUTO_DRIVE_SPEED = 0.7;
   const float AUTO_DRIVE_DIST = 180.5; //180.5
+  const float AUTO_JAG_WAIT_TIME = 2.0;
 
   //Shooter Booleans
   const bool SHOOTER_PISTON_EXTENDED = true; //TODO: needs to be changed for actual bot
@@ -35,7 +36,7 @@ namespace Consts
   const float wheelGearRatio_High = 1.0/11.733;
   const float wheelGearRatio_Low = 1.0/21.0;
 
-  const float encoderTicks = 360.0; //tick count on the encoder
+  const float encoderTicks = 250.0; //tick count on the encoder
 
 
   //JOYSTICK BUTTONS
@@ -43,6 +44,7 @@ namespace Consts
   const int RUN_BUTTON = 1; //trigger
   const int PASS_BUTTON = 6;
   const int CATCH_BUTTON = 4;
+  const int REVERSE_DRIVE = 2;
 
   // const int S_SHIFT_BUTTON = 3; //shift to slow gear if held down
   const int S_LOADER_DOWN_BUTTON = 8; //change state to load
