@@ -98,9 +98,14 @@ float TorShooter::ShooterSpeed()
 }
 void TorShooter::LoaderDownOverride(bool ld)
 {
-  if(loaderDown)
+  if(ld)
     {
-      loadSolenoid->Set(ld);
+      loadSolenoid->Set(false);
     }
-  
+  else
+    {
+      loadSolenoid->Set(loaderDown);
+
+    }
+
 }
