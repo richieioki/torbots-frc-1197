@@ -5,7 +5,8 @@ namespace Consts
   const float stickDeadZone = 0.2;      //if the joystick's value is less than this, it will be considered 0
 
   //Shooter speed variables
-  const float BASE_SHOOTER_FIRE_SPEED = 0.55; //55% is best with full battery against one point goal
+  const float AUTO_BASE_SHOOTER_FIRE_SPEED = 0.60; //55% is best with full battery against one point goal
+  const float BASE_SHOOTER_FIRE_SPEED = 0.65;
   const float MAX_SHOOTER_FIRE_SPEED = 0.90;
   const float SHOOTER_LOAD_SPEED = -0.4;
 
@@ -15,8 +16,9 @@ namespace Consts
 
   //Autonomous Variables
   const float AUTO_DRIVE_SPEED = 0.7;
-  const float AUTO_DRIVE_DIST = 180.5; //180.5
+  const float AUTO_DRIVE_DIST = 165.5; //180.5
   const float AUTO_JAG_WAIT_TIME = 2.0;
+  const float AUTO_SHOOT_WAIT_TIME = 5.0; //lengthen to disable timer
 
   //Shooter Booleans
   const bool SHOOTER_PISTON_EXTENDED = true; //TODO: needs to be changed for actual bot
@@ -48,14 +50,14 @@ namespace Consts
 
   // const int S_SHIFT_BUTTON = 3; //shift to slow gear if held down
   const int S_LOADER_DOWN_BUTTON = 8; //change state to load
-  const int S_LOADER_UP_BUTTON = 7; //change state to drive
+  const int S_LOADER_UP_BUTTON = 3; //change state to drive
   const int S_SHOOTER_UP_BUTTON = 11;
   const int S_SHOOTER_DOWN_BUTTON = 12;
 
 
   //TARTARUS BUTTONS
   const int TARTARUS_PORT = 2;
-  const int SHIFT_BUTTON = 2; //8 on physical Tartarus
+  const int SHIFT_BUTTON = 4; //10 on physical Tartarus
   const int PREP_LOAD = 7;    //14 on physical tartarus
   const int PREP_SHOOT = 3;     //9 on physical tartarus
  // const int SHOOTER_DOWN_BUTTON = 8;  //15 on physical tartarus
@@ -66,7 +68,7 @@ namespace Consts
   // WIRING CHANNELS
   //Solenoids
   const int SHIFT_SOLENOID = 3;
-  const int LOAD_SOLENOID = 1;
+  const int LOAD_SOLENOID = 1; 
   const int FIRE_SOLENOID = 2;
 
   // JAGs

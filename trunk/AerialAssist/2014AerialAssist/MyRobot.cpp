@@ -51,6 +51,8 @@ class RobotDemo : public SimpleRobot
   AnalogChannel *armPOT;
 
   PIDController *myShooterArmPID;
+  
+  Timer *timer;
 
   bool pickupBOOL, shootingBOOL;
 
@@ -95,6 +97,8 @@ public:
 
     myShooterArmPID->SetPercentTolerance(3.5);
     myShooterArmPID->Enable();
+    
+    timer = new Timer();
 
     //myAutonomous = new TorAutonomous(*myShooter, *myTorbotDrive);
   }
@@ -141,10 +145,16 @@ public:
 
     myShooterArmPID->SetSetpoint(Consts::SHOOTER_ARM_SHOOTING); //set the target POT value in the shooting position
 
+    timer->Reset();
+    timer->Start();
     while(!myShooterArmPID->OnTarget())
       {
-
+        if (timer->Get() > Consts::AUTO_SHOOT_WAIT_TIME)
+         {
+            break;
+         }
       }
+    timer->Stop();
     myShooterArmPID->Disable(); //do nothing until shooter is in position and then disable the PID
 
 
@@ -152,7 +162,7 @@ public:
 
     myShooter->MoveLoaderDown(!Consts::LOADER_PISTON_EXTENDED); //moves the loader bar up
 
-    myShooter->SetJagSpeed(myShooter->ShooterSpeed());
+    myShooter->SetJagSpeed(Consts::AUTO_BASE_SHOOTER_FIRE_SPEED);//myShooter->ShooterSpeed());
     Wait(Consts::AUTO_JAG_WAIT_TIME); //wait for jags to get up to speed
 
     myShooter->Fire();
@@ -181,7 +191,7 @@ public:
 
     while(!myShooterArmPID->OnTarget())
       {
-
+        
       }
     myShooterArmPID->Disable(); //turn off pid once in loading position
 

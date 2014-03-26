@@ -309,5 +309,6 @@ void TorbotDrive::ReverseArcadeDrive(bool squaredInputs)
     }
   // set the motor speed
   m_jagDrive.SetDrive(leftMotorSpeed, rightMotorSpeed);
-} // end ReverseArcadeDrive
+}
+  // end ReverseArcadeDrive
 
