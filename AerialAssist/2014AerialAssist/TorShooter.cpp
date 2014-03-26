@@ -100,11 +100,11 @@ void TorShooter::LoaderDownOverride(bool ld)
 {
   if(ld)
     {
-      loadSolenoid->Set(false);
+      loadSolenoid->Set(false);           //Move Loader Up
     }
   else
     {
-      loadSolenoid->Set(loaderDown);
+      loadSolenoid->Set(loaderDown);      //Put in previous position
 
     }
 
