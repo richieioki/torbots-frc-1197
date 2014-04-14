@@ -86,6 +86,8 @@ public class Simulator {
             }
             
         }
+        flushLogs();
+        
         System.out.println();
         log.println();
         log.println("--------------------");
@@ -112,6 +114,7 @@ public class Simulator {
             }
         }
         
+        flushLogs();
         
         for(int i = 0; i < TELE_COUNT; i++) {
             if(redBallsOnField == 0) {
@@ -176,6 +179,13 @@ public class Simulator {
         
         System.out.println();
         System.out.println("Loggers closed");
+    }
+    
+    private void flushLogs() {
+        log.flush();
+        csvLogger.flush();
+        
+        System.out.println("Loggers flushed");
     }
     
     private void determineStrategy() {
