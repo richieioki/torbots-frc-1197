@@ -12,13 +12,12 @@ package objects;
  */
 public class ball {
     
-    private String m_name;
     private int passes;
     private String m_team;
     
-    public ball(String name, String team) {
-        m_name = name;
-        m_team = team;
+    public ball(String color) {
+        m_team = color;
+        passes = 0;
     }
     
     public void passed() {
