@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package robots;
 
 import java.util.Random;
@@ -14,22 +8,25 @@ import objects.ball;
  * @author richi_000
  */
 public class midRobot implements basicRobot {
+
     private Speed m_speed;
     private boolean m_pickup, m_shoot, m_lowGoal, m_pass, m_truss, m_catch;
     private RobotType type;
-    
+
     private basicRobot teammate1, teammate2;
-    
-    private int autoScore;
-    
+    private ball m_ball = null;
+
+    private int autoScore, teleScore;
+
     private Random rng;
     private robotState m_state;
-    private int counter;
-    
-    public midRobot(){
+    private int counter = 0;
+    private int completionCounter = 0;
+
+    public midRobot() {
         type = RobotType.Mid;
     }
-    
+
     public void initRobot(Speed speed, boolean canLowGoal, boolean canPass) {
         //Most mid tier teams will be able to shoot
         //get the ball somehow
@@ -42,33 +39,63 @@ public class midRobot implements basicRobot {
         m_pass = canPass;
         m_truss = true;
         m_catch = false;
-        
+
         autoScore = 0;
+        teleScore = 0;
         rng = new Random();
     }
 
     @Override
-    public void pickupBall() {
+    public void pickupBall(boolean defence) {
+        if (completionCounter == 0) {
+            completionCounter = rng.nextInt(10);
+        }
+        if (counter == completionCounter) {
+            completionCounter = 0;
+            counter = 0;
+            m_state = robotState.SHOOTING;
+        }
+    }
+
+    @Override
+    public int scoreBall(boolean defence) {
+        int score = 0;
+        if (completionCounter == 0) {
+            completionCounter = rng.nextInt(10);
+        }
+        if (m_shoot) {
+            if (counter == completionCounter) {
+                score = 10;
+                completionCounter = 0;
+                counter = 0;
+                m_state = robotState.IDLE;
+                m_ball = null;
+            }
+        } else {
+            if (counter == completionCounter) {
+                score = 1;
+                completionCounter = 0;
+                counter = 0;
+                m_state = robotState.IDLE;
+                m_ball = null;
+            }
+        }
+        teleScore += score;
+        return score;
+    }
+
+    @Override
+    public void passBall(boolean defence) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public int scoreBall() {
+    public int trussShoot(boolean defence) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void passBall() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int trussShoot() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public int canCatch() {
+    public int canCatch(boolean defence) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -81,10 +108,19 @@ public class midRobot implements basicRobot {
     public RobotType getType() {
         return type;
     }
-     
+
     @Override
     public void returnToStation() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (completionCounter == 0) {
+            completionCounter = rng.nextInt(10);
+            m_state = robotState.GOING_TO_STATION;
+        }
+
+        if (completionCounter == counter) {
+            m_state = robotState.WAITING_FOR_BALL;
+            completionCounter = 0;
+            counter = 0;
+        }
     }
 
     @Override
@@ -100,25 +136,25 @@ public class midRobot implements basicRobot {
 
     @Override
     public void runAuto() {
-        if(m_shoot) {
-            if(rng.nextInt(2) != 0 && rng.nextInt(2) != 0) {
+        if (m_shoot) {
+            if (rng.nextInt(2) != 0 && rng.nextInt(2) != 0) {
                 autoScore = 25;
-                m_state = robotState.GOING_TO_STATION;
-            } else if(rng.nextInt(2) != 0) {
+                m_state = robotState.IDLE;
+            } else if (rng.nextInt(2) != 0) {
                 autoScore = 20;
-                m_state = robotState.GOING_TO_STATION;
+                m_state = robotState.IDLE;
             } else {
                 autoScore = 5;
                 m_state = robotState.GETTING_BALL;
             }
-        } else if(m_lowGoal) {
-            if(rng.nextInt(3) != 0) {
-                if(rng.nextInt(2) != 0) {
+        } else if (m_lowGoal) {
+            if (rng.nextInt(3) != 0) {
+                if (rng.nextInt(2) != 0) {
                     autoScore = 16;
                 } else {
                     autoScore = 11;
                 }
-                m_state = robotState.GOING_TO_STATION;
+                m_state = robotState.IDLE;
             } else {
                 autoScore = 5;
                 m_state = robotState.GETTING_BALL;
@@ -137,39 +173,74 @@ public class midRobot implements basicRobot {
     @Override
     public int run() {
         int score = 0;
-        counter++;
-        switch(m_state) {
-            case SHOOTING:               
-                score = scoreBall();
+        if (completionCounter != 0) {
+            counter++;
+        }
+        switch (m_state) {
+            case SHOOTING:
+                score = scoreBall(false);
                 break;
             case LOWGOAL:
-                score = scoreBall();
+                score = scoreBall(false);
                 break;
             case GETTING_BALL:
-                pickupBall();
+                pickupBall(false);
                 break;
             case GOING_TO_STATION:
                 returnToStation();
                 break;
             case TRUSS:
-                trussShoot();
+                trussShoot(false);
                 break;
             case IDLE:
-                
+                completionCounter = 0;
+                counter = 0;
                 break;
-                
+
             case DEFENCE:
-                
+
                 break;
-                               
+
         }
-        
+
         return score;
     }
 
     @Override
-    public void askToPickup(ball passedBall) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void recieveBall(ball passedBall) {
+        m_ball = passedBall;
+        m_state = robotState.IDLE;
     }
-    
+
+    @Override
+    public int getTeleScore() {
+        return teleScore;
+    }
+
+    @Override
+    public robotState getState() {
+        return m_state;
+    }
+
+    @Override
+    public boolean canPickup() {
+        return m_pickup;
+    }
+
+    @Override
+    public void setToIdle() {
+        m_state = robotState.IDLE;
+        completionCounter = 0;
+        counter = 0;
+    }
+
+    @Override
+    public boolean hasBall() {
+        if (m_ball == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 }

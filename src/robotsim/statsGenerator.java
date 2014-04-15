@@ -63,7 +63,7 @@ public class statsGenerator {
     }
     
     public basicRobot generateNoobStats(basicRobot in) {
-        noobRobot temp = (noobRobot)in;
+        lowRobot temp = (lowRobot)in;
         
         Speed noobSpeed;
         
