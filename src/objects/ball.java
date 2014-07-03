@@ -14,6 +14,7 @@ public class ball {
     
     private int passes;
     private String m_team;
+    String x = "this is a string";
     
     public ball(String color) {
         m_team = color;
