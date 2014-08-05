@@ -10,10 +10,6 @@ import objects.ball;
 import robots.basicRobot;
 import robots.*;
 
-/**
- *
- * @author richi_000
- */
 public class Simulator {
 
     private basicRobot[] robots = new basicRobot[6];
@@ -29,6 +25,9 @@ public class Simulator {
     ball redBall, blueBall;
     private int redBallsOnField = 0;
     private int blueBallsOnField = 0;
+
+
+//i made a change! wow
 
     /**
      * Setup a random assortment of robots and assign them with randomized
