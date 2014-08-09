@@ -8,6 +8,7 @@ TorTest::TorTest(Joystick& theStick, DriverStationLCD *dsIn, TorDrive *DriveIn)
 {
  
 }
+
 void TorTest::testDrive()
 {
   m_myTorDrive->SetDrive(0.5,0.5);
