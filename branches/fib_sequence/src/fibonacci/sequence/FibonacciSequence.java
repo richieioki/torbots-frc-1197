@@ -8,6 +8,8 @@ public static void main(String[] args) {
     int x,y,z;
     x= 0;
     y= 1;
+
+
     z= x+y;
     
     System.out.print(x+y);
