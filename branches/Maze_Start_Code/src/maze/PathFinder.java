@@ -34,7 +34,7 @@ public class PathFinder {
     public void findPath() {
         int x = 0,y = 0;
         path = path + " (0,0)";
-        while(x != 4 && y != 4) {
+        while(!(x == 4 && y == 4)) {
             //PUT YOUR CODE HERE
             
         }
