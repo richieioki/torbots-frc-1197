@@ -36,7 +36,6 @@ public class PathFinder {
     public void findPath() {
         int x = 0,y = 0;
         path = path + " (0,0)";
-        System.out.println(path);
         
         while(!(x==4 && y==4)) {
             
@@ -47,12 +46,10 @@ public class PathFinder {
           else if(maze[x+1][y] == 1){
            x++;
                }
-      System.out.println("(" + x + "," + y + ")");  
-       }  
-        }
+      path = path + " (" + x + "," + y + "),";  
+   
         
-    
-
+        }}
     public String getPath() {
        return path;
     }
