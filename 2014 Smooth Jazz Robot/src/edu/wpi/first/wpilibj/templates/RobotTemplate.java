@@ -24,13 +24,17 @@ public class RobotTemplate extends IterativeRobot {
     private Jaguar driveJag3;
     private Jaguar driveJag4;
     private Solenoid shiftSolenoid;
+    private Solenoid shiftSolenoid2;
     private Joystick stick;
     private TorbotDrive myTorbotDrive;
     private TorShooter myTorShooter;
     private Compressor compressor;
+    private TorJagDrive myTorJagDrive;
     
     private Jaguar loadJag;
     private Solenoid loaderBar;
+    
+    private boolean stickin;
 
     /**
      * This function is run when the robot is first started up and should be
@@ -43,19 +47,23 @@ public class RobotTemplate extends IterativeRobot {
         driveJag3 = new Jaguar(3);
         driveJag4 = new Jaguar(4);
         shiftSolenoid = new Solenoid(1);
+        shiftSolenoid2 = new Solenoid(8);
         compressor.start();
-        loadJag = new Jaguar(5);
-        loaderBar = new Solenoid(2);
+//        loadJag = new Jaguar(5);
+//        loaderBar = new Solenoid(2);
         stick = new Joystick(1);
-        myTorbotDrive = new TorbotDrive(stick, driveJag, driveJag2, driveJag3, driveJag4, shiftSolenoid);
-        myTorShooter = new TorShooter(stick,loadJag,loaderBar);
-
+        myTorJagDrive = new TorJagDrive(driveJag,driveJag2,driveJag3,driveJag4);
+        myTorbotDrive = new TorbotDrive(stick, myTorJagDrive, shiftSolenoid);
+        //myTorShooter = new TorShooter(stick,loadJag,loaderBar);
+        
+        stickin = false;
     }
 
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
+    
     }
 
     /**
@@ -63,20 +71,32 @@ public class RobotTemplate extends IterativeRobot {
      */
     public void teleopPeriodic() {
 
-        if (stick.getRawButton(7)) {
-
-            myTorbotDrive.ReverseArcadeDrive(true);
-        } else {
-            myTorbotDrive.ArcadeDrive(true);
+        if(stick.getRawButton(5)) {
+            stickin = true;
+            System.out.println("Linear");
+        } else if(stick.getRawButton(6)) {
+            stickin = false;
+            System.out.println("Squared");
         }
+        
+//        if (stick.getRawButton(7)) {
 
-        shiftSolenoid.set(stick.getRawButton(2));
-        myTorShooter.run();
+//            myTorbotDrive.ReverseArcadeDrive(true);
+//        } else {
+        myTorbotDrive.ArcadeDrive(stickin);
+        
+        
+//        }
+        
+        shiftSolenoid.set(stick.getRawButton(1));
+        shiftSolenoid2.set(stick.getRawButton(1));
+//        myTorShooter.run();
     }
 
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
+    
     }
 }
