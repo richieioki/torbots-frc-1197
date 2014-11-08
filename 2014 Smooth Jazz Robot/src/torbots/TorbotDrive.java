@@ -72,12 +72,11 @@ public class TorbotDrive {
 
 
         // adjust joystick by dead zone
-        if (Math.abs(stickX) <= .2) {
+        if (Math.abs(stickX) <= 0.2 && (Math.abs(stickY)) <= 0.2) {
             stickX = 0.0;
-        }
-        if (Math.abs(stickY) <= .2) {
             stickY = 0.0;
         }
+       
 
         // make sure X and Y don't go beyond the limits of -1 to 1
         if (stickX > 1.0) {
@@ -121,22 +120,25 @@ public class TorbotDrive {
                 stickY = -(stickY * stickY);
             }
         }
-
-        if (stickY > 0.0) {
+        if (Math.abs(stickY) < 0.2){
+            leftMotorSpeed = stickX;
+            rightMotorSpeed = -stickX;
+        }
+        else if (stickY > 0.0) {
             if (stickX > 0.0) {
-                leftMotorSpeed = stickY - stickX;
-                rightMotorSpeed = Math.max(stickY, stickX);
+                leftMotorSpeed = stickY;
+                rightMotorSpeed = stickY * (1-stickX);
             } else {
-                leftMotorSpeed = Math.max(stickY, -stickX);
-                rightMotorSpeed = stickY + stickX ;
+                leftMotorSpeed = stickY *(1+stickX);
+                rightMotorSpeed = stickY ;
             }
         } else {
             if (stickX > 0.0) {
-                leftMotorSpeed = -Math.max(-stickY, stickX);
-                rightMotorSpeed = stickY + stickX;
+                leftMotorSpeed = stickY;
+                rightMotorSpeed = stickY * (1-stickX);
             } else {
-                leftMotorSpeed = stickY - stickX; 
-                rightMotorSpeed = -Math.max(-stickY, -stickX);
+                leftMotorSpeed = stickY * (1+stickX); 
+                rightMotorSpeed =stickY;
             }
         }
         // set the motor speed
@@ -167,10 +169,8 @@ public class TorbotDrive {
 
 
         // adjust joystick by dead zone
-        if (Math.abs(stickX) <= .2) {
+        if (Math.abs(stickX) <= .2 && Math.abs(stickY) <= .2) {
             stickX = 0.0;
-        }
-        if (Math.abs(stickY) <= .2) {
             stickY = 0.0;
         }
 
@@ -231,7 +231,7 @@ public class TorbotDrive {
 //                rightMotorSpeed = (-Math.max(-stickY, -stickX)) * 20;
 //            }
 //        }
-        System.out.println(stickY);
+        //System.out.println(stickY);
         if(Math.abs(stickY) < 0.2){
             leftMotorSpeed = stickX;
             rightMotorSpeed = -stickX;
