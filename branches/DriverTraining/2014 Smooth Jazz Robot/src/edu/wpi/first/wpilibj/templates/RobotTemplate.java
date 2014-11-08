@@ -9,6 +9,7 @@ package edu.wpi.first.wpilibj.templates;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.*;
 import torbots.*;
+import java.util.Timer;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -63,7 +64,7 @@ public class RobotTemplate extends IterativeRobot {
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    
+        
     }
 
     /**
