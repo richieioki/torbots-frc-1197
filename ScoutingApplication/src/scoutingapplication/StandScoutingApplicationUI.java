@@ -442,6 +442,7 @@ public class StandScoutingApplicationUI extends javax.swing.JFrame {
     }//GEN-LAST:event_jCheckBox1ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        setAllValues();
         makeCSV();
         clearForm();
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -465,6 +466,7 @@ public class StandScoutingApplicationUI extends javax.swing.JFrame {
 
     private void jSpinner1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jSpinner1FocusLost
         gamePoints = Integer.parseInt(jSpinner1.getValue().toString());
+        System.out.println(gamePoints);
     }//GEN-LAST:event_jSpinner1FocusLost
 
     private void jSpinner2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jSpinner2FocusLost
@@ -490,18 +492,19 @@ public class StandScoutingApplicationUI extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
+    
+    public void setAllValues(){
+        gamePoints = Integer.parseInt(jSpinner1.getValue().toString());
+        bonusPoints = Integer.parseInt(jSpinner2.getValue().toString());
+        autoPoints = Integer.parseInt(jSpinner3.getValue().toString());
+        foulPoints = Integer.parseInt(jSpinner4.getValue().toString());
+    }
     public void makeCSV(){
         String fileName = "Match" + matchNum + " " + teamNum +".txt";
-        double accuracy=0.0;
-        try{
-            accuracy = numHits/(numHits+numMisses);
-        }
-        catch(Exception e){
-            
-        }
         try{
             FileWriter writer = new FileWriter(fileName,true);
-            writer.append(matchNum + "," + teamNum +"," + redAlliance + "," + offensive + "," +accuracy +","+autoPoints +","
+            writer.append(matchNum + "," + teamNum +"," + redAlliance + "," + offensive + "," +numHits + ","
+                    + numMisses +","+autoPoints +","
                     + gamePoints +","+bonusPoints + "," +foulPoints+","+speed+","+matchComp);
             writer.flush();
             writer.close();
@@ -523,6 +526,8 @@ public class StandScoutingApplicationUI extends javax.swing.JFrame {
         jCheckBox1.setSelected(false);
         jComboBox1.setSelectedIndex(0);
         jComboBox2.setSelectedIndex(0);
+        numHits = 0;
+        numMisses = 0;
     }
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
