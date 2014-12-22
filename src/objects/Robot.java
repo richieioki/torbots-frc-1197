@@ -26,21 +26,27 @@ public class Robot {
         //Elite, Mid Tier, or Low Tier
         //There roughly 20% of teams are elite, about another 40 percent are mid
         //and the last 40 are low tier teams
+        //one in 10 is us
         
         int tier = random.nextInt(10);
         
-        if(tier <= 1) { //if robot rank is either 0-1
+        if(tier == 0) {
+            rr = robotRank.TORBOT;
+            torbotSetup();
+        } else if(tier <= 1) { //if robot rank is either 1-2
             rr = robotRank.ELITE;
             eliteSetup();
         }
-        else if(tier <= 5) { //if robot rank is between 2-5 mid
+        else if(tier <= 5) { //if robot rank is between 3-6 mid
             rr = robotRank.MID;
             midSetup();
-        }
+        } 
         else {
             rr = robotRank.LOW;
             lowSetup();
         }
+        
+        event = null;
     }
     
     /**
@@ -50,9 +56,11 @@ public class Robot {
     public int evalAuto() {
         if(autoAbility > 0) {
             if(lowGoal) {
-                return autoAbility/5 * gameConstants.autoLowGoal;
+                return autoAbility/4 * gameConstants.autoLowGoal;
             } else {
-                return autoAbility/5 * gameConstants.autoHighGOal; //should allow for some teams to take multiple shots.
+                return autoAbility/4 * gameConstants.autoHighGOal; //should allow for some teams to take multiple shots.
+                //Teams with 10's or the elite level teams will be able to shoot twice.  I know some teams can shoot like 
+                //3 times, but we are not counting those teams at this moment.
             }
         } else {
             return 0; 
@@ -62,25 +70,25 @@ public class Robot {
     private void eliteSetup() {
         onlyDefence = false;
         shootAbility = random.nextInt(5) + 5;
-        endGameAbility = random.nextInt(6) + 4;
+        endGameAbility = random.nextInt(6) + 3;
         autoAbility = random.nextInt(6) + 4;
         lowGoal = Math.random() < 0.1;
         
-        System.out.println("Elite robot setup");
+//        System.out.println("Elite robot setup");
     }
 
     private void midSetup() {
         onlyDefence = false;
         shootAbility = random.nextInt(5) + 3;
-        endGameAbility = random.nextInt(6) + 4;
+        endGameAbility = random.nextInt(4) + 4;
         autoAbility = random.nextInt(6) + 2;
         lowGoal = Math.random() < 0.3;
         
-        System.out.println("Mid robot setup");
+//        System.out.println("Mid robot setup");
     }
 
     private void lowSetup() {
-        int d = random.nextInt(2);//coin flip
+        int d = random.nextInt(3);//coin flip
         
         if(d == 1) { //only defence low level robot
             onlyDefence = true;
@@ -95,8 +103,36 @@ public class Robot {
             autoAbility = random.nextInt(3);
             lowGoal = Math.random() < 0.5;
         }
-        System.out.println("low robot setup");
+//        System.out.println("low robot setup");
     } 
     
+    private void torbotSetup() {
+        onlyDefence = false;
+        shootAbility = random.nextInt(2) + 4;
+        endGameAbility = random.nextInt(3) + 4;
+        autoAbility = random.nextInt(3) + 3;
+        lowGoal = false;
+    }
     
+    public boolean getIsOnlyDefence() {
+        return this.onlyDefence;
+    }
+
+    public void update() {
+        if(this.event != null) {
+            event.update();
+        }
+    }
+    
+    public Random getRandom() {
+        return random;
+    }
+    
+    public boolean aimLowGoal() {
+        return this.lowGoal;
+    }
+    
+    public int getEndGame() {
+        return this.endGameAbility;
+    }
 }

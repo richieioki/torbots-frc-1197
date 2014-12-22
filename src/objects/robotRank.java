@@ -1,5 +1,5 @@
 package objects;
 
 public enum robotRank {
-    ELITE, MID, LOW
+    ELITE, MID, LOW, TORBOT
 }
