@@ -1,17 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package sim;
 
 import game.gameConstants;
 
-/**
- *
- * @author gaming
- */
 public class RobotSimulator {
     public static void main(String args[]) {
         
@@ -76,6 +66,7 @@ public class RobotSimulator {
         System.out.println("Mids : " + avgMid);
         System.out.println("Lows : " + avgLow);
         System.out.println("Torbots " + torbotAVG);
-        System.out.println("Torbots info Total points " + torbotTot + " number of torbots " + torbots );
+        int avgRobot = (totalRed + totalBlue)/ (gameConstants.numberOfRuns * 6); //total points/number of runs * 6 robots per match
+        System.out.println("Average Robot Score " + avgRobot);
     }
 }
