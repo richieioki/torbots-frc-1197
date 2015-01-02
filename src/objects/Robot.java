@@ -1,5 +1,6 @@
 package objects;
 
+import events.Cycle;
 import events.Event;
 import game.gameConstants;
 import java.util.Random;
@@ -9,6 +10,7 @@ public class Robot {
     
     private Random random;
     public robotRank rr;
+    private Cycle cycle;
     
     private boolean onlyDefence; //if robot is only defence then they just constantly play defence.
     private boolean lowGoal; //if a robot aims for the low goal or high goal
@@ -19,9 +21,12 @@ public class Robot {
     
     public Event event;
     
-    public Robot() {
+    public Robot(Cycle inCycle) {
         //generate random stats
         random = new Random();
+        
+        cycle = inCycle; //to determine what strategy this robot is doing.
+               
         //first determine what range our team falls into
         //Elite, Mid Tier, or Low Tier
         //There roughly 20% of teams are elite, about another 40 percent are mid

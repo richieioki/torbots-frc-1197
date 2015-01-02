@@ -1,5 +1,6 @@
 package sim;
 
+import events.Cycle;
 import events.defenseEvent;
 import events.endGameEvent;
 import events.gatherEvent;
@@ -30,20 +31,30 @@ public class Simulator {
         }
     }
 
+    /**
+     * Sets up a single match
+     * @param matchNumber 
+     */
     private void setupSim(int matchNumber) {
-        Robot red1 = new Robot(); //When you create a robot it will randomly generate it stats.
-        Robot red2 = new Robot();
-        Robot red3 = new Robot();
+        Cycle redCycle = new Cycle(); //red strategy
+        
+        Robot red1 = new Robot(redCycle); //When you create a robot it will randomly generate it stats.
+        Robot red2 = new Robot(redCycle);
+        Robot red3 = new Robot(redCycle);
         
         Alliance red = new Alliance("R", red1, red2, red3);
         
-        Robot blue1 = new Robot();
-        Robot blue2 = new Robot();
-        Robot blue3 = new Robot();
+        Cycle blueCycle = new Cycle();
+        
+        Robot blue1 = new Robot(blueCycle);
+        Robot blue2 = new Robot(blueCycle);
+        Robot blue3 = new Robot(blueCycle);
         
         Alliance blue = new Alliance("B", blue1, blue2, blue3);
         
-        runSimulation(red,  blue, matchNumber);
+        thisMatch.setCycle(redCycle, blueCycle);
+        
+        runSimulation(red,  blue, matchNumber, redCycle, blueCycle);
         
         results.add(thisMatch);
     }
@@ -54,7 +65,7 @@ public class Simulator {
      * @param blue
      * @param matchNumber 
      */
-    private void runSimulation(Alliance red, Alliance blue, int matchNumber) {
+    private void runSimulation(Alliance red, Alliance blue, int matchNumber, Cycle redCycle, Cycle blueCycle) {
         boolean isBlueD = false, isRedD = false;
         thisMatch = new Data(matchNumber);
         
@@ -122,11 +133,13 @@ public class Simulator {
         //they are capable of it.  And that there are an unlimited number
         //of objects to shoot at in the moment.
         //We will also ignore robots shifting from offense to defense
+        
+        //Need to program a way to have multiple "strategies"
         for(int i = 0; i < gameConstants.matchDuration; i++) {
             //Check robot status
             updateRobots(red, blue);
             //assign robot tasks if idle
-            check(red, blue, isBlueD, isRedD, i);
+            check(red, blue, isBlueD, isRedD, i, redCycle, blueCycle);
         }
 //        System.out.println("Concluded Teleop scoring");
         //print out data
@@ -148,8 +161,9 @@ public class Simulator {
      * If robot is in idle phase a new "cycle" is started.
      * 
      * Needs to be compacted down into loops, too lazy atm
+     * Need to involve cycles
      */
-    private void check(Alliance red, Alliance blue, boolean isBlueD, boolean isRedD, int time) {
+    private void check(Alliance red, Alliance blue, boolean isBlueD, boolean isRedD, int time, Cycle redCycle, Cycle blueCycle) {
         //Check for completed tasks
         //Tasks that are completed, but have a next task that is idle
         //must have scored points so be sure to add to data's robot score.
