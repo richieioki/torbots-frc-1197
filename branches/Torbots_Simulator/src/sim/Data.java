@@ -1,5 +1,7 @@
 package sim;
 
+import events.Cycle;
+import events.CycleType;
 import objects.robotRank;
 
 /**
@@ -22,6 +24,7 @@ class Data {
     public int[] auto = new int[6];
     public int[] total = new int[6];
     public robotRank[] ranks = new robotRank[6];
+    public Cycle redCycle, blueCycle;
 
     public Data(int matchNumber) {
         this.matchNumber = matchNumber;
@@ -52,5 +55,10 @@ class Data {
 
     public int getMatchNumber() {
         return matchNumber;
+    }
+    
+    public void setCycle(Cycle red, Cycle blue) {
+        this.redCycle = red;
+        this.blueCycle = blue;
     }
 }
