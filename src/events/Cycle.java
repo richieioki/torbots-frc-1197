@@ -1,6 +1,5 @@
 package events;
 
-import java.util.Collections;
 import java.util.Random;
 import objects.Robot;
 
@@ -30,10 +29,14 @@ public class Cycle {
      * @return 
      */
     public Event setupCycle(Robot robot) {
+    
+        /*
+         switch(m_type) {
+         //Put robot code for setting up cycles as linked lists basically here.  
         
         
-        
-        
+         }
+         */
         return null;
     }
     
