@@ -23,6 +23,7 @@ class Data {
     public int[] tele = new int[6];
     public int[] auto = new int[6];
     public int[] total = new int[6];
+    public Cycle[] cycles = new Cycle[6];
     public robotRank[] ranks = new robotRank[6];
     public Cycle redCycle, blueCycle;
 
@@ -55,10 +56,5 @@ class Data {
 
     public int getMatchNumber() {
         return matchNumber;
-    }
-    
-    public void setCycle(Cycle red, Cycle blue) {
-        this.redCycle = red;
-        this.blueCycle = blue;
     }
 }
