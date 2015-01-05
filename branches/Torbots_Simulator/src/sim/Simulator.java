@@ -32,7 +32,7 @@ public class Simulator {
      * @param matchNumber 
      */
     private void setupSim(int matchNumber) {
-        
+        System.out.println("Starting match : " + matchNumber);
         Robot red1 = new Robot(); //When you create a robot it will randomly generate it stats.
         Robot red2 = new Robot();
         Robot red3 = new Robot();
@@ -44,6 +44,8 @@ public class Simulator {
         Robot blue3 = new Robot();
         
         Alliance blue = new Alliance("B", blue1, blue2, blue3);
+
+        thisMatch = new Data(matchNumber);
         
         thisMatch.cycles[0] = red1.cycle;
         thisMatch.cycles[1] = red2.cycle;
@@ -65,7 +67,7 @@ public class Simulator {
      */
     private void runSimulation(Alliance red, Alliance blue, int matchNumber) {
         boolean isBlueD = false, isRedD = false;
-        thisMatch = new Data(matchNumber);
+//        thisMatch = new Data(matchNumber);
         
         //record robot types
         thisMatch.ranks[0] = red.getOne().rr;
@@ -131,7 +133,13 @@ public class Simulator {
         }
 //        System.out.println("Concluded Teleop scoring");
         //print out data
-    }    
+        thisMatch.trips[0] = red.getOne().numTrips;
+        thisMatch.trips[1] = red.getTwo().numTrips;
+        thisMatch.trips[2] = red.getThree().numTrips;
+        thisMatch.trips[3] = blue.getOne().numTrips;
+        thisMatch.trips[4] = blue.getTwo().numTrips;
+        thisMatch.trips[5] = blue.getThree().numTrips;
+    }
 
     private void updateRobots(Alliance red, Alliance blue) {
         red.getOne().update();
@@ -155,8 +163,14 @@ public class Simulator {
         //Check for completed tasks
         //Tasks that are completed, but have a next task that is idle
         //must have scored points so be sure to add to data's robot score.
+        
+//        System.out.println(thisMatch.cycles[0].m_type);
+        
         if (red.getOne().event.isComplete()) {
-            thisMatch.tele[0] = thisMatch.tele[0] + red.getOne().event.getPointValue(); //added completed events point value to total            
+            thisMatch.tele[0] = thisMatch.tele[0] + red.getOne().event.getPointValue(); //added completed events point value to total
+            if(red.getOne().event.getPointValue() > 0) {
+                red.getOne().numTrips++;
+            }
             red.getOne().event = red.getOne().event.getNextEvent(); //set next event be equal to current event.
         } else if (red.getOne().event instanceof idleEvent) { //means that the robot isn't playing defence        
 //            if(red.getOne().getEndGame() > 0  && time >= 100) { //Checks to see if we are end game
@@ -167,9 +181,14 @@ public class Simulator {
             
             red.getOne().event = red.getOne().cycle.startNewCycle();
         }
+        
+//        System.out.println(thisMatch.cycles[1].m_type);
 
         if (red.getTwo().event.isComplete()) {
-            thisMatch.tele[1] = thisMatch.tele[1] + red.getTwo().event.getPointValue(); //added completed events point value to total           
+            thisMatch.tele[1] = thisMatch.tele[1] + red.getTwo().event.getPointValue(); //added completed events point value to total  
+            if(red.getTwo().event.getPointValue() > 0) {
+                red.getTwo().numTrips++;
+            }
             red.getTwo().event = red.getTwo().event.getNextEvent(); //set next event be equal to current event.
         } else if (red.getTwo().event instanceof idleEvent) { 
 //            if(red.getTwo().getEndGame() > 0  && time >= 100) {
@@ -179,9 +198,14 @@ public class Simulator {
 //            }
             red.getTwo().event = red.getTwo().cycle.startNewCycle();
         }
+        
+//        System.out.println(thisMatch.cycles[2].m_type);
 
         if (red.getThree().event.isComplete()) {
             thisMatch.tele[2] = thisMatch.tele[2] + red.getThree().event.getPointValue(); //added completed events point value to total
+            if(red.getThree().event.getPointValue() > 0) {
+                red.getThree().numTrips++;
+            }
             red.getThree().event = red.getThree().event.getNextEvent(); //set next event be equal to current event.
         } else if (red.getThree().event instanceof idleEvent) {          
 //            if(red.getThree().getEndGame() > 0  && time >= 100) {
@@ -191,9 +215,14 @@ public class Simulator {
 //            }
             red.getThree().event = red.getThree().cycle.startNewCycle();
         }
+        
+//        System.out.println(thisMatch.cycles[3].m_type);
 
         if (blue.getOne().event.isComplete()) {
             thisMatch.tele[3] = thisMatch.tele[3] + blue.getOne().event.getPointValue(); //added completed events point value to total
+            if(blue.getOne().event.getPointValue() > 0) {
+                blue.getOne().numTrips++;
+            }
             blue.getOne().event = blue.getOne().event.getNextEvent(); //set next event be equal to current event.
         } else if (blue.getOne().event instanceof idleEvent) {            
 //            if(blue.getOne().getEndGame() > 0  && time >= 100) {
@@ -203,8 +232,13 @@ public class Simulator {
 //            }
             blue.getOne().event = blue.getOne().cycle.startNewCycle();
         }
+        
+//        System.out.println(thisMatch.cycles[4].m_type);
         if (blue.getTwo().event.isComplete()) {
             thisMatch.tele[4] = thisMatch.tele[4] + blue.getTwo().event.getPointValue(); //added completed events point value to total
+            if(blue.getTwo().event.getPointValue() > 0) {
+                blue.getTwo().numTrips++;
+            }
             blue.getTwo().event = blue.getTwo().event.getNextEvent(); //set next event be equal to current event.
         } else if (blue.getTwo().event instanceof idleEvent) {          
 //            if(blue.getTwo().getEndGame() > 0  && time >= 100) {
@@ -215,8 +249,14 @@ public class Simulator {
             blue.getTwo().event = blue.getTwo().cycle.startNewCycle();
         }
         
+//        System.out.println(thisMatch.cycles[5].m_type);
+        
+        
         if (blue.getThree().event.isComplete()) {
             thisMatch.tele[5] = thisMatch.tele[5] + blue.getThree().event.getPointValue(); //added completed events point value to total
+            if(blue.getThree().event.getPointValue() > 0) {
+                blue.getThree().numTrips++;
+            }
             blue.getThree().event = blue.getThree().event.getNextEvent(); //set next event be equal to current event.
         } else if (blue.getThree().event instanceof idleEvent) {     
 //            if(blue.getThree().getEndGame() > 0  && time >= 100) {

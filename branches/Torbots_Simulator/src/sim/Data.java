@@ -26,6 +26,7 @@ class Data {
     public Cycle[] cycles = new Cycle[6];
     public robotRank[] ranks = new robotRank[6];
     public Cycle redCycle, blueCycle;
+    public int[] trips = new int[6];
 
     public Data(int matchNumber) {
         this.matchNumber = matchNumber;
