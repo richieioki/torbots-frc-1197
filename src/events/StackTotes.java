@@ -4,10 +4,11 @@ import objects.Robot;
 
 public class StackTotes extends Event {
     //Assumes you are in position.
+    private Robot robot;
    
     public StackTotes(Robot robot) {
         super();
-
+        this.robot = robot;
         switch (robot.rr) {
             case ELITE:
                 duration = robot.getRandom().nextInt(3) + 5; //since the step is
@@ -31,5 +32,21 @@ public class StackTotes extends Event {
                 //I'm hoping that we should be able to unload in a short time span.
                 break;
         }
+    }
+    
+    @Override
+    public boolean isComplete() {
+        if(timer >= duration && duration >= 0) {
+            this.pointValue = 2 * robot.grayTotes;
+            
+            if(robot.isBinAbility() && robot.hasBin) {
+                this.pointValue += 4 * robot.grayTotes;
+                robot.hasBin = false;
+            }
+            return true;
+        } else {
+            return false;
+        }        
+        
     }
 }

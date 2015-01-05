@@ -24,12 +24,17 @@ public class Robot {
     public boolean hasBin;
     
     public int coopTotes;
-
+    
+    
+    public int numTrips;
     public Event event;
 
     public Robot() {
         //generate random stats
         random = new Random();
+        
+        hasBin = false;
+        grayTotes = 0; numTrips = 0;
 
         finishedCoop = false;
 
@@ -88,19 +93,19 @@ public class Robot {
 
     //should eventually replace with weighted values.
     private void eliteSetup() {
-        stackAbility = random.nextInt(7);
+        stackAbility = random.nextInt(6) + 1;
         binAbility = true;
         coopAbility = stackAbility >= 4;
     }
 
     private void midSetup() {
-        stackAbility = random.nextInt(5);
+        stackAbility = random.nextInt(5) + 1;
         binAbility = random.nextInt(10) < 3;
         coopAbility = stackAbility >= 4;
     }
 
     private void lowSetup() {
-        stackAbility = random.nextInt(3);
+        stackAbility = random.nextInt(2) + 1;
         binAbility = false;
         coopAbility = true;
     }

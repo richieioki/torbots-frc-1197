@@ -1,5 +1,6 @@
 package sim;
 
+import events.CycleType;
 import game.gameConstants;
 
 public class RobotSimulator {
@@ -8,6 +9,11 @@ public class RobotSimulator {
         Simulator sim = new Simulator(gameConstants.numberOfRuns);
         
         sim.run(); //should run one instance for now.
+        
+        int type1 = 0, type2 = 0, type3 = 0, type4 = 0, torbots1 = 0, torbots2 = 0;
+        int t1score = 0, t2score = 0, t3score = 0, t4score = 0, tor1score = 0, tor2score = 0;
+        
+        int eliteTrips = 0, midTrips = 0, lowTrips = 0, torbotTrips = 0;
         
         //print out average score of our run
         int totalRed = 0;
@@ -25,18 +31,49 @@ public class RobotSimulator {
                     case ELITE:
                         elite++;
                         totElite += data.total[i];
+                        eliteTrips += data.trips[i];
                         break;
                     case MID:
                         mids++;
                         totMid += data.total[i];
+                        midTrips += data.trips[i];
                         break;
                     case LOW:
                         lows++;
                         totLow += data.total[i];
+                        lowTrips += data.trips[i];
                         break;
                     case TORBOT:
                         torbots++;
                         torbotTot += data.total[i];
+                        torbotTrips += data.trips[i];
+                        break;
+                }
+                
+                switch(data.cycles[i].m_type) {
+                    case TYPE1:
+                        type1++;
+                        t1score+=data.tele[i];
+                        break;
+                    case TYPE2:
+                        type2++;
+                        t2score+=data.tele[i];
+                        break;
+                    case TYPE3:
+                        type3++;
+                        t3score+=data.tele[i];
+                        break;
+                    case TYPE4:
+                        type4++;
+                        t4score+=data.tele[i];
+                        break;
+                    case TORBOT1:
+                        torbots1++;
+                        tor1score+=data.tele[i];
+                        break;
+                    case TORBOT2:
+                        torbots2++;
+                        tor2score+=data.tele[i];
                         break;
                 }
             }
@@ -68,5 +105,29 @@ public class RobotSimulator {
         System.out.println("Torbots " + torbotAVG);
         int avgRobot = (totalRed + totalBlue)/ (gameConstants.numberOfRuns * 6); //total points/number of runs * 6 robots per match
         System.out.println("Average Robot Score " + avgRobot);
+        
+        System.out.println("\n\n\n\n");
+        System.out.println("Type1 = " + type1);
+        System.out.println("Type2 = " + type2);
+        System.out.println("Type3 = " + type3);
+        System.out.println("Type4 = " + type4);
+        System.out.println("Torbots1 = " + torbots1);
+        System.out.println("Torbots2 = " + torbots2);
+        System.out.println("TYPE 1 total points = " + t1score + " average score : " + t1score/type1); 
+        System.out.println("TYPE 2 total points = " + t2score + " average score : " + t2score/type2); 
+        System.out.println("TYPE 3 total points = " + t3score + " average score : " + t3score/type3); 
+        System.out.println("TYPE 4 total points = " + t4score + " average score : " + t4score/type4); 
+        System.out.println("TORBOTS1 total points = " + tor1score + " average score : " + tor1score/torbots1); 
+        System.out.println("TORBOTS2 total points = " + tor2score + " average score : " + tor2score/torbots2); 
+        
+        System.out.println("\n\n Trip data");
+        float averageTrip = eliteTrips/elite;
+        System.out.println("Elite trips = " + averageTrip);
+        averageTrip = midTrips/mids;
+        System.out.println("Mid trips = " + averageTrip);
+        averageTrip = lowTrips/lows;
+        System.out.println("Low trips = " + averageTrip);
+        averageTrip = torbotTrips/torbots;
+        System.out.println("Torbot trips = " + averageTrip);
     }
 }

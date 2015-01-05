@@ -12,5 +12,5 @@ public class gameConstants {
     public static final int teleHigh = 10;
     public static final int teleLow = 1;
     
-    public static final int numberOfRuns = 1000000;
+    public static final int numberOfRuns = 250000;
 }

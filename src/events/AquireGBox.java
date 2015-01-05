@@ -32,6 +32,12 @@ public class AquireGBox extends Event {
                 //but are not as capable at finding the totes
                 break;
         }
+        
+        duration = duration * robot.getStackAbility();
+        robot.grayTotes = robot.getStackAbility();
+        if(duration == 0) {
+            duration++;//you can always push one crate;
+        }
     }
     
 }

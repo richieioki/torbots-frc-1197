@@ -4,8 +4,12 @@ import objects.Robot;
 
 public class AquireBin extends Event {
     
+    private Robot robot;
+    
     public AquireBin(Robot robot) {
         super();
+        
+        this.robot = robot;
         
         //represents the average time to find and load a recycle bin
         switch(robot.rr) {
@@ -32,4 +36,14 @@ public class AquireBin extends Event {
         }
     }
     
+    
+    public boolean isComplete() {
+        if(timer >= duration && duration >= 0) {
+            robot.hasBin = true;
+            return true;
+        } else {
+            return false;
+        }        
+        
+    }
 }
