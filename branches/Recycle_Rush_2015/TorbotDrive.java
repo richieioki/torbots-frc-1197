@@ -15,6 +15,12 @@ public class TorbotDrive {
 		theStick2 = stick2;
 		
 	}
+	public TorbotDrive(TorJagDrive torbotJagDrive, Joystick stick1){
+		
+		myJagDrive = torbotJagDrive;
+		theStick = stick1;
+		
+	}
 	public void mechanum(boolean squaredInputs){
 
 	        // get negative of the stick controls. forward on stick gives negative value  
@@ -76,5 +82,71 @@ public class TorbotDrive {
 		
 		
 	}
+	public void ArcadeDrive(boolean squaredInputs) {
+
+        double leftMotorSpeed;
+        double rightMotorSpeed;
+
+        // get negative of the stick controls. forward on stick gives negative value  
+        double stickX = -theStick.getX();
+        double stickY = -theStick.getY();
+
+
+        // adjust joystick by dead zone
+        if (Math.abs(stickX) <= .2) {
+            stickX = 0.0;
+        }
+        if (Math.abs(stickY) <= .2) {
+            stickY = 0.0;
+        }
+
+        // make sure X and Y don't go beyond the limits of -1 to 1
+      if(Math.abs(stickX) > 1.0){
+    	  stickX = Math.abs(stickX)/stickX;
+      }
+
+
+      if(Math.abs(stickY) > 1.0){
+    	  stickY = Math.abs(stickY)/stickY;
+      }
+
+
+        // square the inputs to produce an exponential power curve
+        // this allows finer control with joystick movement and full power as you approach joystick limits
+        if (squaredInputs) {
+            if (stickX >= 0.0) {
+                stickX = (stickX * stickX);
+            } else {
+                stickX = -(stickX * stickX);
+            }
+
+            if (stickY >= 0.0) {
+                stickY = (stickY * stickY);
+            } else {
+                stickY = -(stickY * stickY);
+            }
+        }
+
+        if (stickY > 0.0) {
+            if (stickX > 0.0) {
+                leftMotorSpeed = stickY - stickX;
+                rightMotorSpeed = Math.max(stickY, stickX);
+            } else {
+                leftMotorSpeed = Math.max(stickY, -stickX);
+                rightMotorSpeed = stickY + stickX ;
+            }
+        } else {
+            if (stickX > 0.0) {
+                leftMotorSpeed = -Math.max(-stickY, stickX);
+                rightMotorSpeed = stickY + stickX;
+            } else {
+                leftMotorSpeed = stickY - stickX; 
+                rightMotorSpeed = -Math.max(-stickY, -stickX);
+            }
+        }
+        myJagDrive.setRightJags(rightMotorSpeed);
+        myJagDrive.setLeftJags(-leftMotorSpeed);
+
+    }
 
 }
