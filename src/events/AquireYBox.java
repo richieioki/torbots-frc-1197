@@ -12,11 +12,11 @@ public class AquireYBox extends Event {
         //on the field at time of search.
         switch(robot.rr) {
             case ELITE:
-                duration = robot.getRandom().nextInt(5) + 8; //I estimate about 5 seconds to load with a 5 second variance
+                duration = robot.getRandom().nextInt(5) + 4; //I estimate about 5 seconds to load with a 5 second variance
                 break;
                 
             case MID:
-                duration = robot.getRandom().nextInt(5) + 10; 
+                duration = robot.getRandom().nextInt(10) + 5; 
                 //mid teams sometimes can load about the same time, but can't locate
                 //as well and sometimes have more variables
                 break;
@@ -28,7 +28,7 @@ public class AquireYBox extends Event {
                 break;
                 
             case TORBOT:
-                duration = robot.getRandom().nextInt(15) + 8; 
+                duration = robot.getRandom().nextInt(15) + 5; 
                 //I am estimating that we could load at elite-ish level speed
                 //but are not as capable at finding the totes
                 break;

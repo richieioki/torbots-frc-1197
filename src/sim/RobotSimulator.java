@@ -13,6 +13,8 @@ public class RobotSimulator {
         int type1 = 0, type2 = 0, type3 = 0, type4 = 0, torbots1 = 0, torbots2 = 0;
         int t1score = 0, t2score = 0, t3score = 0, t4score = 0, tor1score = 0, tor2score = 0;
         
+        int t1trips = 0, t2trips = 0, t3trips = 0, t4trips = 0, tor1trips = 0, tor2trips = 0;
+        
         int eliteTrips = 0, midTrips = 0, lowTrips = 0, torbotTrips = 0;
         
         //print out average score of our run
@@ -52,27 +54,33 @@ public class RobotSimulator {
                 
                 switch(data.cycles[i].m_type) {
                     case TYPE1:
+                        t1trips += data.trips[i];
                         type1++;
                         t1score+=data.tele[i];
                         break;
                     case TYPE2:
                         type2++;
+                        t2trips += data.trips[i];
                         t2score+=data.tele[i];
                         break;
                     case TYPE3:
                         type3++;
+                        t3trips += data.trips[i];
                         t3score+=data.tele[i];
                         break;
                     case TYPE4:
                         type4++;
+                        t4trips += data.trips[i];
                         t4score+=data.tele[i];
                         break;
                     case TORBOT1:
                         torbots1++;
+                        tor1trips += data.trips[i];
                         tor1score+=data.tele[i];
                         break;
                     case TORBOT2:
                         torbots2++;
+                        tor2trips += data.trips[i];
                         tor2score+=data.tele[i];
                         break;
                 }
@@ -129,5 +137,20 @@ public class RobotSimulator {
         System.out.println("Low trips = " + averageTrip);
         averageTrip = torbotTrips/torbots;
         System.out.println("Torbot trips = " + averageTrip);
+        
+        System.out.println("\n\n Trip data by cycle");
+        averageTrip = t1trips/type1;
+        System.out.println("Type1 trips = " + averageTrip);
+        averageTrip = t2trips/type2;
+        System.out.println("Type2 trips = " + averageTrip);
+        averageTrip = t3trips/type3;
+        System.out.println("Type3 trips = " + averageTrip);
+        averageTrip = t4trips/type4;
+        System.out.println("Type1 trips = " + averageTrip);
+        averageTrip = tor1trips/torbots1;
+        System.out.println("Type1 trips = " + averageTrip);
+        averageTrip = tor2trips/torbots2;
+        System.out.println("Type1 trips = " + averageTrip);
+        
     }
 }
