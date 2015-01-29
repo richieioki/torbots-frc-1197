@@ -32,4 +32,13 @@ public class TorJagDrive {
         leftJag1.set(leftSpeed);
         leftJag2.set(leftSpeed);
     }  
+    public void setLeft(double motorSpeed){
+    	leftJag1.set(-motorSpeed);
+    	leftJag2.set(-motorSpeed);
+    }
+    public void setRight(double motorSpeed){
+    	rightJag1.set(motorSpeed);
+    	rightJag2.set(motorSpeed);
+    }
+
 }

@@ -14,63 +14,80 @@ import Torbots.*;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	Jaguar fLeftJag,fRightJag,bLeftJag,bRightJag;
 	
 	Joystick stick;
 	Joystick tartarus;
 	
-	int autoLoopCounter;
-	
-	AnalogPotentiometer pot;
-	Relay spike;
-	Encoder e;
+	Jaguar fLeftJag,fRightJag,bLeftJag,bRightJag;
+	Encoder wheelEncoder;
 	Gyro gyro;
-	AnalogInput sonar;
-	PowerDistributionPanel PDP;
-	
 	TorJagDrive jagDrive;
 	TorbotDrive torDrive;
+	
+	Solenoid deployer;
+	TorDeployer torDeploy;
+	
+	Solenoid clamp;
+	Jaguar intake;
+	AnalogInput armSonar;
+	DigitalInput pSwitch;
+	TorPickup torPickup;
+	
+	Encoder elevatorEncoder;
+
+	PowerDistributionPanel PDP;
+	
+	
 	
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 	public void robotInit() {
+		stick = new Joystick(0);
+		tartarus = new Joystick(1);
+		
 		fLeftJag = new Jaguar(0);
 		bLeftJag = new Jaguar(1);
 		fRightJag = new Jaguar(2);
 		bRightJag = new Jaguar(3);
+		jagDrive = new TorJagDrive(fLeftJag,bLeftJag,fRightJag,bRightJag);
 		
-		stick = new Joystick(0);
-		tartarus = new Joystick(1);
+		wheelEncoder = new Encoder(0,1,false,EncodingType.k4X);
+		gyro = new Gyro(1);
+		torDrive = new TorbotDrive(stick,jagDrive,wheelEncoder,gyro);
+
+		deployer = new Solenoid(0);
+		torDeploy = new TorDeployer(stick,deployer);
 		
-		sonar = new AnalogInput(2);
+		clamp = new Solenoid(1);
+		intake = new Jaguar(4);
+		armSonar = new AnalogInput(0);
+		pSwitch = new DigitalInput(2);
+		torPickup = new TorPickup(tartarus,clamp,intake, armSonar, pSwitch);
+		
+		elevatorEncoder = new Encoder(3,4,false,EncodingType.k4X);
+		
 
 		 
 		//    	rb = new RobotDrive(0,1);
 		
-		pot = new AnalogPotentiometer(0);
-		spike = new Relay(0);
-		e = new Encoder(0,1,false,EncodingType.k4X);
-		gyro = new Gyro(1);
+		
 		PDP = new PowerDistributionPanel ();
 		
-		jagDrive = new TorJagDrive(fLeftJag,bLeftJag,fRightJag,bRightJag);
-		torDrive = new TorbotDrive(stick,jagDrive);
 	}
 
 	/**
 	 * This function is run once each time the robot enters autonomous mode
 	 */
 	public void autonomousInit() {
-		autoLoopCounter = 0;
 	}
 
 	/**
 	 * This function is called periodically during autonomous
 	 */
 	public void autonomousPeriodic() {
-
+		
 	}
 
 	/**
@@ -83,7 +100,6 @@ public class Robot extends IterativeRobot {
 	 * This function is called periodically during operator control
 	 */
 	public void teleopPeriodic() {
-		SmartDashboard.putDouble("Distance", sonar.getVoltage()/0.009766);
 	}
 
 
