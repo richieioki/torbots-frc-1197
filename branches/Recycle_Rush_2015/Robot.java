@@ -37,6 +37,7 @@ public class Robot extends IterativeRobot {
 
 	PowerDistributionPanel PDP;
 	
+	TorTest myTest;
 	
 	
 	/**
@@ -75,6 +76,7 @@ public class Robot extends IterativeRobot {
 		
 		PDP = new PowerDistributionPanel ();
 		
+		myTest = new TorTest();
 	}
 
 	/**
@@ -108,6 +110,7 @@ public class Robot extends IterativeRobot {
 	 */
 	public void testPeriodic() {
 		LiveWindow.run();
+		myTest.testDrive();
 	}
 
 }
