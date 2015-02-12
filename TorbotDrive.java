@@ -48,9 +48,6 @@ public class TorbotDrive {
         double stickX = -m_stick.getX();
         double stickY = -m_stick.getY();
 
-        //shiftButton = m_stick.getRawButton(1);
-
-
         // adjust joystick by dead zone
         if (Math.abs(stickX) <= 0.2 && (Math.abs(stickY)) <= 0.2) {
             stickX = 0.0;
@@ -85,8 +82,8 @@ public class TorbotDrive {
         }
 
         if(Math.abs(stickY) < 0.1){
-            leftMotorSpeed = stickX;
-            rightMotorSpeed = -stickX;
+            leftMotorSpeed = stickX*0.5;
+            rightMotorSpeed = -0.5*stickX;
         }
         else if (stickY > 0.0) {
             if (stickX > 0.0) {
