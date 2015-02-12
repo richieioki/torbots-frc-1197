@@ -1,5 +1,6 @@
 package Torbots;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TorElevator {
 	
@@ -10,14 +11,17 @@ public class TorElevator {
 		private Solenoid clamp;
 		private DigitalInput bottomSwitch;
 		private DigitalInput topSwitch;
-		private DigitalInput oneTote;
 		private TorJagDrive m_jagDrive;
 		private Encoder elevatorEncoder;
-		private PIDController m_PID;
+//		private PIDController m_PID;
 		private boolean isOverridden;
+		private boolean isHolding;
+		private boolean isDeploying;
+		private final int HOLDING = -380;
+		private int currentGoal;;
 		public TorElevator(Joystick stick, Joystick stick2, TorPickup tpu, 
 				Jaguar eJag, Solenoid c, DigitalInput bs, DigitalInput ts, 
-				DigitalInput os, TorJagDrive jagDrive, Encoder e){
+				TorJagDrive jagDrive, Encoder e){
 			tartarus = stick;
 			this.stick = stick2;
 			m_pickup = tpu;
@@ -25,64 +29,113 @@ public class TorElevator {
 			clamp = c;
 			bottomSwitch = bs;
 			topSwitch = ts;
-			oneTote = os;
 			m_jagDrive = jagDrive;
 			elevatorEncoder = e;
 			isOverridden = false;
-
-			m_PID = new PIDController(0.05, 0.003, 0.0, elevatorEncoder, elevatorJag, 0.05);
-			m_PID.setContinuous(false);
-			m_PID.setAbsoluteTolerance(3.5);
-			m_PID.setSetpoint(elevatorEncoder.get());
-			m_PID.setInputRange(Integer.MIN_VALUE, Integer.MAX_VALUE);
-			m_PID.setOutputRange(-0.9, 0.9);
-			m_PID.enable();
+			isHolding = false;
+			currentGoal = elevatorEncoder.get();
 		}
+		public void wait(double t){
+	        long startTime = System.currentTimeMillis();
+	        while((System.currentTimeMillis() - startTime) / 1000.0 < t){
+	            
+	        }
+	    }
 		public void run(){
-			if(!bottomSwitch.get() && !stick.getRawButton(1)){
+			if(bottomSwitch.get() && !stick.getRawButton(1)){
 				elevatorJag.set(0.0);
+				m_pickup.elevatorRunning(false);
+				elevatorEncoder.reset();
 			}
 			if(topSwitch.get() && !stick.getRawButton(2)){
 				elevatorJag.set(0.0);
+				m_pickup.elevatorRunning(false);
 			}
-			if(isOverridden){
-				m_PID.disable();
-				if(tartarus.getRawButton(3)){
-					clamp.set(true);
-				}
-				if(tartarus.getRawButton(4)){
-					clamp.set(false);
-				}
-				if(stick.getRawButton(1)){
-					elevatorJag.set(0.7);
-				}
-				else if(stick.getRawButton(2)){
-					elevatorJag.set(-0.7);
+			if(isHolding&&!(stick.getRawButton(1)||stick.getRawButton(2))&&!bottomSwitch.get()){
+				if( Math.abs(elevatorEncoder.get()- HOLDING)>10){
+					if(elevatorEncoder.get()>HOLDING){
+						elevatorJag.set(0.05);
+					}
+					else{
+						elevatorJag.set(-0.05);
+					}
 				}
 				else{
 					elevatorJag.set(0.0);
+				}  
+			}
+			if(Math.abs(elevatorEncoder.get() - currentGoal)>10){
+				if(elevatorEncoder.get()>currentGoal){
+					elevatorJag.set(0.05);
+				}
+				else{
+					elevatorJag.set(-0.05);
+				}
+			}
+			else{
+				elevatorJag.set(0.0);
+			}
+			if(isOverridden){
+				if(tartarus.getRawButton(3)){
+					clamp.set(false);
+				}
+				if(tartarus.getRawButton(4)){
+					clamp.set(true);
+				}
+				if(stick.getRawButton(1)){
+					m_pickup.elevatorRunning(true);
+					elevatorJag.set(0.4);
+					currentGoal = elevatorEncoder.get();
+				}
+				else if(stick.getRawButton(2)){
+					elevatorJag.set(-0.4);
+					m_pickup.elevatorRunning(true);
+					currentGoal = elevatorEncoder.get();
+				}
+				else{
+					elevatorJag.set(0.0);
+					m_pickup.elevatorRunning(false);
 				}
 			}
 			else{
 				if(m_pickup.isReadyRaise()){
-					m_PID.disable();
-					m_jagDrive.setJagSpeed(0.0, 0.0);
+					m_jagDrive.setJagSpeed(0.0, 0.0); 
 					m_pickup.setRaise(false);
-					clamp.set(false);
-					elevatorJag.set(-0.6);
-					while(bottomSwitch.get()){
+					elevatorJag.set(-0.5);
+					while(elevatorEncoder.get()<-250){
 						
 					}
 					elevatorJag.set(0.0);
 					clamp.set(true);
-					elevatorJag.set(0.6);
-					while(!oneTote.get()){
+					elevatorJag.set(-0.5);
+					while(!bottomSwitch.get()){
+						if(tartarus.getRawButton(5)){
+							break;
+						}
 					}
 					elevatorJag.set(0.0);
-					m_PID.setSetpoint(elevatorEncoder.get());
-					m_PID.enable();
+					wait(0.5);
+					clamp.set(false);
+					wait(0.5);
+					elevatorJag.set(0.5);
+					while(elevatorEncoder.get()>-300){
+						if(tartarus.getRawButton(5)){
+							break;
+						}
+					}
+					elevatorJag.set(0.3);
+					while(elevatorEncoder.get()>- 380){
+						if(tartarus.getRawButton(5)){
+							break;
+						}
+					}
+					wait(0.1);
+					elevatorJag.set(0.0);
+					isHolding = true;
+					currentGoal = elevatorEncoder.get();
 				}
-			}
+			} 
+			
 		}
 		public void Override(boolean a){
 			isOverridden = a;

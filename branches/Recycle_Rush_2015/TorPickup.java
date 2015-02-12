@@ -13,6 +13,8 @@ public class TorPickup {
 	private TorJagDrive m_jagDrive;
 	private boolean isOverridden;
 	private boolean isReadyRaise;
+	private boolean elevatorRunning;
+	private double voltage;
 	
 	public TorPickup(Joystick tartarus, Solenoid wheelSolenoid, 
 			Jaguar intake, Jaguar intake2, AnalogInput sonar, DigitalInput pressureSwitch,
@@ -26,7 +28,14 @@ public class TorPickup {
 		m_jagDrive = jagDrive;
 		isOverridden = false;
 		isReadyRaise = false;
+		voltage = 13.0;
 	}
+	public void wait(double t){
+        long startTime = System.currentTimeMillis();
+        while((System.currentTimeMillis() - startTime) / 1000.0 < t){
+            
+        }
+    }
 	public void run(){
 		if(isOverridden){
 			if(tartarus.getRawButton(1)){
@@ -37,7 +46,7 @@ public class TorPickup {
 			}
 		}
 		else{
-			if(getSonarDistance() < 10.0 && !pSwitch.get()){
+			if(getSonarDistance() < 10.0 && !pSwitch.get() && !elevatorRunning){
 				m_jagDrive.setJagSpeed(0.0, 0.0);
 				closeWheels();
 				while(!pSwitch.get()){
@@ -45,6 +54,7 @@ public class TorPickup {
 						break;
 					}
 				}
+				wait(1.0);
 				retractWheels();
 				isReadyRaise = true;
 			}
@@ -72,5 +82,11 @@ public class TorPickup {
 	}
 	public void Override(boolean a){
 		isOverridden = a;
+	}
+	public void elevatorRunning(boolean a){
+		elevatorRunning = a;
+	}
+	public void setVoltage(double a){
+		
 	}
 }
