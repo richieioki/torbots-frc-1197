@@ -82,7 +82,6 @@ public class PracticeFrame extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         InternalFrame = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -177,11 +176,7 @@ public class PracticeFrame extends javax.swing.JFrame {
 
         jLabel1.setText("Number of Stacks");
 
-        jSpinner4.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                jSpinner4StateChanged(evt);
-            }
-        });
+        jSpinner4.setToolTipText("");
         jSpinner4.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusLost(java.awt.event.FocusEvent evt) {
                 jSpinner4FocusLost(evt);
@@ -239,9 +234,6 @@ public class PracticeFrame extends javax.swing.JFrame {
         });
 
         jLabel13.setText("Can?");
-
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, new javax.swing.JSpinner(), org.jdesktop.beansbinding.ObjectProperty.create(), jLabel13, org.jdesktop.beansbinding.BeanProperty.create("labelFor"));
-        bindingGroup.addBinding(binding);
 
         jLabel14.setText("Can?");
 
@@ -586,12 +578,13 @@ public class PracticeFrame extends javax.swing.JFrame {
                             .addComponent(jLabel26)))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(InternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(InternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jComboBox6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(InternalFrameLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jComboBox5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
                 .addComponent(jButton2)
                 .addContainerGap())
@@ -608,16 +601,8 @@ public class PracticeFrame extends javax.swing.JFrame {
             .addComponent(InternalFrame, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
-        bindingGroup.bind();
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jSpinner4StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSpinner4StateChanged
-        // TODO add your handling code here:
-        numStacks ++;
-        
-    }//GEN-LAST:event_jSpinner4StateChanged
 
     private void jTextField1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextField1FocusLost
         // TODO add your handling code here:
@@ -759,7 +744,6 @@ public class PracticeFrame extends javax.swing.JFrame {
     private void jSpinner3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jSpinner3FocusLost
         // TODO add your handling code here:
         foulPoints = Integer.parseInt(jSpinner3.getValue().toString());
-        System.out.println(foulPoints);
     }//GEN-LAST:event_jSpinner3FocusLost
 
     private void jSpinner4FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jSpinner4FocusLost
@@ -815,8 +799,10 @@ public class PracticeFrame extends javax.swing.JFrame {
             FileWriter writer = new FileWriter(fileName,true);
             writer.append(matchNum + "," + teamNum + "," + teleOpPoints + "," + autoPoints + "," 
                    + foulPoints + "," + gamePoints + "," + numStacks + "," + numTotes + "," 
-                    + s1Can + "," + s2Can + "," + s3Can + "," + s4Can + "," + s5Can + "," + s1Noodle + "," + s2Noodle + "," + s3Noodle + "," +
-                    s4Noodle + "," + s5Noodle + "," + + speed + ",");
+                    + s1Totes + "," + s2Totes + "," + s3Totes + "," + s4Totes + "," + s5Totes + ","
+                    + s1Can + "," + s2Can + "," + s3Can + "," + s4Can + "," + s5Can + "," + s1Noodle 
+                    + "," + s2Noodle + "," + s3Noodle + "," + s4Noodle + "," + s5Noodle 
+                    + "," + + speed + ",");
             writer.flush();
             writer.close();
         }
@@ -939,6 +925,5 @@ public class PracticeFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
-    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }
