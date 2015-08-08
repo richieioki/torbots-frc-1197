@@ -1,0 +1,13 @@
+Team number:  1197 Some Name
+Autonomous Strategy: BLAAABLA
+Tele-Op Strategy: BLAAA
+Coopertition?: No, 
+Drive Train: West Coast
+Speed of Robot: 
+Drive Over the Pedestal?: No, 
+Pick Up Cans?: No, 
+Maximum Number of Totes in Stack: 
+Lift Mechanism & Loading Type: 
+Optimistic?: false
+Comments/Benefits of Alliance: 
+Personal Rating of Robot: 0

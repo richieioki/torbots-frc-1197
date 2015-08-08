@@ -1,0 +1,8 @@
+Team number: 1197 Some Name
+null High Gear Ratio: 0/0
+Low Gear Ratio: 0/0
+West Coast-0,null
+Scoring Apparatus:null-null
+null
+Optimistic:false
+Other regionals: null
