@@ -1,7 +1,5 @@
 package org.usfirst.frc.team1197.robot;
 
-import com.kauailabs.navx.frc.AHRS;
-
 public class TorAuto {
 
 	//TODO some digital input read to get which auto we are running
@@ -9,11 +7,11 @@ public class TorAuto {
 	//NOTES Need to calculate distance that we need to drive and angles to turn.  
 	//ALSO we need to start to estimate which sensors are being executed.  
 
-	AHRS m_ahrs;
+	//AHRS m_ahrs;
 
-	public TorAuto(AHRS ahrs) {
-		m_ahrs = ahrs;
-	}
+	//public TorAuto(AHRS ahrs) {
+	//	m_ahrs = ahrs;
+	//}
 	
 	
 	//starting positions
@@ -21,7 +19,7 @@ public class TorAuto {
 
 	//8 defences, but not all 8 need different autos
 
-	public void AUTO_DrawBridge() {
+	/*public void AUTO_DrawBridge() {
 
 		//Drawbridge	
 		start position 1
@@ -185,5 +183,5 @@ public class TorAuto {
 		Shoot ()
 
 		Turn around
-	}
+	}*/
 }
