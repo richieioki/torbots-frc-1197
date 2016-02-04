@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1197.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -32,9 +33,6 @@ public class TorDrive {
 		// get negative of the stick controls. forward on stick gives negative value  
 		double stickX = m_stick.getX();
 		double stickY = m_stick.getY();
-
-		stickX = -stickX;
-		stickY = -stickY;
 
 		// adjust joystick by dead zone
 		if (Math.abs(stickX) <= .2) {
@@ -92,8 +90,7 @@ public class TorDrive {
 				rightMotorSpeed = -Math.max(-stickY, -stickX);
 			}
 		}
-
-		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+		m_jagDrive.SetDrive(rightMotorSpeed, leftMotorSpeed);
 	}
 
 	public void ReverseArcadeDrive(boolean squaredInputs) {
@@ -186,5 +183,17 @@ public class TorDrive {
 		//  m_driveJag4.set(rightMotorSpeed);
 		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
 
+	}
+
+	/**
+	 * Simple test code, needs gyro straightening eventually
+	 * @param distance
+	 */
+	public void DriveStraight(double distance) {
+		if(m_encoder != null) {
+			
+		} else {
+			DriverStation.reportError("NO ENCODER INITIALIZED", false);
+		}
 	}
 }

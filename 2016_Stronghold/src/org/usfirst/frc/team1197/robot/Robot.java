@@ -2,35 +2,32 @@
 package org.usfirst.frc.team1197.robot;
 
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Jaguar;
 import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.SPI;
 
 public class Robot extends SampleRobot {
 	
 	private TorCAN driveCANS;
 	private TorDrive drive;
-	
+	private AnalogGyro gyro;
+	private TorAuto auto;
 	private CANTalon R1, R2, R3, L1, L2, L3;
     
 	private Encoder encoder;
 	private Joystick stick;
+	private Joystick cypress;
 	
     public Robot() {
+    	encoder = new Encoder(0, 1);
+    	encoder.setDistancePerPulse(1/TorAuto.GEAR_RATIO);
         stick = new Joystick(0);
-        
+        cypress = new Joystick(2);
         R1 = new CANTalon(1);
         R2 = new CANTalon(2);
         R3 = new CANTalon(3);
@@ -42,6 +39,10 @@ public class Robot extends SampleRobot {
         driveCANS = new TorCAN(R1, R2, R3, L1, L2, L3);
         drive = new TorDrive(stick, driveCANS);
         
+        auto = new TorAuto(cypress);
+        
+        gyro = new AnalogGyro(0);
+        
         /*try {
         	//ahrs = new AHRS(SPI.Port.kMXP);
         	
@@ -51,21 +52,37 @@ public class Robot extends SampleRobot {
         	DriverStation.reportError(edu.wpi.first.wpilibj.hal.HALUtil.getHALstrerror(), false);
         }*/
     }
+    
+    public void robotInit() {
+    	auto.initialize();
+    }
 
     /**
      * Drive left & right motors for 2 seconds then stop
      */
     public void autonomous() {
-
+    	encoder.reset();
+    	driveCANS.SetDrive(0.8, 0.8);
+    	while(encoder.getDistance() > -(11*12)) {
+    		SmartDashboard.putNumber("Encoder Value", encoder.getDistance());
+    		//Timer.delay(0.02);
+    		if(stick.getRawButton(1)) {
+    			driveCANS.SetDrive(-0.2, -0.2);
+    			Timer.delay(0.05);
+    			driveCANS.SetDrive(0.0, 0.0);
+    			return;
+    		}
+    	}
+    	driveCANS.SetDrive(0.0, 0.0);
     }
 
     /**
      * Runs the motors with arcade steering.
      */
     public void operatorControl() {
-		
+		encoder.reset();
     	while(isEnabled()) {
-    		
+    		SmartDashboard.putNumber("Encoder Ticks", encoder.get());
     		drive.ArcadeDrive(true);
     		Timer.delay(0.02);
     		/*double stickY = stick.getY();
