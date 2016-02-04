@@ -1,8 +1,10 @@
 package org.usfirst.frc.team1197.robot;
 
+import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -12,8 +14,14 @@ public class TorAuto {
 	private Encoder m_encoder;
 	private Joystick auto_input;
 	private TorDrive m_drive;
+	private TorCAN m_cans;
 	private SendableChooser chooser;
 	public static final double GEAR_RATIO = 56.0f; //ticks per inch
+	public double encoderDistance = 0;
+	public double targetDistance = 0; //distance we need to travel
+	public CANTalon R1, R2, R3, L1, L2, L3;
+	
+	
 	
 	private int lane, defense;
 	
@@ -24,9 +32,10 @@ public class TorAuto {
 
 	//AHRS m_ahrs;
 
-	public TorAuto(Encoder encoder_in, TorDrive drive) {
-		m_encoder = encoder_in;
-		m_drive = drive;
+	public TorAuto(TorCAN cans) {
+//		m_encoder.setDistancePerPulse(1/TorAuto.GEAR_RATIO);
+		m_cans = cans;
+		m_cans = new TorCAN(R1,R2,R3,L1,L2,L3);
 	}
 	
 	/**
@@ -83,11 +92,19 @@ public class TorAuto {
 		SmartDashboard.putNumber("Lane selected", lane);
 		SmartDashboard.putNumber("Defense selected", defense);
 	}
+	public void move(){
+		encoderDistance = m_encoder.getDistance();
+		while(encoderDistance < targetDistance){
+			//drive
+			m_cans.SetDrive(0.5, 0.5);
+			m_encoder.getDistance();
+		}
+		m_cans.SetDrive(0.0, 0.0);
+	}
 	
-	public void UnevenTerrain() {
+	public void RoughTerrain() {
 		//hit at full power
-		
-		Timer.delay(1.0);
+		move();
 		
 	}
 	
@@ -270,4 +287,10 @@ public class TorAuto {
 
 		Turn around
 	}*/
+	public double getDistance(){
+	double distance=0;
+	distance=3.1416*8*2.54*m_encoder.getRaw();
+	
+	return distance;
+	}
 }
