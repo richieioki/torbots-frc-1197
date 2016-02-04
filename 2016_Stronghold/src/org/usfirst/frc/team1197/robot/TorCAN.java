@@ -1,7 +1,6 @@
 package org.usfirst.frc.team1197.robot;
 
-import edu.wpi.first.wpilibj.CANTalon;
-
+import edu.wpi.first.wpilibj.*;
 
 /**
  * Container class for holding a drive train.
@@ -9,7 +8,7 @@ import edu.wpi.first.wpilibj.CANTalon;
  * @author Torbot
  *
  */
-public class TorCAN {
+public class TorCAN implements PIDOutput{
 
 	int numOfJags;
 	CANTalon m_Rtalon1;
@@ -87,8 +86,7 @@ public class TorCAN {
 			m_Ltalon2.set(-speed);
 			m_Ltalon3.set(-speed);
 		}
-		//m_left1.Set(-speed);
-		//m_left2.Set(-speed);
+
 	}
 
 	public void SetRight(double speed)
@@ -107,7 +105,13 @@ public class TorCAN {
 			m_Rtalon2.set(speed);
 			m_Rtalon3.set(speed);
 		}
-		//m_right1.Set(speed);
-		//m_right2.Set(speed);
+
+	}
+
+	@Override
+	public void pidWrite(double output) {
+		SetRight(output);
+		SetLeft(-output);
+		
 	}	
 }
