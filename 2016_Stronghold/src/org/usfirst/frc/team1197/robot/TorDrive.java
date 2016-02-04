@@ -1,8 +1,7 @@
 package org.usfirst.frc.team1197.robot;
 
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class TorDrive {
 	private Joystick m_stick;
@@ -10,10 +9,25 @@ public class TorDrive {
 	private TorCAN m_jagDrive;
 	private Encoder m_encoder;
 
+	private TorCamera cam;
+	private NetworkTable table;
+	private PIDController yawPID;
+	
 	public TorDrive(Joystick stick, TorCAN jagDrive) {
 		m_stick = stick;
 		//m_solenoidshift = solenoidshift;
 		m_jagDrive = jagDrive;
+		
+		table = NetworkTable.getTable("GRIP/myContoursReport");
+        cam = new TorCamera(table);
+        yawPID = new PIDController(0.001, 0, 0, cam, m_jagDrive);
+        
+        yawPID.setContinuous(true);
+        yawPID.setInputRange(-160.0, 160.0);
+        yawPID.setOutputRange(-1.0, 1.0);
+        yawPID.setPercentTolerance(5.0);
+        yawPID.setSetpoint(0.0);
+        yawPID.disable();
 	}
 	
 	public TorDrive(Joystick stick, TorCAN cans, Encoder encoder) {
@@ -186,5 +200,13 @@ public class TorDrive {
 		//  m_driveJag4.set(rightMotorSpeed);
 		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
 
+	}
+	public void turnToGoal(){
+		if(m_stick.getRawButton(1)){
+			yawPID.enable();
+		}
+		else{
+			yawPID.disable();
+		}
 	}
 }

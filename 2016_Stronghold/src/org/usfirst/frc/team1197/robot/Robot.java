@@ -2,21 +2,7 @@
 package org.usfirst.frc.team1197.robot;
 
 
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Jaguar;
-import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.*;
 
 public class Robot extends SampleRobot {
 	
@@ -27,6 +13,7 @@ public class Robot extends SampleRobot {
     
 	private Encoder encoder;
 	private Joystick stick;
+	
 	
     public Robot() {
         stick = new Joystick(0);
@@ -50,6 +37,8 @@ public class Robot extends SampleRobot {
             //DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
         	DriverStation.reportError(edu.wpi.first.wpilibj.hal.HALUtil.getHALstrerror(), false);
         }*/
+        
+    	
     }
 
     /**
@@ -66,7 +55,8 @@ public class Robot extends SampleRobot {
 		
     	while(isEnabled()) {
     		
-    		drive.ArcadeDrive(true);
+//    		drive.ArcadeDrive(true);
+    		drive.turnToGoal();
     		Timer.delay(0.02);
     		/*double stickY = stick.getY();
     		if(Math.abs(stickY) < 0.2) {
