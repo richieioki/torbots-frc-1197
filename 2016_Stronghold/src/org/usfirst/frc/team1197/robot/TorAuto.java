@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -15,15 +16,16 @@ public class TorAuto {
 	private Joystick auto_input;
 	private TorDrive m_drive;
 	private TorCAN m_cans;
+	private Command autonomousCommand;
 	private SendableChooser chooser;
 	public static final double GEAR_RATIO = 56.0f; //ticks per inch
 	public double encoderDistance = 0;
 	public double targetDistance = 0; //distance we need to travel
 	public CANTalon R1, R2, R3, L1, L2, L3;
+	public int defense = 0;
+	public int lane = 0;
 	
-	
-	
-	private int lane, defense;
+
 	
 	//TODO some digital input read to get which auto we are running
 
@@ -47,8 +49,8 @@ public class TorAuto {
 	}
 	
 	//temp function to test chooser
-	public void initialize() {
-		
+	public int[] initialize() {
+		int laneDefense[] = new int[2];
 		if(!auto_input.getRawButton(1) && auto_input.getRawButton(2)) {
 			lane = 1;
 		} else if(!auto_input.getRawButton(1) && !auto_input.getRawButton(2)) {
@@ -63,64 +65,183 @@ public class TorAuto {
 		
 		if(!auto_input.getRawButton(5) && auto_input.getRawButton(6) &&
 				auto_input.getRawButton(7) && auto_input.getRawButton(8)) {
-			defense = 1;
+			defense = 1; //rock wall
 		} else if(auto_input.getRawButton(5) && !auto_input.getRawButton(6) &&
 				auto_input.getRawButton(7) && auto_input.getRawButton(8)) {
-			defense = 2;
+			defense = 2; //cheveldefrise
 		} else if(!auto_input.getRawButton(5) && !auto_input.getRawButton(6) &&
 				auto_input.getRawButton(7) && auto_input.getRawButton(8)) {
-			defense = 3;
+			defense = 3; //rampart
 		} else if(auto_input.getRawButton(5) && auto_input.getRawButton(6) && 
 				!auto_input.getRawButton(7) && auto_input.getRawButton(8)) {
-			defense = 4;
+			defense = 4; //moat
 		} else if(!auto_input.getRawButton(5) && auto_input.getRawButton(6) &&
 				!auto_input.getRawButton(7) && auto_input.getRawButton(8)) {
-			defense = 5;
+		    defense = 5; //rough terrain
 		} else if(auto_input.getRawButton(5) && !auto_input.getRawButton(6) &&
 				!auto_input.getRawButton(7) && auto_input.getRawButton(8)) {
-			defense = 6;
+			defense = 6; //draw bridge
 		} else if(!auto_input.getRawButton(5) && !auto_input.getRawButton(6) &&
 				!auto_input.getRawButton(7) && auto_input.getRawButton(8)) {
-			defense = 7;
+			defense = 7; //sally port
 		} else if(auto_input.getRawButton(5) && auto_input.getRawButton(6) && 
 				auto_input.getRawButton(7) && !auto_input.getRawButton(8)) {
-			defense = 8;
+			defense = 8; //portcullis
 		} else {
 			DriverStation.reportError("Incorrect Defense", false);
 		}
 		
-		SmartDashboard.putNumber("Lane selected", lane);
-		SmartDashboard.putNumber("Defense selected", defense);
+		SmartDashboard.putNumber("Lane selected", laneDefense[0]);
+		SmartDashboard.putNumber("Defense selected", laneDefense[1]);
+		laneDefense[0] = lane;
+		laneDefense[1] = defense;
+		return laneDefense;
 	}
+	
 	public void move(){
 		encoderDistance = m_encoder.getDistance();
+		targetDistance=75;
 		while(encoderDistance < targetDistance){
 			//drive
 			m_cans.SetDrive(0.5, 0.5);
 			m_encoder.getDistance();
 		}
 		m_cans.SetDrive(0.0, 0.0);
+		m_encoder.reset();
 	}
 	
-	public void RoughTerrain() {
-		//hit at full power
-		move();
+	public void ModeChooser(){
 		
-	}
-	
-	public void Moat() {
-		//use about 75 - 80 percent power, with light frame
-	}
-	
-	public void Rampart() {
+		/* 1. rock wall
+		 * 2. chevel de frise
+		 * 3. rampart
+		 * 4. moat
+		 * 5. rough terrain
+		 * 6. draw bridge
+		 * 7. sally port
+		 * 8. portcullis
+		 */
 		
+		int laneAndDefense[] = initialize();
+		
+		System.out.println("lane: " + laneAndDefense[0]);
+		System.out.println("defense: " + laneAndDefense[1]);
+		
+		//position 1
+		if(laneAndDefense[0] == 1 && laneAndDefense[1] == 1){
+			move();
+		}		
+		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 2){
+			move();
+		}
+		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 3){
+			move();
+		}
+		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 4){
+			move();
+		}
+		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 5){
+			move();
+		}
+		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 6){
+			move();
+		}
+		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 7){
+			move();
+		}
+		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 8){
+			move();
+		}
+		
+		//position 2
+		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 1){
+			move();
+		}
+		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 2){
+			move();
+		}
+		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 3){
+			move();
+		}
+		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 4){
+			move();
+		}
+		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 5){
+			move();
+		}
+		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 6){
+			move();
+		}
+		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 7){
+			move();
+		}
+		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 8){
+			move();
+		}
+		
+		//position 3
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 1){
+			move();
+		}
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 2){
+			move();
+		}
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 3){
+			move();
+		}
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 4){
+			move();
+		}
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 5){
+			move();
+		}
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 6){
+			move();
+		}
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 7){
+			move();
+		}
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 8){
+			move();
+		}
+		
+		//position 4
+		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 1){
+			move();
+		}
+		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 2){
+			move();
+		}
+		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 3){
+			move();
+		}
+		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 4){
+			move();
+		}
+		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 5){
+			move();
+		}
+		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 6){
+			move();
+		}
+		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 7){
+			move();
+		}
+		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 8){
+			move();
+		}
+		
+		else {
+			return;
+		}
+
 	}
 	
 	
 	//starting positions
 	//postion 0, 1 , 2 , 3
 
-	//8 defences, but not all 8 need different autos
+	//8 defenses, but not all 8 need different autos
 
 	/*public void AUTO_DrawBridge() {
 
@@ -289,7 +410,7 @@ public class TorAuto {
 	}*/
 	public double getDistance(){
 	double distance=0;
-	distance=3.1416*8*2.54*m_encoder.getRaw();
+	distance=(3.1416*8*m_encoder.getRaw())/GEAR_RATIO;
 	
 	return distance;
 	}

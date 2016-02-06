@@ -9,11 +9,15 @@ public class Robot extends SampleRobot {
 	private TorCAN driveCANS;
 	private TorDrive drive;
 	
-	private CANTalon R1, R2, R3, L1, L2, L3;
+	private CANTalon R1, R2, R3, L1, L2, L3, T1;
+	private Solenoid S1;
     
 	private Encoder encoder;
 	private Joystick stick;
+	private TorSiege siege;
 	
+	private TorAuto autoSwitch;
+	private Joystick cypress;
 	
     public Robot() {
         stick = new Joystick(0);
@@ -26,6 +30,12 @@ public class Robot extends SampleRobot {
         L2 = new CANTalon(5);
         L3 = new CANTalon(6);
         
+        T1 = new CANTalon(7); //Need to change the ports for T1 and S1
+        S1 = new Solenoid(0);
+        
+        autoSwitch = new TorAuto(cypress);
+        
+        siege = new TorSiege(T1, S1);
         driveCANS = new TorCAN(R1, R2, R3, L1, L2, L3);
         drive = new TorDrive(stick, driveCANS);
         
@@ -45,18 +55,35 @@ public class Robot extends SampleRobot {
      * Drive left & right motors for 2 seconds then stop
      */
     public void autonomous() {
-
+    	autoSwitch.ModeChooser();
     }
-
     /**
      * Runs the motors with arcade steering.
      */
     public void operatorControl() {
 		
     	while(isEnabled()) {
+//    		drive.turnToGoal();
     		
-//    		drive.ArcadeDrive(true);
-    		drive.turnToGoal();
+    		drive.ArcadeDrive(true);
+    		
+    		if(stick.getRawButton(3)){
+    			siege.SiegeArmDown();
+    		}
+    		else if(stick.getRawButton(4)){
+    			siege.SiegeArmUp();
+    		}
+    		else{
+    			siege.stopArm();
+    		}
+    		
+    		if(stick.getRawButton(5)){
+    			siege.SallyPort();
+    		}
+    		else{
+    			siege.stopSally();
+    		}
+    		
     		Timer.delay(0.02);
     		/*double stickY = stick.getY();
     		if(Math.abs(stickY) < 0.2) {
