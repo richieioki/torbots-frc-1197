@@ -4,27 +4,32 @@ import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import com.kauailabs.navx.frc.AHRS;
 
 public class TorAuto {
  //
+	private Solenoid shift;
 	private Encoder m_encoder;
 	private Joystick auto_input;
 	private TorDrive m_drive;
 	private TorCAN m_cans;
-	private Command autonomousCommand;
-	private SendableChooser chooser;
 	public static final double GEAR_RATIO = 56.0f; //ticks per inch
 	public double encoderDistance = 0;
-	public double targetDistance = 0; //distance we need to travel
-	public CANTalon R1, R2, R3, L1, L2, L3;
+	public static final double TARGET_DISTANCE = 45; //distance we need to travel
+	public CANTalon R1, R2, R3, L1, L2, L3, T1;
 	public int defense = 0;
 	public int lane = 0;
-	
+	private AHRS gyro;
+	private TorSiege siege;
+	private Ultrasonic sonar;
+	private TorIntake intake;
+	private Joystick stick;
 
 	
 	//TODO some digital input read to get which auto we are running
@@ -34,18 +39,37 @@ public class TorAuto {
 
 	//AHRS m_ahrs;
 
-	public TorAuto(TorCAN cans) {
+	public TorAuto() {
 //		m_encoder.setDistancePerPulse(1/TorAuto.GEAR_RATIO);
-		m_cans = cans;
-		m_cans = new TorCAN(R1,R2,R3,L1,L2,L3);
+
 	}
 	
 	/**
 	 * Temp constructor to test the features
 	 */
-	public TorAuto(Joystick cypress) {
+	public TorAuto(Joystick cypress, Joystick stick, AHRS ahrs, Encoder encoder, TorCAN cans, Solenoid shift,TorSiege siege, 
+			Ultrasonic sonar, TorIntake intake) {
+		this.stick = stick;
+		this.shift = shift;
 		auto_input = cypress;
-		chooser = new SendableChooser();
+		auto_input = new Joystick(2);
+		m_encoder = encoder;
+		gyro = ahrs;
+		m_cans = cans;
+		this.siege = siege;
+		this.sonar = sonar;
+		this.intake = intake;
+	}
+	public void shift(){
+		if(stick.getRawButton(6)){
+			shift.set(false);
+		}
+		else if(stick.getRawButton(7)){
+			shift.set(true);
+		}
+		else{
+			return;
+		}
 	}
 	
 	//temp function to test chooser
@@ -99,15 +123,177 @@ public class TorAuto {
 	}
 	
 	public void move(){
+	
+		m_encoder.setDistancePerPulse(1/GEAR_RATIO);
 		encoderDistance = m_encoder.getDistance();
-		targetDistance=75;
-		while(encoderDistance < targetDistance){
+		while(encoderDistance < TARGET_DISTANCE){
 			//drive
-			m_cans.SetDrive(0.5, 0.5);
+			shift.set(true);
+			m_cans.SetDrive(0.2, -0.2);
 			m_encoder.getDistance();
 		}
+		shift.set(false);
 		m_cans.SetDrive(0.0, 0.0);
 		m_encoder.reset();
+	}
+	
+	public void Moat(){
+		//m_encoder.setDistancePerPulse(1/GEAR_RATIO);
+		encoderDistance = m_encoder.getDistance();
+		shift.set(true);
+		m_cans.SetDrive(0.6, -0.6);
+		double time = 5.0; 
+		Timer.delay(time);
+		shift.set(false);
+		//m_cans.SetDrive(-0.6, 0.6);
+		m_cans.SetDrive(0.0, 0.0);
+	
+	}
+	public void RoughTerrain(){
+		encoderDistance = m_encoder.getDistance();
+		shift.set(true);
+		m_cans.SetDrive(0.6, -0.6);
+		double time = 4.0; 
+		Timer.delay(time);
+		shift.set(false);
+		//m_cans.SetDrive(-0.6, 0.6);
+		m_cans.SetDrive(0.0, 0.0);
+	}
+	public void RockWall(){
+		encoderDistance = m_encoder.getDistance();
+		shift.set(true);
+		m_cans.SetDrive(0.6, -0.6);
+		double time = 4.0; 
+		Timer.delay(time);
+		shift.set(false);
+		//m_cans.SetDrive(-0.6, 0.6);
+		m_cans.SetDrive(0.0, 0.0);
+	}
+	public void Ramparts(){
+		encoderDistance = m_encoder.getDistance();
+		shift.set(true);
+		m_cans.SetDrive(0.6, -0.6);
+		double time = 4.0; 
+		Timer.delay(time);
+		shift.set(false);
+		//m_cans.SetDrive(-0.6, 0.6);
+		m_cans.SetDrive(0.0, 0.0);
+	}
+	public void DrawBridge(){
+		encoderDistance = m_encoder.getDistance();
+		
+//		m_cans.SetDrive(0.6, -0.6);
+//		double time = 1.25; 
+//		Timer.delay(time);
+//		shift.set(false);
+		//m_cans.SetDrive(-0.6, 0.6);
+	
+//		while(sonar.getRangeInches()>15){
+//			m_cans.SetDrive(0.6, -0.6);
+//			Timer.delay(0.2);
+//			shift.set(true);
+//			if(sonar.getRangeInches()<15){
+//				siege.drawbridgeSiege();
+//			}
+//			if(sonar.getRangeInches()<16 && sonar.getRangeInches()>14){
+//				break;
+//			}
+//		}
+		
+		m_cans.SetDrive(0.5,-0.5); //BEFORE TESTING FIX THE POT VALUE 
+		Timer.delay(2.3);
+		if(siege.potGet() > 908){
+			siege.SiegeArmUp();
+			m_cans.SetDrive(0.0, 0.0);
+		}
+		Timer.delay(1.5);
+		m_cans.SetDrive(-0.5, 0.5);
+		Timer.delay(1.6);
+		if(siege.potGet() > 469){
+			siege.SiegeArmUp();
+		}
+		m_cans.SetDrive(0.5, -0.5);
+		Timer.delay(3);
+		m_cans.SetDrive(0, 0);
+		
+//		while(sonar.getRangeInches() < 20){
+//			m_cans.SetDrive(-0.6, 0.6);
+//			if (sonar.getRangeInches() == 20){
+//				break;
+//			}
+//		}
+		
+//		while(siege.potGet() > 245){ // while pot value is greater than 167
+//			if(siege.potGet() < 715){
+//				m_cans.SetDrive(0.5, -0.5); //drives forwards
+//				Timer.delay(2);
+//				if(siege.potGet() < 233){
+//					Timer.delay(2);
+//					siege.SiegeArmDown(); //actually goes up
+//					Timer.delay(2);
+//					siege.stopArm(); //stops arm
+//				}
+//				Timer.delay(2);
+//				m_cans.SetDrive(0, 0); //stops drive
+//				break;
+//			}
+//			else{
+//				siege.SiegeArmUp();
+//				m_cans.SetDrive(-0.5, 0.5); //drives backwards
+//			}
+////			siege.SiegeArmUp(); //actaully goes down
+//		}
+
+
+		
+//		while(sonar.getRangeInches() > 60){
+//		m_cans.SetDrive(0.6, -0.6);
+//		}
+//		m_cans.SetDrive(0.0, 0.0);
+//		
+	}
+	public void ChevelDeFrise(){
+		m_cans.SetDrive(0.3, -0.3);
+		Timer.delay(3); //adjust
+		if(siege.potGet() > 100){ //change value 	
+			siege.SiegeArmUp();
+		}
+		m_cans.SetDrive(-0.3, 0.3);
+		Timer.delay(0.25);
+		siege.stopArm();
+		m_cans.SetDrive(0.5, 0.5);
+		Timer.delay(0.25);
+		siege.SiegeArmDown();
+		Timer.delay(2);
+		siege.stopArm();
+		m_cans.SetDrive(0, 0);
+	}
+	
+	public void Portcullis(){
+		m_cans.SetDrive(0.4, -0.4);
+		Timer.delay(3);
+		if(siege.potGet() < 700){
+			intake.portcullis();
+			Timer.delay(0.25);
+			siege.SiegeArmDown();
+		}
+		
+	}
+	
+	public void Sallyport(){
+		while(sonar.getRangeInches()>15){
+			m_cans.SetDrive(0.6, -0.6);
+			Timer.delay(0.2);
+			shift.set(true);
+			if(sonar.getRangeInches()<17){
+				siege.sallyPortSiege();
+			}
+			if(sonar.getRangeInches()==15){
+				break;
+			}
+		}
+		m_cans.SetDrive(-0.4, 0.4);
+		Timer.delay(2);
 	}
 	
 	public void ModeChooser(){
@@ -155,28 +341,36 @@ public class TorAuto {
 		
 		//position 2
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 1){
-			move();
+			System.out.println("Pos 2 Rock Wall");
+			RockWall();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 2){
-			move();
+			System.out.println("Pos 2 Chevel De Frise");
+			ChevelDeFrise();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 3){
-			move();
+			System.out.println("Pos 2 Ramparts");
+			Ramparts();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 4){
-			move();
+			System.out.println("Pos 2 Moat");
+			Moat();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 5){
-			move();
+			System.out.println("Pos 2 Rough Terrain");
+			RoughTerrain();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 6){
-			move();
+			System.out.println("Pos 2 drawbridge");
+			DrawBridge(); //adjust potentiometer
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 7){
-			move();
+			System.out.println("Pos 2 sallyport");
+			Sallyport();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 8){
-			move();
+			System.out.println("Pos 2 portcullis");
+			Portcullis();
 		}
 		
 		//position 3
@@ -408,10 +602,10 @@ public class TorAuto {
 
 		Turn around
 	}*/
-	public double getDistance(){
-	double distance=0;
-	distance=(3.1416*8*m_encoder.getRaw())/GEAR_RATIO;
-	
-	return distance;
-	}
+//	public double getDistance(){
+//	double distance=0;
+//	distance=(3.1416*8*m_encoder.getRaw())/GEAR_RATIO;
+//	
+//	return distance;
+//	}
 }
