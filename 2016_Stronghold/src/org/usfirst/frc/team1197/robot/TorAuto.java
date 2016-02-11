@@ -30,6 +30,7 @@ public class TorAuto {
 	private Ultrasonic sonar;
 	private TorIntake intake;
 	private Joystick stick;
+	private double potValue;
 
 	
 	//TODO some digital input read to get which auto we are running
@@ -179,7 +180,8 @@ public class TorAuto {
 		//m_cans.SetDrive(-0.6, 0.6);
 		m_cans.SetDrive(0.0, 0.0);
 	}
-	public void DrawBridge(){
+	public void DrawBridge(){ //ALWAYS CHANGE POT VALUE
+		potValue = siege.potGet();
 		encoderDistance = m_encoder.getDistance();
 		
 //		m_cans.SetDrive(0.6, -0.6);
@@ -201,20 +203,27 @@ public class TorAuto {
 //		}
 		
 		m_cans.SetDrive(0.5,-0.5); //BEFORE TESTING FIX THE POT VALUE 
-		Timer.delay(2.3);
-		if(siege.potGet() > 908){
+		Timer.delay(2.4);
+		if(siege.potGet() > 673){
 			siege.SiegeArmUp();
-			m_cans.SetDrive(0.0, 0.0);
+			m_cans.SetDrive(0.0,0.0);
 		}
-		Timer.delay(1.5);
+		Timer.delay(0.5);
 		m_cans.SetDrive(-0.5, 0.5);
-		Timer.delay(1.6);
-		if(siege.potGet() > 469){
+		Timer.delay(1.7);
+		if(siege.potGet() > 183){
 			siege.SiegeArmUp();
+			m_cans.SetDrive(0.0,0.0);
 		}
+		Timer.delay(0.5);
 		m_cans.SetDrive(0.5, -0.5);
 		Timer.delay(3);
-		m_cans.SetDrive(0, 0);
+		m_cans.SetDrive(0,0);
+	
+		
+//		m_cans.SetDrive(0.5, -0.5);
+//		Timer.delay(3);
+//		m_cans.SetDrive(0, 0);
 		
 //		while(sonar.getRangeInches() < 20){
 //			m_cans.SetDrive(-0.6, 0.6);
@@ -252,48 +261,66 @@ public class TorAuto {
 //		m_cans.SetDrive(0.0, 0.0);
 //		
 	}
-	public void ChevelDeFrise(){
-		m_cans.SetDrive(0.3, -0.3);
+	public void ChevelDeFrise(){ //ALWAYS CHECK THE POT VALUE
+		m_cans.SetDrive(0.4, -0.4);
 		Timer.delay(3); //adjust
-		if(siege.potGet() > 100){ //change value 	
+		m_cans.SetDrive(0,0);
+		if(siege.potGet() > 226){  	
 			siege.SiegeArmUp();
 		}
-		m_cans.SetDrive(-0.3, 0.3);
-		Timer.delay(0.25);
+		Timer.delay(1.5);
 		siege.stopArm();
-		m_cans.SetDrive(0.5, 0.5);
+		m_cans.SetDrive(-0.4, 0.4);
+		Timer.delay(0.3);
+		m_cans.SetDrive(0,0);
+
+		m_cans.SetDrive(0.5, -0.5);
 		Timer.delay(0.25);
 		siege.SiegeArmDown();
-		Timer.delay(2);
+		Timer.delay(2.6);
 		siege.stopArm();
 		m_cans.SetDrive(0, 0);
 	}
 	
 	public void Portcullis(){
-		m_cans.SetDrive(0.4, -0.4);
+		if(siege.potGet()>100){
+			m_cans.SetDrive(0.4, -0.4);
+			siege.SiegeArmUp();
+		}
 		Timer.delay(3);
 		if(siege.potGet() < 700){
 			intake.portcullis();
 			Timer.delay(0.25);
 			siege.SiegeArmDown();
 		}
-		
+		Timer.delay(1.5);
+		m_cans.SetDrive(0.5, -0.5);
 	}
 	
 	public void Sallyport(){
-		while(sonar.getRangeInches()>15){
-			m_cans.SetDrive(0.6, -0.6);
-			Timer.delay(0.2);
-			shift.set(true);
-			if(sonar.getRangeInches()<17){
-				siege.sallyPortSiege();
-			}
-			if(sonar.getRangeInches()==15){
-				break;
-			}
-		}
-		m_cans.SetDrive(-0.4, 0.4);
+		m_cans.SetDrive(0.5,-0.5);
 		Timer.delay(2);
+		m_cans.SetDrive(0,0);
+		if(siege.potGet() > 527){
+			siege.SiegeArmUp();
+		}
+		Timer.delay(0.75);
+		siege.stopArm();
+		m_cans.SetDrive(-0.4, 0.4);
+		Timer.delay(2.15);
+		m_cans.SetDrive(0,0);
+		m_cans.SetDrive(0.5, 0.5);
+		Timer.delay(0.25);
+		m_cans.SetDrive(0,0);
+		Timer.delay(0.2);
+		m_cans.SetDrive(0.5, -0.5);
+		Timer.delay(0.5);
+		m_cans.SetDrive(-0.5,-0.5);
+		Timer.delay(0.22);
+		m_cans.SetDrive(0,0);
+		m_cans.SetDrive(0.5,-0.5);
+		Timer.delay(4);
+		m_cans.SetDrive(0,0);
 	}
 	
 	public void ModeChooser(){

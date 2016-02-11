@@ -96,9 +96,11 @@ public class TorSiege implements PIDSource{
 		return potenValue;
 	}
 	public double potGet(){
-		double potenValue = pot.get()*1024;
-		System.out.println("Potentiometer value: " +(int)potenValue);
-		return (int)potenValue;
+		double potValue = pot.get()*1024;
+		double potValue2 = potValue;
+		potValue2 = 800.0;
+		System.out.println("Potentiometer value: " +(int)potValue);
+		return (int)potValue;
 	}  
 	public void drawbridgeSiege(){
 //		double range=sonar.getRangeInches();
