@@ -25,7 +25,6 @@ public class TorAuto {
 	public int lane = 0;
 	private AHRS gyro;
 	private TorSiege siege;
-	private Ultrasonic sonar;
 	private TorIntake intake;
 	private Joystick stick;
 	double armTop = siege.potGet(); //adjust pot value
@@ -51,7 +50,7 @@ public class TorAuto {
 	 * Temp constructor to test the features
 	 */
 	public TorAuto(Joystick cypress, Joystick stick, AHRS ahrs, Encoder encoder, TorCAN cans, Solenoid shift,TorSiege siege, 
-			Ultrasonic sonar, TorIntake intake) {
+			 TorIntake intake) {
 		this.stick = stick;
 		this.shift = shift;
 		auto_input = cypress;
@@ -60,7 +59,6 @@ public class TorAuto {
 		gyro = ahrs;
 		m_cans = cans;
 		this.siege = siege;
-		this.sonar = sonar;
 		this.intake = intake;
 	}
 	
@@ -71,21 +69,6 @@ public class TorAuto {
 //		secondOne = first;
 //		return first;
 //	}
-	public void shift(){
-//		if(stick.getRawButton(7)){
-//			shift.set(firstOne);
-//			switchIt(firstOne, secondOne);
-//		}
-		if(stick.getRawButton(6)){
-			shift.set(false);
-  		}
-		else if(stick.getRawButton(7)){
-			shift.set(true);
-		}
-		else{
-			return;
-		}
-	}
 	
 	//temp function to test chooser
 	public int[] initialize() {
@@ -368,28 +351,28 @@ public class TorAuto {
 		
 		//position 1
 		if(laneAndDefense[0] == 1 && laneAndDefense[1] == 1){
-			move();
+			RockWall();
 		}		
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 2){
-			move();
+			ChevelDeFrise();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 3){
-			move();
+			Ramparts();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 4){
-			move();
+			Moat();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 5){
-			move();
+			RoughTerrain();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 6){
-			move();
+			DrawBridge();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 7){
-			move();
+			Sallyport();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 8){
-			move();
+			Portcullis();
 		}
 		
 		//position 2
@@ -428,54 +411,54 @@ public class TorAuto {
 		
 		//position 3
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 1){
-			move();
+			RockWall();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 2){
-			move();
+			ChevelDeFrise();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 3){
-			move();
+			Ramparts();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 4){
-			move();
+			Moat();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 5){
-			move();
+			RoughTerrain();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 6){
-			move();
+			DrawBridge();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 7){
-			move();
+			Sallyport();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 8){
-			move();
+			Portcullis();
 		}
 		
 		//position 4
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 1){
-			move();
+			RockWall();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 2){
-			move();
+			ChevelDeFrise();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 3){
-			move();
+			Ramparts();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 4){
-			move();
+			Moat();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 5){
-			move();
+			RoughTerrain();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 6){
-			move();
+			DrawBridge();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 7){
-			move();
+			Sallyport();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 8){
-			move();
+			Portcullis();
 		}
 		
 		else {

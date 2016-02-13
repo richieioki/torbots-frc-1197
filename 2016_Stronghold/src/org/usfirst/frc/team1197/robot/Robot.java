@@ -18,29 +18,27 @@ public class Robot extends SampleRobot {
 	private TorCAN driveCANS;
 	private TorDrive drive;
 	
-	private CANTalon R1, R2, R3, L1, L2, L3, T1, P1, P2;
+	private CANTalon R1, R2, R3, L1, L2, L3, T1, P1, P2, E1, shooter;
 	private Solenoid S1;
     
 	private Encoder encoder;
-	private Joystick stick;
-	private Joystick stick2;
+	private Joystick stick, stick2, stick3, cypress;
 	private TorSiege siege;
 	private TorIntake intake;
-	
-	private TorAuto autoSwitch;
-	private TorTeleop tele;
-	private Joystick cypress;
+	private TorAuto auto;
 	private AHRS gyro;
 	private AnalogPotentiometer pot;
 	private Ultrasonic sonar;
-	private boolean teleop;
 	public SmartDashboard sd;
-
+	private DigitalInput breakBeam;
+	private TorShooter shoot;
 	
 	
     public Robot() {
         stick = new Joystick(0);
         stick2 = new Joystick(1);
+        cypress = new Joystick(2);
+        stick3 = new Joystick(3);
         
         R1 = new CANTalon(1);
         R2 = new CANTalon(2);
@@ -54,6 +52,8 @@ public class Robot extends SampleRobot {
         
         P1 = new CANTalon(8);
         P2 = new CANTalon(9);
+        E1 = new CANTalon(10); //unsure port
+        shooter = new CANTalon(11);//unsure
         
         S1 = new Solenoid(0);
         
@@ -61,14 +61,15 @@ public class Robot extends SampleRobot {
         sonar.setAutomaticMode(true);
         
         pot = new AnalogPotentiometer(0);
+        breakBeam = new DigitalInput(0);
         encoder = new Encoder(0,1);
         encoder.setDistancePerPulse(1/TorAuto.GEAR_RATIO);
         driveCANS = new TorCAN(R1, R2, R3, L1, L2, L3);
-        siege = new TorSiege(T1, S1, stick2, pot, sonar, driveCANS);
-        intake = new TorIntake(stick2, P1, P2);
-        Solenoid shift = new Solenoid(1);
-        autoSwitch = new TorAuto(cypress, stick2, gyro, encoder, driveCANS, shift, siege, sonar, intake);
-        tele = new TorTeleop(stick,stick2,driveCANS,siege);
+        siege = new TorSiege(T1, stick2, pot, sonar, driveCANS, S1);
+        intake = new TorIntake(stick2, P1, P2, E1, breakBeam);
+        auto = new TorAuto(cypress, stick2, gyro, encoder, driveCANS, S1, siege, intake);
+        shoot = new TorShooter(intake, shooter, stick3, gyro);
+        
         
         drive = new TorDrive(stick, driveCANS);
         gyro = new AHRS(SPI.Port.kMXP);
@@ -87,10 +88,8 @@ public class Robot extends SampleRobot {
      * Drive left & right motors for 2 seconds then stop
      */
     public void autonomous() {
-//    	compressor = new Compressor();
-//    	compressor.start();
     	encoder.reset();
-    	autoSwitch.ModeChooser();
+    	auto.ModeChooser();
     	
     	double potVal = siege.potGet();
     	double range = sonar.getRangeInches();
@@ -107,18 +106,15 @@ public class Robot extends SampleRobot {
      */
     public void operatorControl() {
     	sonar.setAutomaticMode(true);
-//    	double range = sonar.getRangeInches();
+    	System.out.println("If the pot is good: " + siege.potChecker());
     	while(isEnabled()) {
-//    		drive.turnToGoal();
-//    		siege.potGet();
-//			System.out.println(sonar.getRangeInches()); 
-//    		double angle = gyro.getAngle();
+    		
     		System.out.println(siege.potGet());
-//    		System.out.println(sonar.getRangeInches());
     		drive.ArcadeDrive(true);
-    		autoSwitch.shift();
     		siege.SiegeArmUpdate();
+    		shooter.set(0.3);
     		intake.intake();
+    		intake.autoLoad();
     		
     		//CHANGE BUTTONS
     		if(stick.getRawButton(5)){
@@ -127,33 +123,15 @@ public class Robot extends SampleRobot {
     		if(stick.getRawButton(5)){
     			siege.PortcullisStates();
     		}
-    		
     		if(stick.getRawButton(5)){
     			siege.SallyPortStates();
     		}
     		if(stick.getRawButton(5)){
     			siege.ChevelStates();
     		}
+    		
 
-//    		if(stick2.getRawButton(3)){
-//    			siege.SiegeArmDown();
-//    		}
-//    		else if(stick2.getRawButton(4)){
-//    			siege.SiegeArmUp();
-//    		}
-//    		else{
-//    			siege.stopArm();
-//    		}
-//    		
-//    		if(stick2.getRawButton(5)){
-//    			siege.SallyPort();
-//    		}
-//    		else if(stick2.getRawButton(2)){
-//    			siege.stopSally();
-//    		}
-//    		else{
-//    			
-//    		}
+
     		
 //    		Timer.delay(0.02);
     		/*double stickY = stick.getY();

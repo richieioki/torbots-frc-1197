@@ -2,64 +2,65 @@ package org.usfirst.frc.team1197.robot;
 
 
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PIDSource;
-import edu.wpi.first.wpilibj.PIDController;
-import edu.wpi.first.wpilibj.PIDSourceType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 
-public class TorSiege implements PIDSource{
+public class TorSiege{
 	private CANTalon siegeTalon;
-	private Solenoid siegeSolenoid;
+
 	private Joystick siegeStick;
 	private AnalogPotentiometer pot;
-	private PIDController siegePID;
 	private Ultrasonic sonar;
 	private TorCAN torcan;
+	
 	double armTop = this.potGet();
 	double drawbridgeTop = armTop - 151;
 	double drawbridgeBot = armTop - 655;
 	double sallyPort = armTop - 368;
 	double chevelTop = armTop - 476;
 	double portcullis = 0;
+	double potChecker = armTop - 655; //highest value
+	
 	public static final double SONAR = 10;
-	public enum DRAWBRIDGE{POS1, POS2, POS3, POS4, POS5};
 	private DRAWBRIDGE m_states;
 	public TorTeleop tele;
+	
+	public enum DRAWBRIDGE{POS1, POS2, POS3, POS4, POS5};
 	public enum SALLYPORT{POS1, POS2, POS3, POS4, POS5, POS6};
-	public SALLYPORT m_sally;
 	public enum PORTCULLIS{POS1, POS2, POS3};
-	public PORTCULLIS m_port;
 	public enum CHEVEL{POS1, POS2, POS3};
+	
+	public SALLYPORT m_sally;
+	public PORTCULLIS m_port;
 	public CHEVEL m_chev;
+	private Solenoid shift;
 	
 	private double endTime;
 	private double startTime = System.currentTimeMillis();
 	
 	
-	public TorSiege(CANTalon T1, Solenoid S1, Joystick stick2, AnalogPotentiometer pot, 
-			Ultrasonic sonar, TorCAN torcan){
+	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, 
+			Ultrasonic sonar, TorCAN torcan, Solenoid shift){
 		siegeTalon = T1;
-		siegeSolenoid = S1;
 		siegeStick = stick2;
 		this.pot = pot;
 		this.sonar = sonar;
 		this.torcan = torcan;
+		this.shift = shift;
 	}
 	public void DrawBridgeStates(){
 		//list all defenses and movements for each class
 		m_states = DRAWBRIDGE.POS1;
-			if(!tele.override()){
+			if(this.override()!=true){
 				
 				switch(m_states){
 					
 					
 					case POS1:
 						endTime = System.currentTimeMillis() + 10;
-//						if(so that this runs 1 time suggestion: if endTime = 0)
+
 						if(endTime != 0){
 							if(sonar.getRangeInches() > 15){
 								torcan.SetDrive(0.5, -0.5);
@@ -120,7 +121,7 @@ public class TorSiege implements PIDSource{
 	public void SallyPortStates(){
 		//list all defenses and movements for each class
 		m_sally = SALLYPORT.POS1;
-			if(!tele.override()){
+			if(this.override()!=true){
 				
 				switch(m_sally){
 					
@@ -159,7 +160,7 @@ public class TorSiege implements PIDSource{
 							torcan.SetDrive(0, 0);
 							endTime = 0;
 							m_sally = SALLYPORT.POS4;
-							}
+						}
 						
 					case POS4:
 						endTime = System.currentTimeMillis() + 10;
@@ -201,7 +202,7 @@ public class TorSiege implements PIDSource{
 	public void PortcullisStates(){
 		//list all defenses and movements for each class
 		m_port = PORTCULLIS.POS1;
-			if(!tele.override()){
+			if(this.override()!=true){
 				
 				switch(m_port){
 					
@@ -245,7 +246,7 @@ public class TorSiege implements PIDSource{
 	public void ChevelStates(){
 		//list all defenses and movements for each class
 		m_chev = CHEVEL.POS1;
-			if(!tele.override()){
+			if(this.override()!=true){
 				
 				switch(m_chev){
 					
@@ -299,11 +300,11 @@ public class TorSiege implements PIDSource{
 		else if(siegeStick.getY() > .2){
 			siegeTalon.set(0.5); // siege arm up
 		}
-		else if(siegeStick.getRawButton(5)){
-			siegeSolenoid.set(true); // piston fire
+		else if(siegeStick.getRawButton(11)){
+			shift.set(true);
 		}
-		else if(siegeStick.getRawButton(4)){
-			siegeSolenoid.set(false); // piston retract
+		else if(siegeStick.getRawButton(12)){
+			shift.set(false);
 		}
 		else {
 			siegeTalon.set(0);
@@ -321,36 +322,23 @@ public class TorSiege implements PIDSource{
 		siegeTalon.set(0);
 	}
 	
-	public void SallyPort(){
-		siegeSolenoid.set(true);
-	}
-	public void stopSally(){
-		siegeSolenoid.set(false);
-	}
-
-	@Override
-	public void setPIDSourceType(PIDSourceType pidSource) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public PIDSourceType getPIDSourceType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public double pidGet() {
-		// TODO Auto-generated method stub
-		double potenValue = pot.get();
-//		System.out.println("Potentiometer value: " + potenValue);
-		return potenValue;
-	}
 	public double potGet(){
 		double potValue = pot.get()*1024;
 		System.out.println("Potentiometer value: " +(int)potValue);
 		return (int)potValue;
 	} 
+	public boolean potChecker(){
+		if(potChecker < 0){
+			return false;
+		}
+		return true;
+	}
+	public boolean override(){
+		boolean bool = false;
+		if(siegeStick.getRawButton(11)){
+			bool = true;
+		}
+			return bool;
+	}
 }
 
