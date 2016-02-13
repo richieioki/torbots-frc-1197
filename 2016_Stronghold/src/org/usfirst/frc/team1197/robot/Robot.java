@@ -2,6 +2,7 @@
 package org.usfirst.frc.team1197.robot;
 
 
+
 import edu.wpi.first.wpilibj.*;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -27,11 +28,15 @@ public class Robot extends SampleRobot {
 	private TorIntake intake;
 	
 	private TorAuto autoSwitch;
+	private TorTeleop tele;
 	private Joystick cypress;
 	private AHRS gyro;
 	private AnalogPotentiometer pot;
 	private Ultrasonic sonar;
+	private boolean teleop;
 	public SmartDashboard sd;
+
+	
 	
     public Robot() {
         stick = new Joystick(0);
@@ -63,6 +68,7 @@ public class Robot extends SampleRobot {
         intake = new TorIntake(stick2, P1, P2);
         Solenoid shift = new Solenoid(1);
         autoSwitch = new TorAuto(cypress, stick2, gyro, encoder, driveCANS, shift, siege, sonar, intake);
+        tele = new TorTeleop(stick,stick2,driveCANS,siege);
         
         drive = new TorDrive(stick, driveCANS);
         gyro = new AHRS(SPI.Port.kMXP);
@@ -74,7 +80,6 @@ public class Robot extends SampleRobot {
             //DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
         	DriverStation.reportError(edu.wpi.first.wpilibj.hal.HALUtil.getHALstrerror(), false);
         }*/
-        
     	
     }
 
@@ -109,12 +114,27 @@ public class Robot extends SampleRobot {
 //			System.out.println(sonar.getRangeInches()); 
 //    		double angle = gyro.getAngle();
     		System.out.println(siege.potGet());
-    		System.out.println(sonar.getRangeInches());
+//    		System.out.println(sonar.getRangeInches());
     		drive.ArcadeDrive(true);
     		autoSwitch.shift();
     		siege.SiegeArmUpdate();
+    		intake.intake();
     		
-    		intake.intake(); 
+    		//CHANGE BUTTONS
+    		if(stick.getRawButton(5)){
+    			siege.DrawBridgeStates();
+    		}
+    		if(stick.getRawButton(5)){
+    			siege.PortcullisStates();
+    		}
+    		
+    		if(stick.getRawButton(5)){
+    			siege.SallyPortStates();
+    		}
+    		if(stick.getRawButton(5)){
+    			siege.ChevelStates();
+    		}
+
 //    		if(stick2.getRawButton(3)){
 //    			siege.SiegeArmDown();
 //    		}
@@ -184,6 +204,19 @@ public class Robot extends SampleRobot {
     		//SmartDashboard.putNumber("accelX", accel.getX());
     		//SmartDashboard.putNumber("accelY", accel.getY());
     		//SmartDashboard.putNumber("accelZ", accel.getZ());
+    		
+    		
+//    		//list all defenses and movements for each class
+//    		if(!tele.override()){
+//    			
+//				switch(m_state){
+//    				
+//    				
+//    			case TEST1:
+//    				//SiegeStates.A
+//    				
+//    			}
+//    		}
     		
     	}
     }

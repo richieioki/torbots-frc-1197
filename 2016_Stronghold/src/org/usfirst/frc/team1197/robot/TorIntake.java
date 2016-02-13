@@ -13,24 +13,18 @@ public class TorIntake {
 	}
 	
 	public void intake(){
-		if(stick.getRawButton(10)){
-			cantalon.set(0.75);
-		}
-		else if(stick.getRawButton(11)){
-			cantalon.set(-0.75);
-		}
-		else{
-			cantalon.set(0);
-		}
 		
 		if(stick.getRawButton(4)){
-			cantalon2.set(0.75);
+			cantalon2.set(0.95);
+			cantalon.set(0.95);
 		}
 		else if(stick.getRawButton(5)){
-			cantalon2.set(-0.75);
+			cantalon2.set(-0.95);
+			cantalon.set(-0.95);
 		}
 		else{
 			cantalon2.set(0);
+			cantalon.set(0);
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package org.usfirst.frc.team1197.robot;
 
+
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
@@ -18,23 +19,274 @@ public class TorSiege implements PIDSource{
 	private PIDController siegePID;
 	private Ultrasonic sonar;
 	private TorCAN torcan;
-	public static final int DRAWBRIDGE_TOP = 648;
-	public static final int DRAWBRIDGE_BOT = 130;
-	public static final int SALLY_PORT = 487; 
-	public static final int CHEVEL_BOT = 183;
-	public static final int CHEVEL_TOP = 309;
-	public static final int ARM_TOP = 785;
-	public static final int ARM_BOT = 119;
+	double armTop = this.potGet();
+	double drawbridgeTop = armTop - 151;
+	double drawbridgeBot = armTop - 655;
+	double sallyPort = armTop - 368;
+	double chevelTop = armTop - 476;
+	double portcullis = 0;
 	public static final double SONAR = 10;
+	public enum DRAWBRIDGE{POS1, POS2, POS3, POS4, POS5};
+	private DRAWBRIDGE m_states;
+	public TorTeleop tele;
+	public enum SALLYPORT{POS1, POS2, POS3, POS4, POS5, POS6};
+	public SALLYPORT m_sally;
+	public enum PORTCULLIS{POS1, POS2, POS3};
+	public PORTCULLIS m_port;
+	public enum CHEVEL{POS1, POS2, POS3};
+	public CHEVEL m_chev;
+	
+	private double endTime;
+	private double startTime = System.currentTimeMillis();
 	
 	
-	public TorSiege(CANTalon T1, Solenoid S1, Joystick stick2, AnalogPotentiometer pot, Ultrasonic sonar, TorCAN torcan){
+	public TorSiege(CANTalon T1, Solenoid S1, Joystick stick2, AnalogPotentiometer pot, 
+			Ultrasonic sonar, TorCAN torcan){
 		siegeTalon = T1;
 		siegeSolenoid = S1;
 		siegeStick = stick2;
 		this.pot = pot;
 		this.sonar = sonar;
 		this.torcan = torcan;
+	}
+	public void DrawBridgeStates(){
+		//list all defenses and movements for each class
+		m_states = DRAWBRIDGE.POS1;
+			if(!tele.override()){
+				
+				switch(m_states){
+					
+					
+					case POS1:
+						endTime = System.currentTimeMillis() + 10;
+//						if(so that this runs 1 time suggestion: if endTime = 0)
+						if(endTime != 0){
+							if(sonar.getRangeInches() > 15){
+								torcan.SetDrive(0.5, -0.5);
+							}
+						}
+						if(startTime < endTime){ //meaning check if currenttime is >= endTime
+							torcan.SetDrive(0, 0);
+							m_states = DRAWBRIDGE.POS2;
+							endTime = 0;
+						}
+					case POS2:
+						while(this.checkTime(10) < 10){
+							if(this.potGet() > drawbridgeTop){
+								this.SiegeArmUp();
+							}
+							this.stopArm();
+						}
+						m_states = DRAWBRIDGE.POS3;
+						
+					
+					case POS3:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							if(sonar.getRangeInches() < 10){
+								torcan.SetDrive(-0.5, 0.5);
+							}
+						}
+						if(startTime < endTime){ //meaning check if currenttime is >= endTime
+							torcan.SetDrive(0, 0);
+							endTime = 0;
+							m_states = DRAWBRIDGE.POS4;
+						}
+						
+					case POS4:
+						while(this.checkTime(10) < 10){
+							if(this.potGet() > drawbridgeBot){
+								this.SiegeArmUp();
+							}
+							this.stopArm();
+						}
+						m_states = DRAWBRIDGE.POS5;
+					
+					case POS5:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							if(sonar.getRangeInches() > 10){
+								torcan.SetDrive(0.5, -0.5);
+							}
+						}
+						if(startTime < endTime){ //meaning check if currenttime is >= endTime
+							torcan.SetDrive(0, 0);
+							endTime = 0;
+							break;
+						}
+				}
+			}
+	}
+	public void SallyPortStates(){
+		//list all defenses and movements for each class
+		m_sally = SALLYPORT.POS1;
+			if(!tele.override()){
+				
+				switch(m_sally){
+					
+					
+					case POS1:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							if(sonar.getRangeInches()>10){
+								torcan.SetDrive(0.5, -0.5);
+							}
+						}
+						if(startTime < endTime){
+						torcan.SetDrive(0, 0);
+						endTime = 0;
+						m_sally = SALLYPORT.POS2;
+						}
+					
+					case POS2:
+						while(this.checkTime(10) < 10){
+							if(this.potGet() > sallyPort){
+								this.SiegeArmUp();
+							}
+							this.stopArm();
+						}
+						
+						m_sally = SALLYPORT.POS3;
+					
+					case POS3:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							if(sonar.getRangeInches() < 10){
+								torcan.SetDrive(-0.5, 0.5);
+							}
+						}
+						if(startTime < endTime){
+							torcan.SetDrive(0, 0);
+							endTime = 0;
+							m_sally = SALLYPORT.POS4;
+							}
+						
+					case POS4:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							torcan.SetDrive(0.5, 0.5);
+						}
+						if(startTime < endTime){
+							torcan.SetDrive(0, 0);
+							endTime = 0;
+							m_sally = SALLYPORT.POS5;
+							}
+					
+					case POS5:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							torcan.SetDrive(-0.5, -0.5);
+							//gyro
+						}
+						if(startTime < endTime){
+							torcan.SetDrive(0, 0);
+							endTime = 0;
+							m_sally = SALLYPORT.POS6;
+							}
+					case POS6:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							if(sonar.getRangeInches() > 10){
+								torcan.SetDrive(0.5, -0.5);
+							}
+						}
+						if(startTime < endTime){
+							torcan.SetDrive(0, 0);
+							endTime = 0;
+							break;
+						}
+				}
+			}
+	}
+	public void PortcullisStates(){
+		//list all defenses and movements for each class
+		m_port = PORTCULLIS.POS1;
+			if(!tele.override()){
+				
+				switch(m_port){
+					
+					
+					case POS1:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							if(sonar.getRangeInches() > 10){
+								torcan.SetDrive(0.5, -0.5);
+							}
+						}
+						if(startTime < endTime){
+						torcan.SetDrive(0, 0);
+						endTime = 0;
+						m_port = PORTCULLIS.POS2;
+						}
+					
+					case POS2:
+						while(this.checkTime(10) < 10){
+							if(this.potGet() > 100){
+								this.SiegeArmUp();
+							}
+						}
+						
+						m_port = PORTCULLIS.POS3;
+					
+					case POS3:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							if(sonar.getRangeInches() < 10){
+								torcan.SetDrive(-0.5, 0.5);
+							}
+						}
+						if(startTime < endTime){
+						torcan.SetDrive(0, 0);
+						endTime = 0;
+						}
+				}
+			}
+	}
+	public void ChevelStates(){
+		//list all defenses and movements for each class
+		m_chev = CHEVEL.POS1;
+			if(!tele.override()){
+				
+				switch(m_chev){
+					
+					
+					case POS1:
+						while(this.checkTime(10) < 10){
+							if(this.potGet() > chevelTop){
+								this.SiegeArmUp();
+							}
+						}
+						m_chev = CHEVEL.POS2;
+					
+					case POS2:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							torcan.SetDrive(-0.5, 0.5);
+						}
+						if(startTime < endTime){
+						torcan.SetDrive(0, 0);
+						endTime = 0;
+						m_chev = CHEVEL.POS3;
+						}
+					
+					case POS3:
+						endTime = System.currentTimeMillis() + 10;
+						if(endTime != 0){
+							torcan.SetDrive(0.5, -0.5);
+						}
+						if(startTime < endTime){
+						torcan.SetDrive(0, 0);
+						endTime = 0;
+						break;
+						}
+				}
+			}
+	}
+	public long checkTime(int wait){
+		long time = System.currentTimeMillis();
+		long endTime = System.currentTimeMillis() + wait; 
+		long difference = endTime - time;
+		return difference;
 	}
 	
 	public void SiegeArmUpdate(){
@@ -92,39 +344,13 @@ public class TorSiege implements PIDSource{
 	public double pidGet() {
 		// TODO Auto-generated method stub
 		double potenValue = pot.get();
-		System.out.println("Potentiometer value: " + potenValue);
+//		System.out.println("Potentiometer value: " + potenValue);
 		return potenValue;
 	}
 	public double potGet(){
 		double potValue = pot.get()*1024;
-		double potValue2 = potValue;
-		potValue2 = 800.0;
 		System.out.println("Potentiometer value: " +(int)potValue);
 		return (int)potValue;
-	}  
-	public void drawbridgeSiege(){
-//		double range=sonar.getRangeInches();
-//		System.out.println(range);
-		
-//		while(this.potGet()<DRAWBRIDGE_TOP){
-//			siegeTalon.set(0.25);
-//		
-//		}
-		while(this.potGet()>DRAWBRIDGE_TOP){
-				siegeTalon.set(-0.5);
-			}
-			siegeTalon.set(0.0);
-	}
-	public void sallyPortSiege(){
-		while(this.potGet()<SALLY_PORT){ //need to change sally value
-			siegeTalon.set(0.25);
-		}
-			siegeTalon.set(0.0);
-	}
-	public void chevelSiege(){
-		while(this.potGet()<CHEVEL_TOP&&this.potGet()>CHEVEL_BOT){
-			siegeTalon.set(0.25);
-		}
-			siegeTalon.set(0.0);
-	}
+	} 
 }
+

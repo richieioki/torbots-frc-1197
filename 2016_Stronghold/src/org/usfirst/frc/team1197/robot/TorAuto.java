@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,7 +16,6 @@ public class TorAuto {
 	private Solenoid shift;
 	private Encoder m_encoder;
 	private Joystick auto_input;
-	private TorDrive m_drive;
 	private TorCAN m_cans;
 	public static final double GEAR_RATIO = 56.0f; //ticks per inch
 	public double encoderDistance = 0;
@@ -30,8 +28,12 @@ public class TorAuto {
 	private Ultrasonic sonar;
 	private TorIntake intake;
 	private Joystick stick;
-	private double potValue;
-
+	double armTop = siege.potGet(); //adjust pot value
+	double drawbridgeTop = armTop - 151;
+	double drawbridgeBot = armTop - 655;
+	double sallyPort = armTop - 368;
+	double chevelTop = armTop - 476;
+	double portcullis = 0;
 	
 	//TODO some digital input read to get which auto we are running
 
@@ -61,10 +63,22 @@ public class TorAuto {
 		this.sonar = sonar;
 		this.intake = intake;
 	}
+	
+//	boolean firstOne = false;
+//	boolean secondOne = true;
+//	public boolean switchIt(boolean first, boolean second){
+//		firstOne = second;
+//		secondOne = first;
+//		return first;
+//	}
 	public void shift(){
+//		if(stick.getRawButton(7)){
+//			shift.set(firstOne);
+//			switchIt(firstOne, secondOne);
+//		}
 		if(stick.getRawButton(6)){
 			shift.set(false);
-		}
+  		}
 		else if(stick.getRawButton(7)){
 			shift.set(true);
 		}
@@ -123,6 +137,16 @@ public class TorAuto {
 		return laneDefense;
 	}
 	
+	public void turnToTheta(double theta){
+		double gyroAngle = gyro.getAngle();
+		if(gyroAngle > theta){
+			m_cans.SetDrive(-0.5, -0.5);
+		}
+		else if(gyroAngle < theta){
+			m_cans.SetDrive(0.5, 0.5);
+		}
+	}
+	
 	public void move(){
 	
 		m_encoder.setDistancePerPulse(1/GEAR_RATIO);
@@ -179,10 +203,29 @@ public class TorAuto {
 		shift.set(false);
 		//m_cans.SetDrive(-0.6, 0.6);
 		m_cans.SetDrive(0.0, 0.0);
+		this.turnToTheta(0);
 	}
+	
+	
 	public void DrawBridge(){ //ALWAYS CHANGE POT VALUE
-		potValue = siege.potGet();
-		encoderDistance = m_encoder.getDistance();
+		m_cans.SetDrive(0.5,-0.5); //BEFORE TESTING FIX THE POT VALUE 
+		Timer.delay(2.4);
+		if(siege.potGet() > drawbridgeTop){
+			siege.SiegeArmUp();
+			m_cans.SetDrive(0.0,0.0);
+		}
+		Timer.delay(0.5);
+		m_cans.SetDrive(-0.5, 0.5);
+		Timer.delay(1.7);
+		if(siege.potGet() > drawbridgeBot){
+			siege.SiegeArmUp();
+			m_cans.SetDrive(0.0,0.0);
+		}
+		Timer.delay(0.5);
+		m_cans.SetDrive(0.5, -0.5);
+		Timer.delay(3);
+		m_cans.SetDrive(0,0);
+		
 		
 //		m_cans.SetDrive(0.6, -0.6);
 //		double time = 1.25; 
@@ -202,23 +245,6 @@ public class TorAuto {
 //			}
 //		}
 		
-		m_cans.SetDrive(0.5,-0.5); //BEFORE TESTING FIX THE POT VALUE 
-		Timer.delay(2.4);
-		if(siege.potGet() > 673){
-			siege.SiegeArmUp();
-			m_cans.SetDrive(0.0,0.0);
-		}
-		Timer.delay(0.5);
-		m_cans.SetDrive(-0.5, 0.5);
-		Timer.delay(1.7);
-		if(siege.potGet() > 183){
-			siege.SiegeArmUp();
-			m_cans.SetDrive(0.0,0.0);
-		}
-		Timer.delay(0.5);
-		m_cans.SetDrive(0.5, -0.5);
-		Timer.delay(3);
-		m_cans.SetDrive(0,0);
 	
 		
 //		m_cans.SetDrive(0.5, -0.5);
@@ -265,7 +291,7 @@ public class TorAuto {
 		m_cans.SetDrive(0.4, -0.4);
 		Timer.delay(3); //adjust
 		m_cans.SetDrive(0,0);
-		if(siege.potGet() > 226){  	
+		if(siege.potGet() > chevelTop){  	
 			siege.SiegeArmUp();
 		}
 		Timer.delay(1.5);
@@ -301,7 +327,7 @@ public class TorAuto {
 		m_cans.SetDrive(0.5,-0.5);
 		Timer.delay(2);
 		m_cans.SetDrive(0,0);
-		if(siege.potGet() > 527){
+		if(siege.potGet() > sallyPort){
 			siege.SiegeArmUp();
 		}
 		Timer.delay(0.75);
