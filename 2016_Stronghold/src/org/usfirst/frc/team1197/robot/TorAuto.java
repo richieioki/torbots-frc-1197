@@ -24,15 +24,16 @@ public class TorAuto {
 	public int defense = 0;
 	public int lane = 0;
 	private AHRS gyro;
-	private TorSiege siege;
 	private TorIntake intake;
 	private Joystick stick;
-	double armTop = siege.potGet(); //adjust pot value
-	double drawbridgeTop = armTop - 151;
-	double drawbridgeBot = armTop - 655;
-	double sallyPort = armTop - 368;
-	double chevelTop = armTop - 476;
+	double ratio = 3.4/5;
+	double armTop = 0;
+	double drawbridgeTop = 0;
+	double drawbridgeBot = 0;
+	double sallyPort = 0;
+	double chevelTop = 0;
 	double portcullis = 0;
+	private TorSiege siege;
 	
 	//TODO some digital input read to get which auto we are running
 
@@ -130,23 +131,28 @@ public class TorAuto {
 		}
 	}
 	
-	public void move(){
+//	public void move(){
+//	
+//		m_encoder.setDistancePerPulse(1/GEAR_RATIO);
+//		encoderDistance = m_encoder.getDistance();
+//		while(encoderDistance < TARGET_DISTANCE){
+//			//drive
+//			shift.set(true);
+//			m_cans.SetDrive(0.2, -0.2);
+//			m_encoder.getDistance();
+//		}
+//		shift.set(false);
+//		m_cans.SetDrive(0.0, 0.0);
+//		m_encoder.reset();
+//	}
 	
-		m_encoder.setDistancePerPulse(1/GEAR_RATIO);
-		encoderDistance = m_encoder.getDistance();
-		while(encoderDistance < TARGET_DISTANCE){
-			//drive
-			shift.set(true);
-			m_cans.SetDrive(0.2, -0.2);
-			m_encoder.getDistance();
-		}
-		shift.set(false);
-		m_cans.SetDrive(0.0, 0.0);
-		m_encoder.reset();
-	}
+
+		
+	
 	
 	public void Moat(){
 		//m_encoder.setDistancePerPulse(1/GEAR_RATIO);
+		
 		encoderDistance = m_encoder.getDistance();
 		shift.set(true);
 		m_cans.SetDrive(0.6, -0.6);
@@ -193,23 +199,23 @@ public class TorAuto {
 	public void DrawBridge(){ //ALWAYS CHANGE POT VALUE
 		m_cans.SetDrive(0.5,-0.5); //BEFORE TESTING FIX THE POT VALUE 
 		Timer.delay(2.4);
-		if(siege.potGet() > drawbridgeTop){
+		m_cans.SetDrive(0.0,0.0);
+		if(siege.potGet() < drawbridgeTop){
 			siege.SiegeArmUp();
-			m_cans.SetDrive(0.0,0.0);
 		}
 		Timer.delay(0.5);
 		m_cans.SetDrive(-0.5, 0.5);
 		Timer.delay(1.7);
-		if(siege.potGet() > drawbridgeBot){
+		m_cans.SetDrive(0.0,0.0);
+		if(siege.potGet() < drawbridgeBot){
 			siege.SiegeArmUp();
-			m_cans.SetDrive(0.0,0.0);
 		}
 		Timer.delay(0.5);
 		m_cans.SetDrive(0.5, -0.5);
 		Timer.delay(3);
 		m_cans.SetDrive(0,0);
 		
-		
+	    
 //		m_cans.SetDrive(0.6, -0.6);
 //		double time = 1.25; 
 //		Timer.delay(time);

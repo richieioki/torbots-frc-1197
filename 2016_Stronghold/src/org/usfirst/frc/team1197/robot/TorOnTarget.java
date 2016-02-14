@@ -23,10 +23,10 @@ public class TorOnTarget {
 	 */
 	public boolean OnTarget(int location) {
 		int rawValue = pidTalon.getAnalogInRaw();
-		if(rawValue > (location + tolerance) || rawValue < (location - tolerance)) {
-			return false;
-		} else {
+		if(rawValue > (location - tolerance) && rawValue < (location + tolerance)) {
 			return true;
+		} else {
+			return false;
 		}
 	}
 }
