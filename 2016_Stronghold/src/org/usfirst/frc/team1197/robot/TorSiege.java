@@ -17,6 +17,7 @@ public class TorSiege{
 	private AnalogPotentiometer pot;
 	private Ultrasonic sonar;
 	private TorCAN torcan;
+	private TorIntake intakeSiege;
 
 	public boolean enabled;
 
@@ -27,11 +28,11 @@ public class TorSiege{
 	
 	public enum DRAWBRIDGE{POS1, POS2, POS3, POS4, POS5, POS6, POS7, IDLE};
 	public enum SALLYPORT{POS1, POS2, POS3, POS4, POS5, POS6, IDLE};
-	public enum PORTCULLIS{POS1, POS2, POS3};
+	public enum PORTCULLIS{IDLE, POS1, POS2, POS3};
 	public enum CHEVEL{POS1, POS2, POS3, IDLE};
 
 	public SALLYPORT m_sally = SALLYPORT.IDLE;
-	public PORTCULLIS m_port;
+	public PORTCULLIS m_port = PORTCULLIS.IDLE;
 	public CHEVEL m_chev = CHEVEL.IDLE;
 	private Solenoid shift;
 
@@ -39,18 +40,20 @@ public class TorSiege{
 	private double sallyTime;
 	private double startTime;
 	private double chevTime;
+	private double portTime;
 	double ratio = 3.4/5;
 	double armTop = 0;
 	double drawbridgeTop = 0;
 	double drawbridgeBot = 0;
 	double sallyPort = 0;
 	double chevelTop = 0;
-	double portcullis = 0;
+	double portcullisTop = 0;
+	double portcullisBot = 0;
 	double potChecker = 0; //highest value
 
 
 	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, 
-			Ultrasonic sonar, TorCAN torcan, Solenoid shift, Joystick stick){
+			Ultrasonic sonar, TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee){
 
 		siegeTalon = T1;
 		siegeStick = stick2;
@@ -59,6 +62,7 @@ public class TorSiege{
 		this.torcan = torcan;
 		this.shift = shift;
 		this.stick = stick;
+		intakeSiege = intakee;
 
 		calc();
 		enabled = false;
@@ -73,198 +77,38 @@ public class TorSiege{
 	public void calc(){
 		ratio = 3.4/5;
 		int rest = siegeTalon.getAnalogInRaw();
-		drawbridgeTop = (int)170;
-		drawbridgeBot = (int)582;
-		sallyPort = (int)299;
-		chevelTop = (int)552;
-		armTop = rest;
+		siegeTalon.setSetpoint(armTop);
+		drawbridgeTop = armTop + 170;
+		drawbridgeBot = armTop + 582;
+		sallyPort = armTop + 299;
+		chevelTop = armTop + 552;
+		portcullisTop = armTop + 230;
+		portcullisBot = armTop + 580;
+		armTop = (int)rest;
 	}
 
 	public void PID(){
 		siegeTalon.enable();
-		siegeTalon.set(armTop);
+		int rest = siegeTalon.getAnalogInRaw();
+		siegeTalon.set(rest);
+		siegeTalon.setSetpoint(rest);
 	}
 
-	public double potGet(){
-		double potValue = siegeTalon.getAnalogInRaw();
-		armTop = siegeTalon.getAnalogInRaw();
+	public int potGet(){
+		double potValue = pot.get()*1024;
 		System.out.println("Potentiometer value: " + potValue);
-		return potValue;
+		return (int)potValue;
 	} 
-
+// 420
+	//we will win 
+	
 	public void potTest(){
 		if(siegeStick.getRawButton(8)){
 			siegeTalon.set(drawbridgeTop);	
 		}
 	}
 	
-	public void SallyPortStates(){
-		//list all defenses and movements for each class
-		calc();
-		m_sally = SALLYPORT.POS1;
-		if(this.override()!=true){
-
-			switch(m_sally){
-
-
-			case POS1:
-				endTime = System.currentTimeMillis() + 10;
-				if(endTime != 0){
-					if(sonar.getRangeInches()>10){
-						torcan.SetDrive(0.5, -0.5);
-					}
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-					m_sally = SALLYPORT.POS2;
-				}
-
-			case POS2:
-				while(this.checkTime(10) < 10){
-					if(siegeTalon.getAnalogInRaw() > sallyPort){
-						siegeTalon.set(sallyPort);
-					}
-				}
-
-				m_sally = SALLYPORT.POS3;
-
-			case POS3:
-				endTime = System.currentTimeMillis() + 10;
-				if(endTime != 0){
-					if(sonar.getRangeInches() < 10){
-						torcan.SetDrive(-0.5, 0.5);
-					}
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-					m_sally = SALLYPORT.POS4;
-				}
-
-			case POS4:
-				endTime = System.currentTimeMillis() + 10;
-				if(endTime != 0){
-					torcan.SetDrive(0.5, 0.5);
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-					m_sally = SALLYPORT.POS5;
-				}
-
-			case POS5:
-				endTime = System.currentTimeMillis() + 10;
-				if(endTime != 0){
-					torcan.SetDrive(-0.5, -0.5);
-					//gyro
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-					m_sally = SALLYPORT.POS6;
-				}
-			case POS6:
-				endTime = System.currentTimeMillis() + 10;
-				if(endTime != 0){
-					if(sonar.getRangeInches() > 10){
-						torcan.SetDrive(0.5, -0.5);
-					}
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-					break;
-				}
-			}
-		}
-	}
-	public void PortcullisStates(){
-		//list all defenses and movements for each class
-		calc();
-		ratio = 3.4/5;
-		portcullis = 0;
-		m_port = PORTCULLIS.POS1;
-		if(this.override()!=true){
-
-			switch(m_port){
-
-
-			case POS1:
-				endTime = System.currentTimeMillis() + 1000;
-				if(endTime != 0){
-					if(sonar.getRangeInches() > 10){
-						torcan.SetDrive(0.5, -0.5);
-					}
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-					m_port = PORTCULLIS.POS2;
-				}
-
-			case POS2:
-				while(this.checkTime(10) < 10){
-					if(siegeTalon.getAnalogInRaw() > portcullis){
-						siegeTalon.set(portcullis);
-					}
-				}
-
-				m_port = PORTCULLIS.POS3;
-
-			case POS3:
-				endTime = System.currentTimeMillis() + 10;
-				if(endTime != 0){
-
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-				}
-			}
-		}
-	}
-	public void ChevelStates(){
-		//list all defenses and movements for each class
-		calc();
-		m_chev = CHEVEL.POS1;
-		if(this.override()!=true){
-
-			switch(m_chev){
-
-
-			case POS1:
-				while(this.checkTime(10) < 10){
-					if(siegeTalon.getAnalogInRaw() > chevelTop){
-						siegeTalon.set(chevelTop);
-					}
-				}
-				m_chev = CHEVEL.POS2;
-
-			case POS2:
-				endTime = System.currentTimeMillis() + 10;
-				if(endTime != 0){
-					torcan.SetDrive(-0.5, 0.5);
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-					m_chev = CHEVEL.POS3;
-				}
-
-			case POS3:
-				endTime = System.currentTimeMillis() + 10;
-				if(endTime != 0){
-					torcan.SetDrive(0.5, -0.5);
-				}
-				if(startTime < endTime){
-					torcan.SetDrive(0, 0);
-					endTime = 0;
-					break;
-				}
-			}
-		}
-	}
+	
 	public long checkTime(int wait){
 		long time = System.currentTimeMillis();
 		long endTime = System.currentTimeMillis() + wait; 
@@ -283,6 +127,9 @@ public class TorSiege{
 		
 		if(stick.getRawButton(5) && !enabled) {
 			Cheve();
+		}
+		if(stick.getRawButton(6) && !enabled) {
+			Portcullis();
 		}
 
 		if(!enabled) {
@@ -315,6 +162,14 @@ public class TorSiege{
 		}
 		
 	}
+	
+	private void Portcullis() {
+		if(!enabled) {
+			enabled = true;
+			m_port = PORTCULLIS.POS1;
+		}
+		
+	}
 
 	private void SallyPort() {
 		if(!enabled) {
@@ -330,7 +185,39 @@ public class TorSiege{
 			m_states = DRAWBRIDGE.IDLE;
 			m_sally = SALLYPORT.IDLE;
 			m_chev = CHEVEL.IDLE;
+			m_port = PORTCULLIS.IDLE;
 		}
+		
+		switch(m_port) {
+		case IDLE:
+			if(portTime != -1){
+				portTime = -1;
+			}
+			break;
+		
+		case POS1:
+			if(portTime == -1) {
+				portTime = System.currentTimeMillis() + 750;
+				intakeSiege.portcullis();
+				siegeTalon.set(portcullisTop);
+			} else if(portTime <= System.currentTimeMillis()) {
+				m_port = PORTCULLIS.IDLE;
+				intakeSiege.portStop();
+				portTime = -1;
+			}
+			break;
+//		case POS2:
+//			if(portTime == -1) {
+//				portTime = System.currentTimeMillis() + 700;
+//				torcan.SetDrive(0.5,-0.5);
+//			} else if(portTime <= System.currentTimeMillis()) {
+//				m_port = PORTCULLIS.IDLE;
+//				portTime = -1;
+//			}
+//			break;
+			
+		}
+		
 		
 		switch(m_chev) {
 		case IDLE:
@@ -347,7 +234,7 @@ public class TorSiege{
 		case POS2:
 			if(target.OnTarget((int)chevelTop)) {
 				torcan.SetDrive(-0.5, 0.5);
-				Timer.delay(0.2);
+				Timer.delay(0.3);
 				torcan.SetDrive(0, 0);
 				m_chev = CHEVEL.POS3;
 			}
@@ -362,6 +249,7 @@ public class TorSiege{
 				m_chev = CHEVEL.IDLE;
 			}
 			break;
+			
 		}
 		
 		switch(m_sally) {
@@ -396,7 +284,7 @@ public class TorSiege{
 		case POS4:
 			if(sallyTime == -1) {
 				torcan.SetDrive(-0.5, 0.5);
-				sallyTime = System.currentTimeMillis() + 2200;
+				sallyTime = System.currentTimeMillis() + 2000;//originally 2200
 			} else if(sallyTime <= System.currentTimeMillis()) {
 				m_sally = SALLYPORT.POS5;
 				torcan.SetDrive(0, 0);
@@ -491,10 +379,25 @@ public class TorSiege{
 	}
 
 	public void SiegeArmDown(){
-		siegeTalon.set(0.5);
+		siegeTalon.set(chevelTop);
 	}
 	public void SiegeArmUp(){
-		siegeTalon.set(-0.5);
+		siegeTalon.set(chevelTop-100);
+	}
+	public void drawbridgeTop(){
+		siegeTalon.set(drawbridgeTop);
+	}
+	public void drawbridgeBot(){
+		siegeTalon.set(drawbridgeBot);
+	}
+	public void sally(){
+		siegeTalon.set(299);
+	}
+	public void portBot(){
+		siegeTalon.set(portcullisBot);
+	}
+	public void portTop(){
+		siegeTalon.set(portcullisTop);
 	}
 	public void stopArm(){
 		siegeTalon.set(0);

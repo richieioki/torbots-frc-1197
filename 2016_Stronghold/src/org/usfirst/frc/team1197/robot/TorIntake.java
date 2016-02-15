@@ -32,7 +32,13 @@ public class TorIntake {
 	}
 	
 	public void portcullis(){
-		cantalon.set(-0.75);
+		cantalon.set(0.95);
+	}
+	public void portStop(){
+		cantalon.set(0);
+	}
+	public void portcullisTele(double val){
+		cantalon.set(val);
 	}
 	public void autoLoad(){
 		if(stick.getRawButton(7) && breakBeam.get()!=true){

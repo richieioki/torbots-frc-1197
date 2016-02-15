@@ -1,5 +1,7 @@
 package org.usfirst.frc.team1197.robot;
 
+import org.usfirst.frc.team1197.robot.TorSiege.CHEVEL;
+
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
@@ -120,6 +122,9 @@ public class TorAuto {
 		laneDefense[1] = defense;
 		return laneDefense;
 	}
+	public void telePortcullis(){
+		intake.portcullis();
+	}
 	
 	public void turnToTheta(double theta){
 		double gyroAngle = gyro.getAngle();
@@ -198,17 +203,17 @@ public class TorAuto {
 	
 	public void DrawBridge(){ //ALWAYS CHANGE POT VALUE
 		m_cans.SetDrive(0.5,-0.5); //BEFORE TESTING FIX THE POT VALUE 
-		Timer.delay(2.4);
+		Timer.delay(2.05);
 		m_cans.SetDrive(0.0,0.0);
-		if(siege.potGet() < drawbridgeTop){
-			siege.SiegeArmUp();
+		if(siege.potGet() > drawbridgeTop){
+			siege.drawbridgeTop();
 		}
 		Timer.delay(0.5);
 		m_cans.SetDrive(-0.5, 0.5);
-		Timer.delay(1.7);
+		Timer.delay(1.4);
 		m_cans.SetDrive(0.0,0.0);
-		if(siege.potGet() < drawbridgeBot){
-			siege.SiegeArmUp();
+		if(siege.potGet() > drawbridgeBot){
+			siege.drawbridgeBot();
 		}
 		Timer.delay(0.5);
 		m_cans.SetDrive(0.5, -0.5);
@@ -278,49 +283,31 @@ public class TorAuto {
 	}
 	public void ChevelDeFrise(){ //ALWAYS CHECK THE POT VALUE
 		m_cans.SetDrive(0.4, -0.4);
-		Timer.delay(3); //adjust
+		Timer.delay(3.0); //adjust
 		m_cans.SetDrive(0,0);
-		if(siege.potGet() > chevelTop){  	
-			siege.SiegeArmUp();
+		if(siege.potGet() < siege.chevelTop){
+			siege.SiegeArmDown();
 		}
-		Timer.delay(1.5);
-		siege.stopArm();
+		Timer.delay(1.2);
 		m_cans.SetDrive(-0.4, 0.4);
 		Timer.delay(0.3);
 		m_cans.SetDrive(0,0);
 
 		m_cans.SetDrive(0.5, -0.5);
 		Timer.delay(0.25);
-		siege.SiegeArmDown();
+		siege.SiegeArmUp();
 		Timer.delay(2.6);
 		siege.stopArm();
 		m_cans.SetDrive(0, 0);
 	}
-	
-	public void Portcullis(){
-		if(siege.potGet()>100){
-			m_cans.SetDrive(0.4, -0.4);
-			siege.SiegeArmUp();
-		}
-		Timer.delay(3);
-		if(siege.potGet() < 700){
-			intake.portcullis();
-			Timer.delay(0.25);
-			siege.SiegeArmDown();
-		}
-		Timer.delay(1.5);
-		m_cans.SetDrive(0.5, -0.5);
-	}
-	
 	public void Sallyport(){
 		m_cans.SetDrive(0.5,-0.5);
 		Timer.delay(2);
 		m_cans.SetDrive(0,0);
-		if(siege.potGet() > sallyPort){
-			siege.SiegeArmUp();
+		if(siege.potGet() < 299){
+			siege.sally();
 		}
 		Timer.delay(0.75);
-		siege.stopArm();
 		m_cans.SetDrive(-0.4, 0.4);
 		Timer.delay(2.15);
 		m_cans.SetDrive(0,0);
@@ -328,14 +315,37 @@ public class TorAuto {
 		Timer.delay(0.25);
 		m_cans.SetDrive(0,0);
 		Timer.delay(0.2);
-		m_cans.SetDrive(0.5, -0.5);
-		Timer.delay(0.5);
+//		m_cans.SetDrive(0.5, -0.5);
+//		Timer.delay(0.5);
 		m_cans.SetDrive(-0.5,-0.5);
-		Timer.delay(0.22);
+		Timer.delay(0.2);
 		m_cans.SetDrive(0,0);
 		m_cans.SetDrive(0.5,-0.5);
 		Timer.delay(4);
 		m_cans.SetDrive(0,0);
+	}
+	public void Portcullis(){
+		if(siege.potGet() < siege.portcullisBot){
+			siege.portBot();
+		}
+		m_cans.SetDrive(0.5,-0.5);
+		Timer.delay(2.75);
+		m_cans.SetDrive(0,0);
+		if(siege.potGet() < siege.portcullisTop){
+			intake.portcullis();
+			siege.portTop();
+		}
+		Timer.delay(0.75);
+		m_cans.SetDrive(0,0);
+		intake.portStop();
+		m_cans.SetDrive(0.5,-0.5);
+		Timer.delay(0.7);
+		m_cans.SetDrive(0, 0);
+		Timer.delay(0.3);
+		m_cans.SetDrive(0.8,-0.8);
+		Timer.delay(0.5);
+		m_cans.SetDrive(0,0);
+		
 	}
 	
 	public void ModeChooser(){

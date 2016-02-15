@@ -26,7 +26,7 @@ public class Robot extends SampleRobot {
 	private Encoder encoder;
 	private Joystick stick, stick2, stick3, cypress;
 	private TorSiege siege;
-	private TorIntake intake;
+	private TorIntake intakee;
 	private TorAuto auto;
 	private AHRS gyro;
 	private AnalogPotentiometer pot;
@@ -80,10 +80,10 @@ public class Robot extends SampleRobot {
 		encoder = new Encoder(0,1);
 		encoder.setDistancePerPulse(1/TorAuto.GEAR_RATIO);
 		driveCANS = new TorCAN(R1, R2, R3, L1, L2, L3);
-		siege = new TorSiege(T1, stick2, pot, sonar, driveCANS, S1, stick);
-		intake = new TorIntake(stick2, P1, P2, E1, breakBeam);
-		auto = new TorAuto(cypress, stick2, gyro, encoder, driveCANS, S1, siege, intake);
-		shoot = new TorShooter(intake, shooter, stick3, gyro);
+		intakee = new TorIntake(stick2, P1, P2, E1, breakBeam);
+		siege = new TorSiege(T1, stick2, pot, sonar, driveCANS, S1, stick, intakee);
+		auto = new TorAuto(cypress, stick2, gyro, encoder, driveCANS, S1, siege, intakee);
+		shoot = new TorShooter(intakee, shooter, stick3, gyro);
 
 
 		drive = new TorDrive(stick, driveCANS);
@@ -104,15 +104,16 @@ public class Robot extends SampleRobot {
 	 */
 	public void autonomous() {
 		encoder.reset();
+		siege.PID();
 		auto.ModeChooser();
-
-		double potVal = siege.potGet();
-		double range = sonar.getRangeInches();
+//		siege.calc();
+		double potVal;
+		double range;
 
 		while (isEnabled()){
-			potVal = siege.potGet();
-			range = sonar.getRangeInches();
-			System.out.println(potVal); 
+//			potVal = siege.potGet();
+//			range = sonar.getRangeInches();
+//			System.out.println(potVal); 
 			//    	System.out.println(range);
 		}
 	}
@@ -124,15 +125,21 @@ public class Robot extends SampleRobot {
 		siege.PID();
 		
 		while(isEnabled()) {
+			System.out.println("POT: " + siege.potGet());
 			siege.SiegeArmUpdate();
 			//    		shooter.set(0.3);
-			intake.intake();
+//			if(!stick.getRawButton(2)){
+//				intakee.intake();
+//			}
 			//    		intake.autoLoad();
 			
 			if(!siege.enabled) {
 				drive.ArcadeDrive(true);
 			}
 		}
+	}
+	public void disabled(){
+		T1.disableControl();
 	}
 
 	/**
