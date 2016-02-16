@@ -127,12 +127,7 @@ public class Robot extends SampleRobot {
 		while(isEnabled()) {
 			System.out.println("POT: " + siege.potGet());
 			siege.SiegeArmUpdate();
-			//    		shooter.set(0.3);
-//			if(!stick.getRawButton(2)){
-//				intakee.intake();
-//			}
-			//    		intake.autoLoad();
-			
+			intakee.intake();
 			if(!siege.enabled) {
 				drive.ArcadeDrive(true);
 			}

@@ -329,22 +329,21 @@ public class TorAuto {
 			siege.portBot();
 		}
 		m_cans.SetDrive(0.5,-0.5);
-		Timer.delay(2.75);
+		Timer.delay(2.5);
 		m_cans.SetDrive(0,0);
+		Timer.delay(0.5);
 		if(siege.potGet() < siege.portcullisTop){
 			intake.portcullis();
 			siege.portTop();
+			Timer.delay(0.5);
+			m_cans.SetDrive(0.25,-0.25);
 		}
 		Timer.delay(0.75);
 		m_cans.SetDrive(0,0);
 		intake.portStop();
 		m_cans.SetDrive(0.5,-0.5);
-		Timer.delay(0.7);
+		Timer.delay(1.2);
 		m_cans.SetDrive(0, 0);
-		Timer.delay(0.3);
-		m_cans.SetDrive(0.8,-0.8);
-		Timer.delay(0.5);
-		m_cans.SetDrive(0,0);
 		
 	}
 	
