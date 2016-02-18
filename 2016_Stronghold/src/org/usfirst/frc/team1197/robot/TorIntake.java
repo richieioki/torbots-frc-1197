@@ -6,14 +6,13 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.CANTalon;
 
 public class TorIntake {
-	private CANTalon cantalon, cantalon2, elevate;
+	private CANTalon cantalon, cantalon2;
 	private Joystick stick;
 	private DigitalInput breakBeam;
-	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, CANTalon elevate, DigitalInput breakbeam){
+	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, DigitalInput breakbeam){
 		this.cantalon = cantalon;
 		this.stick = stick;
 		this.cantalon2 = cantalon2;
-		this.elevate = elevate;
 		this.breakBeam = breakbeam;
 	}
 	public void intake(){
@@ -39,18 +38,6 @@ public class TorIntake {
 	}
 	public void portcullisTele(double val){
 		cantalon.set(val);
-	}
-	public void autoLoad(){
-		if(stick.getRawButton(7) && breakBeam.get()!=true){
-		elevate.set(0.5);
-		}
-		elevate.set(0.0);
-	}
-	public void elevate(){
-		if(stick.getRawButton(7)){
-			elevate.set(0.5);
-		}
-		elevate.set(0);
 	}
 
 }

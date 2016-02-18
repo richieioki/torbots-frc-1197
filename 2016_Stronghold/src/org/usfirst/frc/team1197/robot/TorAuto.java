@@ -209,8 +209,11 @@ public class TorAuto {
 			siege.drawbridgeTop();
 		}
 		Timer.delay(0.5);
-		m_cans.SetDrive(-0.5, 0.5);
-		Timer.delay(1.4);
+		if(siege.potGet() > (drawbridgeTop+150)){
+			m_cans.SetDrive(-0.5, 0.5);
+			siege.drawbridgeMid();
+		}
+		Timer.delay(1.3);
 		m_cans.SetDrive(0.0,0.0);
 		if(siege.potGet() > drawbridgeBot){
 			siege.drawbridgeBot();
@@ -219,67 +222,7 @@ public class TorAuto {
 		m_cans.SetDrive(0.5, -0.5);
 		Timer.delay(3);
 		m_cans.SetDrive(0,0);
-		
-	    
-//		m_cans.SetDrive(0.6, -0.6);
-//		double time = 1.25; 
-//		Timer.delay(time);
-//		shift.set(false);
-		//m_cans.SetDrive(-0.6, 0.6);
 	
-//		while(sonar.getRangeInches()>15){
-//			m_cans.SetDrive(0.6, -0.6);
-//			Timer.delay(0.2);
-//			shift.set(true);
-//			if(sonar.getRangeInches()<15){
-//				siege.drawbridgeSiege();
-//			}
-//			if(sonar.getRangeInches()<16 && sonar.getRangeInches()>14){
-//				break;
-//			}
-//		}
-		
-	
-		
-//		m_cans.SetDrive(0.5, -0.5);
-//		Timer.delay(3);
-//		m_cans.SetDrive(0, 0);
-		
-//		while(sonar.getRangeInches() < 20){
-//			m_cans.SetDrive(-0.6, 0.6);
-//			if (sonar.getRangeInches() == 20){
-//				break;
-//			}
-//		}
-		
-//		while(siege.potGet() > 245){ // while pot value is greater than 167
-//			if(siege.potGet() < 715){
-//				m_cans.SetDrive(0.5, -0.5); //drives forwards
-//				Timer.delay(2);
-//				if(siege.potGet() < 233){
-//					Timer.delay(2);
-//					siege.SiegeArmDown(); //actually goes up
-//					Timer.delay(2);
-//					siege.stopArm(); //stops arm
-//				}
-//				Timer.delay(2);
-//				m_cans.SetDrive(0, 0); //stops drive
-//				break;
-//			}
-//			else{
-//				siege.SiegeArmUp();
-//				m_cans.SetDrive(-0.5, 0.5); //drives backwards
-//			}
-////			siege.SiegeArmUp(); //actaully goes down
-//		}
-
-
-		
-//		while(sonar.getRangeInches() > 60){
-//		m_cans.SetDrive(0.6, -0.6);
-//		}
-//		m_cans.SetDrive(0.0, 0.0);
-//		
 	}
 	public void ChevelDeFrise(){ //ALWAYS CHECK THE POT VALUE
 		m_cans.SetDrive(0.4, -0.4);
@@ -290,7 +233,7 @@ public class TorAuto {
 		}
 		Timer.delay(1.2);
 		m_cans.SetDrive(-0.4, 0.4);
-		Timer.delay(0.3);
+		Timer.delay(0.6);
 		m_cans.SetDrive(0,0);
 
 		m_cans.SetDrive(0.5, -0.5);
@@ -304,7 +247,7 @@ public class TorAuto {
 		m_cans.SetDrive(0.5,-0.5);
 		Timer.delay(2);
 		m_cans.SetDrive(0,0);
-		if(siege.potGet() < 299){
+		if(siege.potGet() < siege.sallyPort){
 			siege.sally();
 		}
 		Timer.delay(0.75);
@@ -482,177 +425,7 @@ public class TorAuto {
 
 	}
 	
-	
-	//starting positions
-	//postion 0, 1 , 2 , 3
 
-	//8 defenses, but not all 8 need different autos
-
-	/*public void AUTO_DrawBridge() {
-
-		//Drawbridge	
-		start position 1
-		drive forward to defense ( X FEET)
-		use seige arm to pull draw bridge down
-		drive forward to shooting spot( Y FEET)
-
-		Shoot()
-
-		Turn around
-
-		Start position 2 || 0
-		drive forward to defense ( X FEET)
-		use seige arm to pull down drawbridge
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (z degrees)
-
-		Shoot ()
-
-		Turn around
-
-		Start position 3
-		drive forward to defense ( X FEET)
-		use seige arm to pull down drawbridge
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (q degrees)
-
-		Shoot ()
-
-		Turn around
-	}
-
-	public void AUTO_DRIVE() {
-		//Moat, Rough Terrain, Ramparts, Rock Wall
-		Start position 2 || 0
-		drive forward to defense ( X FEET)
-		run over moat, rough terrain, ramparts, rock wall
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (z degrees)
-
-		Shoot ()
-
-		Turn around
-
-		//Moat, Rough Terrain, Ramparts, Rock Wall
-		Start position 3
-		drive forward to defense ( X FEET)
-		run over moat, rough terrain, ramparts, rock wall
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (z degrees)
-
-		Shoot ()
-
-		Turn around 
-
-		Start position 1
-		drive forward to defense ( X FEET)
-		run over moat, rough terrain, ramparts, rock wall
-		drive forward to shooting spot ( Y FEET)
-
-		Shoot ()
-
-		Turn around
-
-	}
-
-	public void AUTO_PORTCULLIS() {
-
-		//Portcullis
-		Start position 1
-		drive forward to defense ( X FEET)
-		use seige arm to pull up portcullis
-		drive forward to shooting spot ( Y FEET)
-
-		Shoot ()
-
-		Turn around
-
-		Start position 2 || 0
-		drive forward to defense ( X FEET)
-		use seige arm to pull up portcullis
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (z degrees)
-
-		Shoot ()
-
-		Turn around
-
-		Start position 3
-		drive forward to defense ( X FEET)
-		use seige arm to pull up portcullis
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (z degrees)
-
-		Shoot ()
-
-		Turn around
-	}
-
-	public void AUTO_ChevalDeFrise() {
-		//Cheval de Frise
-		Start position 1
-		drive forward to defense ( X FEET)
-		use seige arm to pull down cheval de frise
-		drive forward to shooting spot ( Y FEET)
-
-		Shoot ()
-
-		Turn around
-
-		Start position 2 || 0
-		drive forward to defense ( X FEET)
-		use seige arm to pull down cheval de frise
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (z degrees)
-
-		Shoot ()
-
-		Turn around		
-	}
-
-
-
-	public void AUTO_SALLYPORT() {		
-
-		Start position 1
-		drive forward to defense ( X FEET)
-		use seige arm to pull to the side sally port
-		drive forward to shooting spot ( Y FEET)
-
-		Shoot ()
-
-		Turn around
-
-		Start positon 2 || 0
-		drive forward to defense ( X FEET)
-		use seige arm to pull to the side sally port
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (z degrees)
-
-		Shoot ()
-
-		Turn around	
-
-		//Sally Port
-		Start position 3
-		drive forward to defense ( X FEET)
-		use seige arm to pull to the side sally port
-		drive forward to shooting spot ( Y FEET)
-
-		Turn to angle (z degrees)
-
-		Shoot ()
-
-		Turn around
-	}*/
 //	public double getDistance(){
 //	double distance=0;
 //	distance=(3.1416*8*m_encoder.getRaw())/GEAR_RATIO;

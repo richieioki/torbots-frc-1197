@@ -50,6 +50,7 @@ public class TorSiege{
 	double portcullisTop = 0;
 	double portcullisBot = 0;
 	double potChecker = 0; //highest value
+	double intakeVal = 0;
 
 
 	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, 
@@ -79,13 +80,15 @@ public class TorSiege{
 		int rest = siegeTalon.getAnalogInRaw();
 		siegeTalon.setSetpoint(armTop);
 		drawbridgeTop = armTop + 170;
-		drawbridgeBot = armTop + 550;
-		sallyPort = armTop + 260;
-		chevelTop = armTop + 550;
+		drawbridgeBot = armTop + 550; //550 for protobot, 800 for final bot
+		sallyPort = armTop + 270; //260 for protobot, 400 for final bot
+		chevelTop = armTop + 550; //550 for protobot, 800 for final bot
 		portcullisTop = armTop + 100;
-		portcullisBot = armTop + 530;
+		portcullisBot = armTop + 530; //530 for protobot, 825 for final bot			
+		intakeVal = armTop + 708;
 		armTop = (int)rest;
 	}
+
 
 	public void PID(){
 		siegeTalon.enable();
@@ -95,8 +98,8 @@ public class TorSiege{
 	}
 
 	public int potGet(){
-		double potValue = pot.get()*1024;
-		System.out.println("Potentiometer value: " + potValue);
+		double potValue = siegeTalon.getAnalogInRaw();
+//		System.out.println("Potentiometer value: " + (int)potValue);
 		return (int)potValue;
 	} 
 // 420
@@ -105,6 +108,12 @@ public class TorSiege{
 	public void potTest(){
 		if(siegeStick.getRawButton(8)){
 			siegeTalon.set(drawbridgeTop);	
+		}
+	}
+	public void intakeTele(){
+		if(siegeStick.getRawButton(3)){
+		siegeTalon.set(intakeVal);
+		siegeTalon.setSetpoint(intakeVal);
 		}
 	}
 	
@@ -142,10 +151,11 @@ public class TorSiege{
 			}
 		}
 
-		else if(siegeStick.getRawButton(10)){
+		if(siegeStick.getRawButton(7)){
 			shift.set(true);
+			System.out.println("!!!!!Solenoid Enabled!!!!!!");
 		}
-		else if(siegeStick.getRawButton(11)){
+		if(siegeStick.getRawButton(9)){
 			shift.set(false);
 		}
 		else {
@@ -263,7 +273,8 @@ public class TorSiege{
 			if(chevTime == -1) {
 				chevTime = System.currentTimeMillis() + 2500;
 				torcan.SetDrive(0.5, -0.5);
-				siegeTalon.set(chevelTop - 100);
+				Timer.delay(0.3);
+				siegeTalon.set(chevelTop - 250);
 			} else if(chevTime <= System.currentTimeMillis()) {
 				torcan.SetDrive(0, 0);
 				enabled = false;
@@ -311,7 +322,7 @@ public class TorSiege{
 		case POS4:
 			if(sallyTime == -1) {
 				torcan.SetDrive(-0.5, 0.5);
-				sallyTime = System.currentTimeMillis() + 1500;//originally 2200
+				sallyTime = System.currentTimeMillis() + 1600;//originally 2200
 			} else if(sallyTime <= System.currentTimeMillis()) {
 				m_sally = SALLYPORT.POS5;
 				torcan.SetDrive(0, 0);
@@ -319,12 +330,12 @@ public class TorSiege{
 			}
 			break;
 		case POS5:
-			Timer.delay(0.5);
-			torcan.SetDrive(0.5, 0.5);
+			Timer.delay(0.7);
+			torcan.SetDrive(0.6, 0.6);
 			Timer.delay(0.25);
 			torcan.SetDrive(0,0);
 			Timer.delay(0.2);
-			torcan.SetDrive(-0.5,-0.5);
+			torcan.SetDrive(-0.6,-0.6);
 			Timer.delay(0.2);
 			torcan.SetDrive(0,0);
 			torcan.SetDrive(0.5,-0.5);
@@ -356,16 +367,9 @@ public class TorSiege{
 			Timer.delay(0.5);
 			m_states = DRAWBRIDGE.POS2;
 			break;
-//		case POS2:
-//			System.out.println("DRAVE BRIDGE TOP " + siegeTalon.getAnalogInRaw());
-//			if(target.OnTarget((int)drawbridgeTop)) {
-//				m_states = DRAWBRIDGE.POS3;
-//				endTime = -1;
-//			}
-//			break;
 		case POS2:
 			if(endTime == -1) {
-				endTime = System.currentTimeMillis() + 1200;
+				endTime = System.currentTimeMillis() + 1250;
 				siegeTalon.set(drawbridgeTop + 140);
 				torcan.SetDrive(-0.5, 0.5);
 			} else {
@@ -410,11 +414,14 @@ public class TorSiege{
 	public void drawbridgeTop(){
 		siegeTalon.set(drawbridgeTop);
 	}
+	public void drawbridgeMid(){
+		siegeTalon.set(drawbridgeTop+150);
+	}
 	public void drawbridgeBot(){
 		siegeTalon.set(drawbridgeBot);
 	}
 	public void sally(){
-		siegeTalon.set(299);
+		siegeTalon.set(sallyPort);
 	}
 	public void portBot(){
 		siegeTalon.set(portcullisBot);
@@ -425,7 +432,6 @@ public class TorSiege{
 	public void stopArm(){
 		siegeTalon.set(0);
 	}
-
 	public void reset() {
 		System.out.println("!!!!!!!!!!!RESET!!!!!!!!!!!!");
 		m_states = DRAWBRIDGE.IDLE;

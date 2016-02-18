@@ -67,8 +67,7 @@ public class Robot extends SampleRobot {
 
 		P1 = new CANTalon(8);
 		P2 = new CANTalon(9);
-		//        E1 = new CANTalon(10); //unsure port
-		//        shooter = new CANTalon(11);//unsure
+//       shooter = new CANTalon(10);//unsure
 
 		S1 = new Solenoid(0);
 
@@ -80,10 +79,10 @@ public class Robot extends SampleRobot {
 		encoder = new Encoder(0,1);
 		encoder.setDistancePerPulse(1/TorAuto.GEAR_RATIO);
 		driveCANS = new TorCAN(R1, R2, R3, L1, L2, L3);
-		intakee = new TorIntake(stick2, P1, P2, E1, breakBeam);
+		intakee = new TorIntake(stick2, P1, P2, breakBeam);
 		siege = new TorSiege(T1, stick2, pot, sonar, driveCANS, S1, stick, intakee);
 		auto = new TorAuto(cypress, stick2, gyro, encoder, driveCANS, S1, siege, intakee);
-		shoot = new TorShooter(intakee, shooter, stick3, gyro);
+		shoot = new TorShooter(intakee, shooter, P2, stick3, stick2, gyro, driveCANS);
 
 
 		drive = new TorDrive(stick, driveCANS);
@@ -127,6 +126,8 @@ public class Robot extends SampleRobot {
 		while(isEnabled()) {
 			System.out.println("POT: " + siege.potGet());
 			siege.SiegeArmUpdate();
+			siege.intakeTele();
+			shoot.adjustShooter();
 			intakee.intake();
 			if(!siege.enabled) {
 				drive.ArcadeDrive(true);
@@ -142,17 +143,15 @@ public class Robot extends SampleRobot {
 	 */
 	public void test() {
 
-
+		siege.PID();
 		compressor = new Compressor();
 		compressor.start();
-		//Drive arm down to lowest position and turn sprocket to 0.1 pot value
-		double range = sonar.getRangeInches();
-		while(isEnabled()){
-
-			range=sonar.getRangeInches();
-			System.out.println("Sonar: " + range); 
-			System.out.println("POT: " + siege.potGet());
-			//    			System.out.println("HI, IM MATTeotimotimo");
+//		siege.portBot();
+//		Timer.delay(1);
+//		siege.portTop();
+	
+		while(isEnabled()){ 
+			System.out.println("POT: " +siege.potGet());
 
 		}
 
