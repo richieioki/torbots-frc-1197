@@ -20,7 +20,7 @@ public class Robot extends SampleRobot {
 	private TorCAN driveCANS;
 	private TorDrive drive;
 
-	private CANTalon R1, R2, R3, L1, L2, L3, T1, P1, P2, E1, shooter;
+	private CANTalon R1, R2, R3, L1, L2, L3, T1, P1, P2, E1, shooter1, shooter2;
 	private Solenoid S1;
 
 	private Encoder encoder;
@@ -32,7 +32,7 @@ public class Robot extends SampleRobot {
 	private AnalogPotentiometer pot;
 	private Ultrasonic sonar;
 	public SmartDashboard sd;
-	private DigitalInput breakBeam;
+	private DigitalInput breakBeam, breakBeam2;
 	private TorShooter shoot;
 
 
@@ -51,11 +51,11 @@ public class Robot extends SampleRobot {
 		L3 = new CANTalon(6);
 
 		T1 = new CANTalon(7);
-		
+
 		T1.changeControlMode(TalonControlMode.Position);
 		T1.setFeedbackDevice(FeedbackDevice.AnalogPot);
 		T1.reverseOutput(true);
-		
+
 		double p = 8.0;
 		double i = 0.0;
 		double d = 0.0;
@@ -65,11 +65,13 @@ public class Robot extends SampleRobot {
 		profile = 0;
 		T1.setPID(p, i, d, 0, 0, RampRate, profile);
 
-		P1 = new CANTalon(8);
+		//intake talons
+		P1 = new CANTalon(8); 
 		P2 = new CANTalon(9);
-//       shooter = new CANTalon(10);//unsure
 
 		S1 = new Solenoid(0);
+		breakBeam = new DigitalInput(4);
+		breakBeam2 = new DigitalInput(5);
 
 		sonar = new Ultrasonic(2, 3);
 		sonar.setAutomaticMode(true);
@@ -79,23 +81,13 @@ public class Robot extends SampleRobot {
 		encoder = new Encoder(0,1);
 		encoder.setDistancePerPulse(1/TorAuto.GEAR_RATIO);
 		driveCANS = new TorCAN(R1, R2, R3, L1, L2, L3);
-		intakee = new TorIntake(stick2, P1, P2, breakBeam);
+		intakee = new TorIntake(stick2, P1, P2, breakBeam, breakBeam2, siege);
 		siege = new TorSiege(T1, stick2, pot, sonar, driveCANS, S1, stick, intakee);
 		auto = new TorAuto(cypress, stick2, gyro, encoder, driveCANS, S1, siege, intakee);
-		shoot = new TorShooter(intakee, shooter, P2, stick3, stick2, gyro, driveCANS);
-
+		shoot = new TorShooter(intakee, shooter1, shooter2, P2, stick3, stick2, gyro, driveCANS);
 
 		drive = new TorDrive(stick, driveCANS);
 		gyro = new AHRS(SPI.Port.kMXP);
-		/*try {
-        	ahrs = new AHRS(SPI.Port.kMXP);
-
-        	//distance = new TorDistance(ahrs);
-        } catch (RuntimeException ex ) {
-            //DriverStation.reportError("Error instantiating navX MXP:  " + ex.getMessage(), true);
-        	DriverStation.reportError(edu.wpi.first.wpilibj.hal.HALUtil.getHALstrerror(), false);
-        }*/
-
 	}
 
 	/**
@@ -105,14 +97,14 @@ public class Robot extends SampleRobot {
 		encoder.reset();
 		siege.PID();
 		auto.ModeChooser();
-//		siege.calc();
+		//		siege.calc();
 		double potVal;
 		double range;
 
 		while (isEnabled()){
-//			potVal = siege.potGet();
-//			range = sonar.getRangeInches();
-//			System.out.println(potVal); 
+			//			potVal = siege.potGet();
+			//			range = sonar.getRangeInches();
+			//			System.out.println(potVal); 
 			//    	System.out.println(range);
 		}
 	}
@@ -122,15 +114,24 @@ public class Robot extends SampleRobot {
 	public void operatorControl() {
 		sonar.setAutomaticMode(true);
 		siege.PID();
-		
+
 		while(isEnabled()) {
-			System.out.println("POT: " + siege.potGet());
-			siege.SiegeArmUpdate();
-			siege.intakeTele();
-			shoot.adjustShooter();
-			intakee.intake();
-			if(!siege.enabled) {
-				drive.ArcadeDrive(true);
+			if(!shoot.shooterEnabled) {
+				System.out.println("POT: " + siege.potGet());
+				siege.SiegeArmUpdate();
+
+				siege.intakeTele();
+
+				shoot.adjustShooter();
+				shoot.update();
+
+				intakee.intake(); //runs shooter update loop
+
+				if(!siege.enabled) {
+					drive.ArcadeDrive(true);
+				}
+			} else {
+				shoot.update();
 			}
 		}
 	}
@@ -146,13 +147,15 @@ public class Robot extends SampleRobot {
 		siege.PID();
 		compressor = new Compressor();
 		compressor.start();
-//		siege.portBot();
-//		Timer.delay(1);
-//		siege.portTop();
-	
+		//		siege.portBot();
+		//		Timer.delay(1);
+		//		siege.portTop();
+
 		while(isEnabled()){ 
 			System.out.println("POT: " +siege.potGet());
-
+			//			System.out.println("BREAKBEAM1: " + breakBeam.get());
+			//			System.out.println("BREAKBEAM2: " + breakBeam2.get());
+			//			intakee.intake();
 		}
 
 	}

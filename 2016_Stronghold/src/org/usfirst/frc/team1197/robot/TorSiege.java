@@ -79,12 +79,12 @@ public class TorSiege{
 		ratio = 3.4/5;
 		int rest = siegeTalon.getAnalogInRaw();
 		siegeTalon.setSetpoint(armTop);
-		drawbridgeTop = armTop + 170;
-		drawbridgeBot = armTop + 550; //550 for protobot, 800 for final bot
-		sallyPort = armTop + 270; //260 for protobot, 400 for final bot
-		chevelTop = armTop + 550; //550 for protobot, 800 for final bot
-		portcullisTop = armTop + 100;
-		portcullisBot = armTop + 530; //530 for protobot, 825 for final bot			
+		drawbridgeTop = armTop + 160;
+		drawbridgeBot = armTop + 540; //550 for protobot, 800 for final bot
+		sallyPort = armTop + 250; //260 for protobot, 400 for final bot
+		chevelTop = armTop + 520; //550 for protobot, 800 for final bot
+		portcullisTop = armTop + 90;
+		portcullisBot = armTop + 520; //530 for protobot, 825 for final bot			
 		intakeVal = armTop + 708;
 		armTop = (int)rest;
 	}
@@ -112,8 +112,8 @@ public class TorSiege{
 	}
 	public void intakeTele(){
 		if(siegeStick.getRawButton(3)){
-		siegeTalon.set(intakeVal);
-		siegeTalon.setSetpoint(intakeVal);
+			siegeTalon.set(intakeVal);
+			siegeTalon.setSetpoint(intakeVal);
 		}
 	}
 	
@@ -322,7 +322,7 @@ public class TorSiege{
 		case POS4:
 			if(sallyTime == -1) {
 				torcan.SetDrive(-0.5, 0.5);
-				sallyTime = System.currentTimeMillis() + 1600;//originally 2200
+				sallyTime = System.currentTimeMillis() + 1500;//originally 2200
 			} else if(sallyTime <= System.currentTimeMillis()) {
 				m_sally = SALLYPORT.POS5;
 				torcan.SetDrive(0, 0);

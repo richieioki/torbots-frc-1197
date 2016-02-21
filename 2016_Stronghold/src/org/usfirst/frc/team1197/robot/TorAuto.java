@@ -213,7 +213,7 @@ public class TorAuto {
 			m_cans.SetDrive(-0.5, 0.5);
 			siege.drawbridgeMid();
 		}
-		Timer.delay(1.3);
+		Timer.delay(1.1);
 		m_cans.SetDrive(0.0,0.0);
 		if(siege.potGet() > drawbridgeBot){
 			siege.drawbridgeBot();
@@ -252,7 +252,7 @@ public class TorAuto {
 		}
 		Timer.delay(0.75);
 		m_cans.SetDrive(-0.4, 0.4);
-		Timer.delay(2.15);
+		Timer.delay(2.0);
 		m_cans.SetDrive(0,0);
 		m_cans.SetDrive(0.5, 0.5);
 		Timer.delay(0.25);
