@@ -36,6 +36,8 @@ public class TorAuto {
 	double chevelTop = 0;
 	double portcullis = 0;
 	private TorSiege siege;
+	double turnSpeed;
+	double turnAngle;
 	
 	//TODO some digital input read to get which auto we are running
 
@@ -126,14 +128,19 @@ public class TorAuto {
 		intake.portcullis();
 	}
 	
-	public void turnToTheta(double theta){
-		double gyroAngle = gyro.getAngle();
-		if(gyroAngle > theta){
-			m_cans.SetDrive(-0.5, -0.5);
+	public void turnToTheta(double theta, double turnSpeed){
+		//(-speed,-speed) = Right
+		//(+speed,+speed) = Left
+//		double gyroAngle = gyro.getAngle();
+		this.turnSpeed = turnSpeed;
+		double currentAngle = gyro.getAngle();
+		turnAngle = 0;//gyro.getAngle()+theta;
+		while(currentAngle!=turnAngle){
+			m_cans.SetDrive(-this.turnSpeed, -this.turnSpeed);
 		}
-		else if(gyroAngle < theta){
-			m_cans.SetDrive(0.5, 0.5);
-		}
+//		else if(gyroAngle < theta){
+//			m_cans.SetDrive(0.5, 0.5);
+//		}
 	}
 	
 //	public void move(){
@@ -197,7 +204,7 @@ public class TorAuto {
 		shift.set(false);
 		//m_cans.SetDrive(-0.6, 0.6);
 		m_cans.SetDrive(0.0, 0.0);
-		this.turnToTheta(0);
+//		this.turnToTheta(0);
 	}
 	
 	

@@ -4,14 +4,18 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class TorDrive {
-	private Joystick m_stick;
+	private Joystick m_stick, overrideStick;
 	private Solenoid m_solenoidshift;
 	private TorCAN m_jagDrive;
 	private Encoder m_encoder;
+	final static float ENC_CON = 11;
+	float negOvershoot;
 
 	private TorCamera cam;
 	private NetworkTable table;
 	private PIDController yawPID;
+	double m_speed;
+	double m_distance;
 	
 	public TorDrive(Joystick stick, TorCAN jagDrive) {
 		m_stick = stick;
@@ -201,12 +205,50 @@ public class TorDrive {
 		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
 
 	}
-	public void turnToGoal(){
-		if(m_stick.getRawButton(1)){
-			yawPID.enable();
+//	public void turnToGoal(){
+//		if(m_stick.getRawButton(1)){
+//			yawPID.enable();
+//		}
+//		else{
+//			yawPID.disable();
+//		}
+//	}
+//	public void haltDrive(double p){
+////		if(overrideStick.getRawButton(10)){
+//		m_distance = m_encoder.getDistance();
+//		m_speed = -p*m_distance;
+//		m_jagDrive.SetDrive(m_speed, -1*m_speed);
+////		}
+//	}
+	public void driveDistance(float distance, float speed, boolean forward){
+		m_encoder.reset();
+		if(forward==true){
+			if(distance<20){
+				negOvershoot = 0;
+			}
+			else{
+				negOvershoot = ENC_CON;
+			}
+			distance = distance - negOvershoot;
+			while(m_encoder.getDistance()<= distance){
+				m_jagDrive.SetDrive(speed, -speed);
+//				Timer.delay(0.02);
+				if(overrideStick.getRawButton(10))
+					break;
+//				Timer.delay(0.02);
+//				System.out.println("Distance: " + m_encoder.getDistance());
+			}
 		}
 		else{
-			yawPID.disable();
+			distance = distance + negOvershoot;
+			while(m_encoder.getDistance()>= distance){
+				m_jagDrive.SetDrive(-speed, speed);
+//				Timer.delay(0.02);
+				if(overrideStick.getRawButton(10))
+					break;
+//				Timer.delay(0.02);
+//				System.out.println("Distance: " + m_encoder.getDistance());
+			}
+			}
 		}
 	}
-}

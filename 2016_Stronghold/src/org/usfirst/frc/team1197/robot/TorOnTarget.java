@@ -21,9 +21,17 @@ public class TorOnTarget {
 	 * @param location INT location that you want to reach
 	 * @return if you are within your target, true if you are within threshold, false if not
 	 */
-	public boolean OnTarget(int location) {
+	public boolean siegeOnTarget() {
 		int rawValue = pidTalon.getAnalogInRaw();
-		if(rawValue > (location - tolerance) && rawValue < (location + tolerance)) {
+		if(rawValue > (pidTalon.getSetpoint() - tolerance) && rawValue < (pidTalon.getSetpoint() + tolerance)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	public boolean onTargetRaw() {
+		int rawValue = pidTalon.getAnalogInRaw();
+		if(rawValue > (pidTalon.getSetpoint() - tolerance) && rawValue < (pidTalon.getSetpoint() + tolerance)) {
 			return true;
 		} else {
 			return false;
