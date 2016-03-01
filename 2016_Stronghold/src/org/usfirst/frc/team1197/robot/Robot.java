@@ -29,7 +29,7 @@ public class Robot extends SampleRobot {
 	private AnalogPotentiometer pot;
 	private Ultrasonic sonar;
 	public SmartDashboard sd;
-	private DigitalInput breakBeam;
+	private DigitalInput breakBeam, breakBeam2;
 	private TorShooter shoot;
 
 	public Robot() {
@@ -48,7 +48,7 @@ public class Robot extends SampleRobot {
 		L3 = new CANTalon(6);
 
 		T1 = new CANTalon(7);
-		
+
 		T1.changeControlMode(TalonControlMode.Position);
 		T1.setFeedbackDevice(FeedbackDevice.AnalogPot);
 		T1.reverseOutput(true);
@@ -64,10 +64,10 @@ public class Robot extends SampleRobot {
 		T1.setPID(50.0, 0, 0, 0, 0, RampRate, 0);
 //		T1.setProfile(1);
 
-		P1 = new CANTalon(8);
+		//intake talons
+		P1 = new CANTalon(8); 
 		P2 = new CANTalon(9);
-		// shooter = new CANTalon(10);//unsure
-		
+
 		S1 = new Solenoid(0);
 
 		shooter1 = new CANTalon(11);
@@ -81,6 +81,8 @@ public class Robot extends SampleRobot {
 
 		// 12-11 shooter
 		// 10 window motor
+		breakBeam = new DigitalInput(4);
+		breakBeam2 = new DigitalInput(5);
 
 		sonar = new Ultrasonic(2, 3);
 		sonar.setAutomaticMode(true);
@@ -90,7 +92,7 @@ public class Robot extends SampleRobot {
 		encoder = new Encoder(0, 1);
 		encoder.setDistancePerPulse(1 / TorAuto.GEAR_RATIO);
 		driveCANS = new TorCAN(R1, R2, R3, L1, L2, L3);
-		intakee = new TorIntake(stick2, P1, P2, breakBeam);
+		intakee = new TorIntake(stick2, P1, P2, breakBeam, breakBeam2, siege);
 		siege = new TorSiege(T1, stick2, pot, sonar, driveCANS, S1, stick,
 				intakee, drive, encoder, gyro);
 		auto = new TorAuto(cypress, stick2, gyro, encoder, driveCANS, S1,
@@ -138,7 +140,7 @@ public class Robot extends SampleRobot {
 		sonar.setAutomaticMode(true);
 		siege.PID();
 		encoder.reset();
-		
+
 		while (isEnabled()) {
 //			System.out.println("Degrees: " + siege.potGet());
 			System.out.println("Distance: " + encoder.getDistance());
@@ -180,7 +182,9 @@ public class Robot extends SampleRobot {
 		// siege.portBot();
 		// Timer.delay(1);
 		// siege.portTop();
-
+			//			System.out.println("BREAKBEAM1: " + breakBeam.get());
+			//			System.out.println("BREAKBEAM2: " + breakBeam2.get());
+			//			intakee.intake();
 		while (isEnabled()) {
 			System.out.println("POT: " + siege.potGet());
 		}

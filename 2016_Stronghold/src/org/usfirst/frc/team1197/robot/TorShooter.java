@@ -11,6 +11,11 @@ public class TorShooter {
 	CANTalon shooter1, shooter2, hood, elevate, arm;
 	Joystick stick3, stick2;
 	AHRS gyro;
+	public boolean shooterEnabled;
+	private enum ShooterState{TURNING, MANUAL};
+	private ShooterState m_state;
+	float angleToTurn;
+
 
 	public TorShooter(TorIntake intake, CANTalon shooter1, CANTalon shooter2,
 			CANTalon hood, CANTalon elevate, CANTalon arm, Joystick stick3,
@@ -25,6 +30,12 @@ public class TorShooter {
 		this.stick2 = stick2;
 		this.gyro = gyro;
 		cans = can;
+		shooterEnabled = false;
+		m_state = ShooterState.MANUAL;
+		
+		//NEED TO DETERMINE THE CORRECT SPEED 
+		shooter1.set(0.4);
+		shooter2.set(0.4);
 	}
 
 	public void shoot() {
@@ -72,5 +83,11 @@ public class TorShooter {
 			// shooter.set(-0.5);
 			// }
 		}
+	}
+
+	private void shooterReset() {
+		m_state = ShooterState.MANUAL;
+		shooter1.set(0.4);
+		shooter2.set(0.4);
 	}
 }

@@ -561,10 +561,7 @@ public class TorSiege{
 	}
 	public void reset() {
 		System.out.println("!!!!!!!!!!!RESET!!!!!!!!!!!!");
-//		m_states = DRAWBRIDGE.IDLE;
-//		m_sally = SALLYPORT.IDLE;
-//		m_port = PORTCULLIS.IDLE;
-//		m_chev = CHEVEL.IDLE;
+		m_states = DRAWBRIDGE.IDLE;
 		//siegeTalon.set(siegeTalon.getAnalogInRaw());
 		//siegeTalon.setProfile(0);
 	}
