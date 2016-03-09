@@ -1,20 +1,24 @@
 package org.usfirst.frc.team1197.robot;
 
 import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.io.PrintStream;
 
 public class TorAuto
 {
   private Solenoid shift;
   private Encoder m_encoder;
-  private Joystick auto_input;
+  private Joystick auto_input, stick;
   private TorCAN m_cans;
+  private TorShooter shoot;
   private TorDrive drive;
   public static final double GEAR_RATIO = 56.0D;
   public double encoderDistance = 0.0D;
@@ -26,11 +30,12 @@ public class TorAuto
   public CANTalon L2;
   public CANTalon L3;
   public CANTalon T1;
+  public CANTalon hood;
   public int defense = 0;
   public int lane = 0;
   private AHRS gyro;
   private TorIntake intake;
-  private Joystick stick;
+  private Joystick stick2;
   double ratio = 0.6799999999999999D;
   double armTop = 0.0D;
   double drawbridgeTop = 0.0D;
@@ -41,23 +46,31 @@ public class TorAuto
   private TorSiege siege;
   double turnSpeed;
   double turnAngle;
+  private Robot robot;
   
   public TorAuto() {}
   
-  public TorAuto(Joystick cypress, Joystick stick, AHRS ahrs, Encoder encoder, TorCAN cans, Solenoid shift, TorSiege siege, TorIntake intake, TorDrive drive)
+  public TorAuto(Joystick cypress, Joystick stick, Joystick stick2, AHRS ahrs, Encoder encoder, TorCAN cans, 
+		  Solenoid shift, TorSiege siege, TorIntake intake, TorDrive drive, TorShooter shoot, Robot robot)
   {
     this.stick = stick;
     this.drive = drive;
     this.shift = shift;
     this.auto_input = cypress;
     this.auto_input = new Joystick(2);
+    this.stick2 = stick2;
     this.m_encoder = encoder;
     this.gyro = ahrs;
     this.m_cans = cans;
     this.siege = siege;
     this.intake = intake;
+    this.shoot = shoot;
+    this.robot = robot;
   }
-  
+  public int throttle(){
+	  double val = (stick.getThrottle()+1)*4;
+	  return (int)val;
+  }
   public int[] initialize()
   {
     int[] laneDefense = new int[2];
@@ -105,6 +118,35 @@ public class TorAuto
     laneDefense[1] = this.defense;
     return laneDefense;
   }
+  public void autoThrottle(){
+	  if(throttle()==0){
+	    	
+	    }
+	    else if(throttle()==1){
+	    	DrawBridge();
+	    }
+	    else if(throttle()==2){
+	    	Sallyport();
+	    }
+	    else if(throttle()==3){
+	    	ChevelDeFrise();
+	    }
+	    else if(throttle()==4){
+	    	Portcullis();
+	    }
+	    else if(throttle()==5){
+	    	Ramparts();
+	    }
+	    else if(throttle()==6){
+	    	RoughTerrain();
+	    }
+	    else if(throttle()==7){
+	    	Moat();
+	    }
+	    else if(throttle()==8){
+	    	RockWall();
+	    }
+  }
   
   public void telePortcullis()
   {
@@ -124,7 +166,7 @@ public class TorAuto
   public void Moat()
   {
     this.m_encoder.reset();
-    this.siege.setDegrees(30.0D);
+    this.siege.setDegrees(sallyPort);
     this.siege.highGear();
     this.drive.driveDistance(15.0F, 0.5F, true);
     this.drive.driveDistance(45.0F, 1.0F, true);
@@ -136,6 +178,7 @@ public class TorAuto
   public void RoughTerrain()
   {
     this.m_encoder.reset();
+    this.siege.setDegrees(sallyPort);
     this.drive.driveDistance(130.0F, 0.5F, true);
     this.m_cans.SetDrive(0.0D, 0.0D);
   }
@@ -143,7 +186,7 @@ public class TorAuto
   public void RockWall()
   {
     this.m_encoder.reset();
-    this.siege.setDegrees(30.0D);
+    this.siege.setDegrees(sallyPort);
     this.siege.highGear();
     this.drive.driveDistance(15.0F, 0.5F, true);
     this.drive.driveDistance(45.0F, 1.0F, true);
@@ -155,7 +198,7 @@ public class TorAuto
   public void Ramparts()
   {
     this.m_encoder.reset();
-    this.siege.setDegrees(30.0D);
+    this.siege.setDegrees(sallyPort);
     this.drive.driveDistance(140.0F, 1.0F, true);
     this.m_cans.SetDrive(0.0D, 0.0D);
     this.siege.setDegrees(0.0D);
@@ -167,6 +210,10 @@ public class TorAuto
     this.drive.driveDistance(60.0F, 0.5F, true);
     this.m_cans.SetDrive(0.0D, 0.0D);
     this.siege.DrawBridge();
+    
+    while(robot.isEnabled() && robot.isAutonomous()) {
+    	this.siege.SiegeArmUpdate();
+    }
   }
   
   public void ChevelDeFrise()
@@ -175,6 +222,9 @@ public class TorAuto
     this.drive.driveDistance(60.0F, 0.5F, true);
     this.m_cans.SetDrive(0.0D, 0.0D);
     this.siege.Cheve();
+    while(robot.isEnabled() && robot.isAutonomous()) {
+    	this.siege.SiegeArmUpdate();
+    }
   }
   
   public void Sallyport()
@@ -183,6 +233,18 @@ public class TorAuto
     this.drive.driveDistance(60.0F, 0.5F, true);
     this.m_cans.SetDrive(0.0D, 0.0D);
     this.siege.SallyPort();
+    while(robot.isEnabled() && robot.isAutonomous()) {
+    	this.siege.SiegeArmUpdate();
+    }
+    
+//    if (m_encoder.getDistance() > siege.sallyPortDist)
+//    {
+//	    gyro.reset();
+//	    siege.turnToTheta(20);
+//	    Timer.delay(0.5);
+//	    shoot.elevateShoot();
+//	    Timer.delay(2);
+//    }
   }
   
   public void Portcullis()
@@ -201,6 +263,9 @@ public class TorAuto
     }
     this.m_cans.SetDrive(0.0D, 0.0D);
     this.siege.Portcullis();
+    while(robot.isEnabled() && robot.isAutonomous()) {
+    	this.siege.SiegeArmUpdate();
+    }
   }
   
   public void ModeChooser()
