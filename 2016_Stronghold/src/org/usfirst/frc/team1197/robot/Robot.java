@@ -101,7 +101,7 @@ extends SampleRobot
 
 		this.T1.changeControlMode(CANTalon.TalonControlMode.Position);
 		this.T1.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
-		    this.T1.reverseOutput(true);
+//		    this.T1.reverseOutput(true);
 
 		double p = 40.0D;
 		double i = 0.005D;
@@ -210,7 +210,7 @@ extends SampleRobot
 		this.encoder.reset();
 		gyro.reset();
 		this.siege.PID();
-		siege.setDegrees(-42);
+		
 		
 		while (isEnabled()) {
 			//      System.out.println("Degrees: " + this.siege.potGet());
@@ -220,7 +220,7 @@ extends SampleRobot
 			//    	if(shoot.shooterEnabled) {
 			//    	lidar.getDistance();
 			//        this.shoot.update();
-//			this.siege.SiegeArmUpdate();
+			this.siege.SiegeArmUpdate();
 			//        this.shoot.adjustShooter();
 			this.siege.intakeTele();
 			//        siege.turnToReference();
@@ -228,7 +228,9 @@ extends SampleRobot
 			this.intakee.intake();
 			//        this.shoot.hood();
 			//        this.shoot.shoot();
+			
 		    camera.cameraUpdate();
+		    System.out.println("EMPTY: " + camera.empty);
 //			this.shoot.hoodSet();
 //			System.out.println("Hood Degrees" + shoot.hoodGetDegrees());
 			this.drive.ArcadeDrive(true);
@@ -284,9 +286,7 @@ extends SampleRobot
 //		compressor = new Compressor();
 //		compressor.start();
 		while (isEnabled()) {
-			if(stick2.getRawButton(1)){
-				S1.set(true);
-			}
+			camera.checkArray();
 		}
 
 	}

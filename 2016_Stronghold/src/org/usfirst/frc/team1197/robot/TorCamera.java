@@ -20,6 +20,7 @@ public class TorCamera
   private double targetAngle = 0;
   private double ahrsAngle = 0;
   private Joystick stick3;
+  public boolean empty = true;
   private TorLidar lidar;
   public TorCAN torcan;
   private TorSiege siege;
@@ -57,44 +58,56 @@ public class TorCamera
   }
   
   public double GetValue(){
-	  
 	  double[] defaultValue = new double[0];
 	  double[] centerx = m_networkTable.getNumberArray("centerX", defaultValue);
 	  double[] areas = m_networkTable.getNumberArray("area", defaultValue);
-	  double value = centerx[0] + 20;
-	  System.out.println("VALUE: " + value);
-	  if(value < CENTER){
-		  deltaX = CENTER - value;
-		  angleDeltaX = deltaX * 0.209375;
-		  ahrs.reset();
-		  System.out.println("ANGLE CHECK: " + ahrs.getAngle());
-		  return angleDeltaX;
+	  for(int i=0; i<centerx.length; i++){
+		  if(centerx[i] != 0){
+			  empty = false;
+			  System.out.println("EMPTY: " + empty);
+			  break;
+		  }
 	  }
-	  else if(value > CENTER){
-		  value = value + 42;
-		  deltaX = value - CENTER;
-		  angleDeltaX = deltaX * 0.209375;
-		  ahrs.reset();
-		  System.out.println("ANGLE CHECK: " + ahrs.getAngle());
-		  return angleDeltaX;
+	  if(empty == false){
+		  double value = centerx[0] + 20; //needs adjustments
+		  System.out.println("VALUE: " + value);
+		  if(value < CENTER){
+			  deltaX = CENTER - value;
+			  angleDeltaX = deltaX * 0.209375;
+			  ahrs.reset();
+//			  System.out.println("ANGLE CHECK: " + ahrs.getAngle());
+			  return angleDeltaX;
+		  }
+		  else if(value > CENTER){
+			  value = value + 39; //needs adjustment
+			  deltaX = value - CENTER;
+			  angleDeltaX = deltaX * 0.209375;
+			  ahrs.reset();
+//			  System.out.println("ANGLE CHECK: " + ahrs.getAngle());
+			  return angleDeltaX;
+		  }
+		  else{
+			  System.out.println("ERROR");
+			  return 0;
+		  }
+	//	  deltaX = targetX - CENTER;
+	//	  angleDeltaX = deltaX * 0.209375;
+	//	  targetAngle = angleMapper() + angleDeltaX;
+	//	  
+	//	  targetArea = -1.0;
+	//	  targetX = 0.0;
+	//	  for(int i=0; i<areas.length; i++){
+	//		  if(areas[i] > targetArea){
+	//			  targetArea = areas[i];
+	//			  targetX = centerx[i];
+	//		  }
+	//	  }
+	//	  return targetX;
 	  }
 	  else{
 		  System.out.println("ERROR");
 		  return 0;
 	  }
-//	  deltaX = targetX - CENTER;
-//	  angleDeltaX = deltaX * 0.209375;
-//	  targetAngle = angleMapper() + angleDeltaX;
-//	  
-//	  targetArea = -1.0;
-//	  targetX = 0.0;
-//	  for(int i=0; i<areas.length; i++){
-//		  if(areas[i] > targetArea){
-//			  targetArea = areas[i];
-//			  targetX = centerx[i];
-//		  }
-//	  }
-//	  return targetX;
   }
   
   public double angleMapper(){
@@ -122,6 +135,7 @@ public class TorCamera
 //		  //some method to shoot
 //		  return;
 //	  }
+	  
 	  double[] defaultValue = new double[0];
 	  double[] centerx = m_networkTable.getNumberArray("centerX", defaultValue);
 	  double value = centerx[0];
@@ -131,36 +145,44 @@ public class TorCamera
 		  break;
 	  case TURN: 
 		  if(value < CENTER){
-			  System.out.println("Delta Angle HELLO: " + angleDeltaX);
-			  System.out.println("Angle: " + ahrs.getAngle());
+//			  System.out.println("Delta Angle HELLO: " + angleDeltaX);
+//			  System.out.println("Angle: " + ahrs.getAngle());
 			  while(360 - angleDeltaX < ahrs.getAngle()){
 			  	siege.turnToTheta(ahrs.getAngle() - angleDeltaX);
 			  }
 			  torcan.SetDrive(0, 0);
+			  empty = true;
 		  }
 		  else if(value > CENTER){
-			  System.out.println("Delta Angle HI: " + angleDeltaX);
-			  System.out.println("Angle: " + ahrs.getAngle());
+//			  System.out.println("Delta Angle HI: " + angleDeltaX);
+//			  System.out.println("Angle: " + ahrs.getAngle());
 			  while(angleDeltaX > ahrs.getAngle()){
 				siege.turnToTheta(ahrs.getAngle() + angleDeltaX);
 			  }
 			  torcan.SetDrive(0, 0);
+			  empty = true;
 	      }
 	  }
   }
   public void cameraUpdate(){
-	  if(stick3.getRawButton(11)){
+	  if(stick3.getRawButton(3)){
     	  GetValue();
       }
-      if(stick3.getRawButton(12)){
+      if(stick3.getRawButton(4)){
     	  AutoShoot();
       }
   }
-  public boolean checkTable(){
+  public void checkArray(){
 	  double[] defaultValue = new double[0];
 	  double[] centerx = m_networkTable.getNumberArray("centerX", defaultValue);
-	  System.out.println("CENTERX: " + centerx[0]);
-	  return true;
+//	  System.out.println("EMPTY: " + empty);
+	  for(int i=0; i<centerx.length; i++){
+		  if(centerx[i] != 0){
+			  empty = false;
+//			  System.out.println("EMPTY: " + empty);
+			  break;
+		  }
+	  }
   }
   
 }
