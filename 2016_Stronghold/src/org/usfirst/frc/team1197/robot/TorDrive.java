@@ -63,7 +63,7 @@ public class TorDrive
 
 		boolean shiftButton = false;
 
-		double stickX = this.m_stick.getX() * (0.66f);
+		double stickX = this.m_stick.getX() * (0.75f);
 		double stickY = this.m_stick.getY();
 
 		stickX = -stickX;

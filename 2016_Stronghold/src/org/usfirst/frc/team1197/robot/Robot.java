@@ -123,15 +123,15 @@ extends SampleRobot
 		this.shooter2 = new CANTalon(12);
 		this.hood = new CANTalon(10);
 		this.hood.setFeedbackDevice(FeedbackDevice.CtreMagEncoder_Absolute);
-		this.hood.changeControlMode(CANTalon.TalonControlMode.Position);
-
-		this.hood.reverseSensor(true);
-		this.hood.enableForwardSoftLimit(true);
-		this.hood.enableReverseSoftLimit(true);
-		this.hood.setForwardSoftLimit(-1.81);
-		this.hood.setReverseSoftLimit(-2.6);
-		//this.hood.setPID(0.01D, 0.0D, 0.0D, 0.0D, 0, 0.0D, 0);
-		this.hood.enable();
+//		this.hood.changeControlMode(CANTalon.TalonControlMode.Position);
+//
+//		this.hood.reverseSensor(true);
+//		this.hood.enableForwardSoftLimit(true);
+//		this.hood.enableReverseSoftLimit(true);
+//		this.hood.setForwardSoftLimit(-1.81);
+//		this.hood.setReverseSoftLimit(-2.6);
+//		//this.hood.setPID(0.01D, 0.0D, 0.0D, 0.0D, 0, 0.0D, 0);
+//		this.hood.enable();
 		
 		hoodPosition = hood.getPulseWidthPosition();
 
@@ -143,16 +143,22 @@ extends SampleRobot
 		this.encoder.setDistancePerPulse(0.017857142857142856D);
 		this.driveCANS = new TorCAN(this.R1, this.R2, this.R3, this.L1, this.L2, this.L3);
 
-		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, this.breakBeam, this.breakBeam2, this.siege);
+		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, 
+				this.breakBeam, this.breakBeam2, this.siege, shoot, stick3);
+		
 		this.drive = new TorDrive(this.stick, this.stick2, this.driveCANS, this.encoder, S1);
-		this.siege = new TorSiege(this.T1, this.stick2, this.pot, this.driveCANS, this.S1, this.stick, this.intakee, this.drive, this.encoder, this.gyro, stick3);
+		
+		this.siege = new TorSiege(this.T1, this.stick2, this.pot, this.driveCANS, this.S1, this.stick, 
+				this.intakee, this.drive, this.encoder, this.gyro, stick3);
 
-		this.auto = new TorAuto(this.cypress, this.stick, this.stick2, this.gyro, this.encoder, this.driveCANS, this.S1, this.siege, this.intakee, this.drive, shoot, this);
+		this.auto = new TorAuto(this.cypress, this.stick, this.stick2, this.gyro, this.encoder, 
+				this.driveCANS, this.S1, this.siege, this.intakee, this.drive, shoot, this);
 
-		this.shoot = new TorShooter(this.intakee, this.shooter1, this.shooter2, this.hood, this.P2, this.P1, this.stick3, this.stick2, this.gyro, this.driveCANS);
+		this.shoot = new TorShooter(this.intakee, this.shooter1, this.shooter2, this.hood, this.P2, 
+				this.P1, this.stick3, this.stick2, this.gyro, this.driveCANS, camera);
 
 		this.gyro = new AHRS(SerialPort.Port.kMXP);
-		camera = new TorCamera(table, gyro, driveCANS, siege, stick3, lidar);
+		camera = new TorCamera(table, gyro, driveCANS, siege, stick3, lidar, intakee);
 	}
 
 	public void robotInit(){
@@ -165,43 +171,6 @@ extends SampleRobot
 		this.encoder.reset();
 		this.siege.PID();
 		this.auto.ModeChooser();
-		//    String autoSelected = (String) chooser.getSelected();
-		//	System.out.println("Auto selected: " + autoSelected);
-		//	switch(autoSelected) {
-		//	case drawBridgeAuto:
-		//		auto.DrawBridge();
-		//		break;
-		//	case sallyPortAuto:
-		//		auto.Sallyport();
-		//		break;
-		//	case portcullisAuto:
-		//		auto.Portcullis();
-		//		break;
-		//	case chevelAuto:
-		//		auto.ChevelDeFrise();
-		//		break;
-		//	case rampartsAuto:
-		//		auto.Ramparts();
-		//		break;
-		//	case rockWallAuto:
-		//		auto.RockWall();
-		//		break;
-		//	case roughTerrainAuto:
-		//		auto.RoughTerrain();
-		//		break;
-		//	case moatAuto:
-		//		auto.Moat();
-		//		break;
-		//	}
-
-		//    auto.autoThrottle();
-		/*this.driveCANS.SetDrive(0.0D, 0.0D);
-    while (isEnabled())
-    {
-      this.siege.SiegeArmUpdate();
-      this.intakee.intake();
-      System.out.println("Distance: " + this.encoder.getDistance());
-    }*/
 	}
 
 	public void operatorControl()
@@ -213,65 +182,28 @@ extends SampleRobot
 		
 		
 		while (isEnabled()) {
-			//      System.out.println("Degrees: " + this.siege.potGet());
-			//      System.out.println("Distance: " + this.encoder.getDistance());
-			//      System.out.println("Hood Value" + hood.getPulseWidthPosition());
-			//      System.out.println("Siege Enabled: " + this.siege.enabled);
-			//    	if(shoot.shooterEnabled) {
-			//    	lidar.getDistance();
-			//        this.shoot.update();
 			this.siege.SiegeArmUpdate();
-			//        this.shoot.adjustShooter();
 			this.siege.intakeTele();
-			//        siege.turnToReference();
-			//        shoot.hoodSet();
 			this.intakee.intake();
-			//        this.shoot.hood();
-			//        this.shoot.shoot();
-			
-		    camera.cameraUpdate();
-		    System.out.println("EMPTY: " + camera.empty);
-//			this.shoot.hoodSet();
-//			System.out.println("Hood Degrees" + shoot.hoodGetDegrees());
 			this.drive.ArcadeDrive(true);
-			
-			/*if (!shootEnabled) {
-				
-			} else {
-				if(stick3.getRawButton(1)) {
-					double stickx = -stick3.getX();
-					driveCANS.SetDrive(stickx * 0.5, stickx * 0.5);
-				}
-			}*/
+
 			if (stick2.getRawButton(1))
 			{
 				S1.set(true);
-				System.out.println("!!!!!Solenoid Enabled!!!!!!");
 			}
-			else if(stick2.getRawButton(2))
+			else {
 				S1.set(false);
+			}
 			
-			if(stick3.getRawButton(1)) {
+//			shoot.shooter();
+			if(stick3.getRawButton(1)){
 				shooter1.set(0.8);
 				shooter2.set(0.8);
-				shootEnabled = true;
-			} else if(shootEnabled) {
-				shooter1.set(0.0);
-				shooter2.set(0.0);
-				shootEnabled = false;
 			}
-			
-			//hood.set(stick3.getY());
-			
-//			hood.set(hoodPosition);
-			double hoodStick = stick3.getY();
-			if(Math.abs(hoodStick) > 0.05) {
-				hood.set(hood.get() + (hoodStick *  0.1));
+			else{
+				shooter1.set(0);
+				shooter2.set(0);
 			}
-//			System.out.println("HOOD GET: " + hood.get());
-//			System.out.println("HOOD SETPOINT " + hood.getSetpoint());
-			//System.out.println("HOOD PULSE VALUE: " + hood.getPulseWidthPosition());
-			
 		}
 	}
 
@@ -283,10 +215,12 @@ extends SampleRobot
 	{
 
 //		siege.PID();
-//		compressor = new Compressor();
-//		compressor.start();
+		compressor = new Compressor();
+		compressor.start();
 		while (isEnabled()) {
-			camera.checkArray();
+//			System.out.println("HOOD: " + hood.getPulseWidthPosition());
+//			hood.set(stick3.getY());
+//			camera.cameraUpdate();
 		}
 
 	}

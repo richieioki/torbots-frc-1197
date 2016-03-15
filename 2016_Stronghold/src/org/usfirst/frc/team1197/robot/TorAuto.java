@@ -109,6 +109,9 @@ public class TorAuto
     } else if ((this.auto_input.getRawButton(5)) && (this.auto_input.getRawButton(6)) && 
       (this.auto_input.getRawButton(7)) && (!this.auto_input.getRawButton(8))) {
       this.defense = 8;
+    } else if ((this.auto_input.getRawButton(5)) && (this.auto_input.getRawButton(6)) && 
+    	      (this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
+      defense = 0;
     } else {
       DriverStation.reportError("Incorrect Defense", false);
     }
@@ -162,6 +165,11 @@ public class TorAuto
       this.m_cans.SetDrive(-this.turnSpeed, -this.turnSpeed);
     }
   }
+  public void touchAuto(){
+	  this.m_encoder.reset();
+	  this.drive.driveDistance(57.0F, 0.5F, true);
+	  this.m_cans.SetDrive(0.0D, 0.0D);
+  }
   
   public void Moat()
   {
@@ -207,7 +215,7 @@ public class TorAuto
   public void DrawBridge()
   {
     this.m_encoder.reset();
-    this.drive.driveDistance(60.0F, 0.5F, true);
+    this.drive.driveDistance(62.0F, 0.5F, true);
     this.m_cans.SetDrive(0.0D, 0.0D);
     this.siege.DrawBridge();
     
@@ -305,6 +313,11 @@ public class TorAuto
     else if ((laneAndDefense[0] == 1) && (laneAndDefense[1] == 8))
     {
       Portcullis();
+    }
+    else if ((laneAndDefense[0] == 2) && (laneAndDefense[1] == 0))
+    {
+      System.out.println("Pos 2 Touch");
+      touchAuto();
     }
     else if ((laneAndDefense[0] == 2) && (laneAndDefense[1] == 1))
     {

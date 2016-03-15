@@ -34,7 +34,7 @@ public class TorSiege
 	}
 	public static enum DRAWBRIDGE
 	{
-		POS0,  POS1,  POS2,  POS3,  POS4,  POS5,  POS6,  POS7,  IDLE,  NULL;
+		POS0,  POS1,  POS2,  POS3,  POS4,  POS5,  POS6,  POS7,  IDLE,  NULL,POS2half;
 
 		private DRAWBRIDGE() {}
 	}
@@ -168,8 +168,7 @@ public class TorSiege
 		this.turnP = 0.05D;
 		this.degreesTop = 50.6D;
 		this.degreesBot = -70.3D;
-		this.bottomArm = 439; //439
-		this.drawbridgeBack = -34.0D;
+		this.drawbridgeBack = -32.0D;
 		this.sallyPortInitBack = -6.0D;
 		this.sallyPortBack = -50.0D;
 		this.chevelBack = -8.0D;
@@ -179,7 +178,9 @@ public class TorSiege
 		this.drawbridgeArmUp = 12.0D;
 		this.drawbridgeDist = 110.0D;
 
-		int rest = 797;  //797
+		this.bottomArm = 397; //439
+		int rest = 741;  //797
+		
 		this.setDegreesSlope = ((this.bottomArm - rest) / (this.degreesBot - this.degreesTop));
 		this.setDegreesInter = (rest - this.setDegreesSlope * this.degreesTop);
 		this.readDegreesSlope = (1.0D / this.setDegreesSlope);
@@ -187,12 +188,12 @@ public class TorSiege
 
 		this.siegeTalon.setSetpoint(this.armTop);
 		this.drawbridgeTop = 29.0D;
-		this.drawbridgeBot = -62.0D;
+		this.drawbridgeBot = -56.0D;
 		this.sallyPort = 0.0D;
 		this.chevelTop = -50.0D;
 		this.portcullisTop = 5.0D;
 		this.portcullisBot = -69.0D;
-		this.intakeVal = -40.0D;
+		this.intakeVal = -48.0D;
 		this.siegeTalon.setSetpoint(rest);
 		this.drawbridgeConstant = ((this.drawbridgeTop - this.drawbridgeBot) / (-1.0D * this.drawbridgeBack));
 	}
@@ -275,7 +276,7 @@ public class TorSiege
 			if (this.siegeStick.getRawButton(1))
 			{
 				this.shift.set(true);
-				System.out.println("!!!!!Solenoid Enabled!!!!!!");
+				//System.out.println("!!!!!Solenoid Enabled!!!!!!");
 			}
 			else
 				shift.set(false);
@@ -611,6 +612,7 @@ public class TorSiege
 		//		  turnToTheta(-10);
 		//	  }
 	}
+	
 	public void turnToTheta(double desiredAngle)
 	{
 		this.targetAngle = ((desiredAngle + 360.0D) % 360.0D);

@@ -35,6 +35,8 @@ public class TorShooter
 	double readHoodDegreesInter;
 	double hoodDegreesBot;
 	double hoodDegreesTop;
+	private TorCamera camera;
+	public boolean shootFlag;
 
 	private static enum ShooterState
 	{
@@ -45,7 +47,7 @@ public class TorShooter
 
 	public TorShooter(TorIntake intake, CANTalon shooter1, CANTalon shooter2, 
 			CANTalon hood, CANTalon elevate, CANTalon arm, Joystick stick3, 
-			Joystick stick2, AHRS gyro, TorCAN can)
+			Joystick stick2, AHRS gyro, TorCAN can, TorCamera camera)
 	{
 		this.intake = intake;
 		this.shooter1 = shooter1;
@@ -57,6 +59,9 @@ public class TorShooter
 		this.stick2 = stick2;
 		this.gyro = gyro;
 		this.cans = can;
+		this.camera = camera;
+		
+		shootFlag = false;
 		
 		hoodCalc();
 		
@@ -88,6 +93,7 @@ public class TorShooter
 			this.shooter2.set(0.0D);
 		}
 	}
+	
 	public void hoodCalc(){
 		hoodTopLimit = -1.8099;
 		hoodBotLimit = -2.6365;
@@ -99,6 +105,7 @@ public class TorShooter
 		this.readHoodDegreesSlope = (1.0D / this.setHoodDegreesSlope);
 		this.readHoodDegreesInter = (-this.setHoodDegreesInter / this.setHoodDegreesSlope);
 	}
+	
 	public void hoodSetDegrees(double degrees)
 	{
 		this.hood.set(this.setHoodDegreesSlope * degrees + this.setHoodDegreesInter);
@@ -108,11 +115,12 @@ public class TorShooter
 	{
 		return this.readHoodDegreesSlope * this.hood.get() + this.readHoodDegreesInter;
 	}
+	
 	public void hoodSet(){
-		if(stick3.getRawButton(3)){
+		if(stick3.getRawButton(5)){
 			hoodSetDegrees(59);
 		}
-		if(stick3.getRawButton(4)){
+		if(stick3.getRawButton(6)){
 			hoodSetDegrees(30);
 		}
 	}
@@ -198,5 +206,24 @@ public class TorShooter
 
 	public void setEnbled(boolean input) {
 		shooterEnabled = input;
+	}
+	
+	public void shooting(){
+		shooter1.set(0.8);
+		shooter2.set(0.8);
+	}
+	
+	public void shooter(){
+		if(stick3.getRawButton(2) && !shootFlag){
+			shooting();
+//			double value = camera.GetValue();
+			camera.AutoShoot(10);
+			shootFlag = true;
+		} else if(!stick3.getRawButton(2)) {
+			intake.stopElevator();
+			shooter1.set(0.3);
+			shooter2.set(0.3);
+//			intake.stopElevator();
+		}
 	}
 }

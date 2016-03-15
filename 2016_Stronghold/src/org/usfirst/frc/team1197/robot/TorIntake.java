@@ -15,15 +15,19 @@ public class TorIntake
 	private TorSiege siege;
 	private IntakeState m_state;
 	private boolean override;
+	private TorShooter m_shoot;
+	private Joystick stick3;
 
 	private static enum IntakeState
 	{
-		BOTH,  ELEVATOR,  IDLE,  NULL,  PORT;
+		BOTH,  ELEVATOR,  IDLE,  NULL,  PORT, SHOOTING;
 
 		private IntakeState() {}
 	}
 
-	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, DigitalInput breakBeam, DigitalInput breakBeam2, TorSiege siege)
+	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, 
+			DigitalInput breakBeam, DigitalInput breakBeam2, TorSiege siege, 
+			TorShooter shoot, Joystick stick3)
 	{
 		this.armTalon = cantalon;
 		this.elevatorTalon = cantalon2;
@@ -32,6 +36,8 @@ public class TorIntake
 		this.siege = siege;
 		this.stick = stick;
 		this.m_state = IntakeState.IDLE;
+		m_shoot = shoot;
+		this.stick3 = stick3;
 	}
 
 	public void intake()
@@ -49,12 +55,19 @@ public class TorIntake
 			this.elevatorTalon.set(-0.95D);
 			//1690 close, 440 far, 1150/1168 mid, 702 left
 		}
+		else if (stick.getRawButton(6)){
+			this.m_state = IntakeState.IDLE;
+//			this.armTalon.set(-0.95D);
+			this.elevatorTalon.set(-0.95D);
+		}
 		else if ((this.stick.getRawButton(3)) && (this.m_state == IntakeState.IDLE))
 		{
-			this.m_state = IntakeState.BOTH;
-//			siege.setDegrees(siege.intakeVal);
-			this.elevatorTalon.set(-0.95D);
-			this.armTalon.set(-0.95D);
+			if(this.shooterBreakBeam.get() != true) { //there is a ball in the robot
+				this.m_state = IntakeState.BOTH;
+	//			siege.setDegrees(siege.intakeVal);
+				this.elevatorTalon.set(-0.95D);
+				this.armTalon.set(-0.95D);
+			}
 		}
 		else if (this.m_state == IntakeState.BOTH)
 		{
@@ -69,6 +82,7 @@ public class TorIntake
 			if (this.shooterBreakBeam.get() == true)
 			{
 				this.elevatorTalon.set(0.0D);
+//				m_shoot.shootFlag = false;
 				this.m_state = IntakeState.IDLE;
 			}
 		}
@@ -122,6 +136,19 @@ public class TorIntake
 	{
 		if (bool == true) {
 			this.elevatorTalon.set(0.0D);
+		}
+	}
+	
+	public void runIntake(){
+		m_state = IntakeState.SHOOTING;
+		elevatorTalon.set(-0.95);
+	}
+	
+	public void stopElevator() {
+		if(m_state == IntakeState.SHOOTING) {
+			m_state = IntakeState.IDLE;
+			m_shoot.shootFlag = false;
+			elevatorTalon.set(0);
 		}
 	}
 }
