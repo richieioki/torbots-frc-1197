@@ -20,6 +20,7 @@ public class TorDrive
 	private PIDController yawPID;
 	double m_speed;
 	double m_distance;
+<<<<<<< HEAD
 	double previousStick;
 	double stepValue;
 	double dec;
@@ -37,6 +38,25 @@ public class TorDrive
 
 		this.table = NetworkTable.getTable("GRIP/myContoursReport");
 
+=======
+
+	double previousStick, stepValue, dec;
+	int sign;
+
+	public TorDrive(Joystick stick, TorCAN jagDrive)
+	{
+		stepValue = -1;
+		dec = 0.02;
+		previousStick = 0;
+
+
+		this.m_stick = stick;
+
+		this.m_jagDrive = jagDrive;
+
+		this.table = NetworkTable.getTable("GRIP/myContoursReport");
+		//    this.cam = new TorCamera(this.table);
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		this.yawPID = new PIDController(0.001D, 0.0D, 0.0D, this.cam, this.m_jagDrive);
 
 		this.yawPID.setContinuous(true);
@@ -53,18 +73,32 @@ public class TorDrive
 		this.overrideStick = stick2;
 		this.m_jagDrive = cans;
 		this.m_encoder = encoder;
+<<<<<<< HEAD
 		this.m_solenoidshift = shift;
+=======
+		m_solenoidshift = shift;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	}
 
 	public void ArcadeDrive(boolean squaredInputs)
 	{
+<<<<<<< HEAD
 		boolean shiftButton = false;
 
 		double stickX = this.m_stick.getX();
+=======
+		double rightMotorSpeed;
+		double leftMotorSpeed;
+
+		boolean shiftButton = false;
+
+		double stickX = this.m_stick.getX() * (0.75f);
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		double stickY = this.m_stick.getY();
 
 		stickX = -stickX;
 		stickY = -stickY;
+<<<<<<< HEAD
 		if (Math.abs(stickX) <= 0.1D) {
 			stickX = 0.0D;
 		}
@@ -84,16 +118,74 @@ public class TorDrive
 				this.m_jagDrive.lowGear();
 			}
 			stickX *= 0.75D;
+=======
+
+		//COAST CODE
+		if(m_solenoidshift.get()) {
+			if(previousStick == 0) {
+				previousStick = stickY;
+			}
+
+			if(stepValue == -1) {
+				if((Math.abs(previousStick) - Math.abs(stickY)) > 30) {
+					stepValue = Math.abs(previousStick);
+					sign = (int) (stickY/stepValue);
+				} 
+				previousStick = stickY;
+			} else {
+				if(Math.abs(stickY) < 0.2) {
+					previousStick = stickY;
+					stepValue -= dec;
+					if(stepValue < 0) {
+						stepValue = -1;
+						previousStick = 0;
+						stickY = 0;
+					} else {
+						stickY = sign * stepValue;
+					}
+				}
+				else {
+					stepValue = -1;
+					previousStick = 0;
+				}
+			}
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		}
+<<<<<<< HEAD
 		if (stickX > 1.0D) {
 			stickX = 1.0D;
+=======
+		//END COAST CODE
+		
+		if (Math.abs(stickX) <= 0.1D) {
+			stickX = 0.0D;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		}
+<<<<<<< HEAD
+		if (stickX < -1.0D) {
+			stickX = -1.0D;
+=======
+		if (Math.abs(stickY) <= 0.2D) {
+			stickY = 0.0D;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
+		}
+<<<<<<< HEAD
+		if (stickY > 1.0D) {
+			stickY = 1.0D;
+=======
+		if (stickX > 1.0D) {
+			stickX = 1.0D;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
+		}
+<<<<<<< HEAD
+=======
 		if (stickX < -1.0D) {
 			stickX = -1.0D;
 		}
 		if (stickY > 1.0D) {
 			stickY = 1.0D;
 		}
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		if (stickY < -1.0D) {
 			stickY = -1.0D;
 		}
@@ -110,8 +202,12 @@ public class TorDrive
 				stickY = -(stickY * stickY);
 			}
 		}
+<<<<<<< HEAD
 		double rightMotorSpeed;
 		double leftMotorSpeed;
+=======
+
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		if (stickY > 0.0D)
 		{
 			if (stickX > 0.0D)
@@ -138,8 +234,14 @@ public class TorDrive
 				rightMotorSpeed = -Math.max(-stickY, -stickX);
 			}
 		}
+<<<<<<< HEAD
 		if (this.m_solenoidshift.get()) {
 			this.m_jagDrive.SetDrive(rightMotorSpeed * 0.65D, -leftMotorSpeed * 0.65D);
+=======
+
+		if(m_solenoidshift.get()) {
+			this.m_jagDrive.SetDrive(rightMotorSpeed * 0.65, -leftMotorSpeed * 0.65);
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		} else {
 			this.m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
 		}
@@ -147,6 +249,12 @@ public class TorDrive
 
 	public void ReverseArcadeDrive(boolean squaredInputs)
 	{
+<<<<<<< HEAD
+=======
+		double rightMotorSpeed;
+		double leftMotorSpeed;
+
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		boolean shiftButton = false;
 
 		double stickX = this.m_stick.getX();
@@ -196,6 +304,11 @@ public class TorDrive
 		if (stickY > 0.0D)
 		{
 
+<<<<<<< HEAD
+=======
+		if (stickY > 0.0D)
+		{
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 			if (stickX > 0.0D)
 			{
 				leftMotorSpeed = stickY - stickX;
@@ -209,7 +322,24 @@ public class TorDrive
 		}
 		else
 		{
+<<<<<<< HEAD
+=======
+			if (stickX > 0.0D)
+			{
+				leftMotorSpeed = -Math.max(-stickY, stickX) * 20.0D;
+				rightMotorSpeed = stickY + stickX;
+			}
+			else
+			{
+				leftMotorSpeed = stickY - stickX;
+				rightMotorSpeed = -Math.max(-stickY, -stickX) * 20.0D;
+			}
+		}
+		this.m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+	}
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 
+<<<<<<< HEAD
 			if (stickX > 0.0D)
 			{
 				leftMotorSpeed = -Math.max(-stickY, stickX) * 20.0D;
@@ -224,6 +354,8 @@ public class TorDrive
 		this.m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
 	}
 
+=======
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	public void driveDistance(float distance, float speed, boolean forward)
 	{
 		this.m_encoder.reset();
@@ -255,6 +387,7 @@ public class TorDrive
 			}
 		}
 	}
+<<<<<<< HEAD
 
 	public void highGear()
 	{
@@ -271,3 +404,6 @@ public class TorDrive
 		this.m_jagDrive.offGear();
 	}
 }
+=======
+}
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git

@@ -14,8 +14,12 @@ public class TorSiege
 	private CANTalon siegeTalon;
 	private TorOnTarget target;
 	private Joystick siegeStick;
+<<<<<<< HEAD
 	private Joystick stick;
 	private Joystick stick3;
+=======
+	private Joystick stick, stick3;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	private AnalogPotentiometer pot;
 	private Ultrasonic sonar;
 	private TorCAN torcan;
@@ -28,6 +32,7 @@ public class TorSiege
 	private DRAWBRIDGE m_states;
 	private HALT m_halt;
 	public TorTeleop tele;
+<<<<<<< HEAD
 
 	public static enum HALT
 	{
@@ -39,6 +44,16 @@ public class TorSiege
 	public static enum DRAWBRIDGE
 	{
 		POS0,  POS1,  POS2,  POS3,  POS4,  POS5,  POS6,  POS7,  IDLE,  NULL,  POS2half;
+=======
+	public static enum HALT{
+		IDLE, NULL, POS1, POS2;
+		
+		private HALT() {}
+	}
+	public static enum DRAWBRIDGE
+	{
+		POS0,  POS1,  POS2,  POS3,  POS4,  POS5,  POS6,  POS7,  IDLE,  NULL,POS2half;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 
 		private DRAWBRIDGE() {}
 	}
@@ -110,7 +125,13 @@ public class TorSiege
 	double targetAngle;
 	double sallyStartAngle;
 
+<<<<<<< HEAD
 	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee, TorDrive drive, Encoder encoder, AHRS gyro, Joystick stick3)
+=======
+	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, 
+			TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee, TorDrive drive, 
+			Encoder encoder, AHRS gyro, Joystick stick3)
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	{
 		this.siegeTalon = T1;
 		this.siegeStick = stick2;
@@ -126,6 +147,7 @@ public class TorSiege
 
 		calc();
 
+<<<<<<< HEAD
 		this.enabled = false;
 		this.target = new TorOnTarget(this.siegeTalon, 2);
 		this.m_states = DRAWBRIDGE.NULL;
@@ -133,6 +155,14 @@ public class TorSiege
 		this.m_chev = CHEVEL.NULL;
 		this.m_sally = SALLYPORT.NULL;
 		this.m_halt = HALT.POS1;
+=======
+		this.target = new TorOnTarget(this.siegeTalon, 2);
+		this.m_states = DRAWBRIDGE.NULL;
+		this.m_port = PORTCULLIS.NULL;
+		this.m_chev = CHEVEL.NULL;
+		this.m_sally = SALLYPORT.NULL;
+		m_halt = HALT.POS1;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	}
 
 	public boolean siegeOnTarget(int tolerance)
@@ -168,6 +198,7 @@ public class TorSiege
 
 	public void calc()
 	{
+<<<<<<< HEAD
 		this.turnP = 0.04D;
 		this.degreesTop = 50.6D;
 		this.degreesBot = -70.3D;
@@ -211,6 +242,52 @@ public class TorSiege
 
 	public double potGet()
 	{
+=======
+		this.turnP = 0.05D;
+		this.degreesTop = 50.6D;
+		this.degreesBot = -70.3D;
+		this.drawbridgeBack = -32.0D;
+		this.sallyPortInitBack = -6.0D;
+		this.sallyPortBack = -50.0D;
+		this.chevelBack = -8.0D;
+		this.chevelArmUp = 13.0D;
+		this.chevelDist = 80.0D;
+		this.sallyPortDist = 116.0D;
+		this.drawbridgeArmUp = 12.0D;
+		this.drawbridgeDist = 110.0D;
+
+		this.bottomArm = 397; //439
+		int rest = 741;  //797
+		
+		this.setDegreesSlope = ((this.bottomArm - rest) / (this.degreesBot - this.degreesTop));
+		this.setDegreesInter = (rest - this.setDegreesSlope * this.degreesTop);
+		this.readDegreesSlope = (1.0D / this.setDegreesSlope);
+		this.readDegreesInter = (-this.setDegreesInter / this.setDegreesSlope);	
+
+		this.siegeTalon.setSetpoint(this.armTop);
+		this.drawbridgeTop = 29.0D;
+		this.drawbridgeBot = -56.0D;
+		this.sallyPort = 0.0D;
+		this.chevelTop = -50.0D;
+		this.portcullisTop = 5.0D;
+		this.portcullisBot = -69.0D;
+		this.intakeVal = -48.0D;
+		this.siegeTalon.setSetpoint(rest);
+		this.drawbridgeConstant = ((this.drawbridgeTop - this.drawbridgeBot) / (-1.0D * this.drawbridgeBack));
+	}
+
+	public void PID()
+	{
+		this.siegeTalon.enable();
+		int rest = this.siegeTalon.getAnalogInRaw();
+		this.siegeTalon.set(rest);
+		this.siegeTalon.setSetpoint(rest);
+	}
+
+	public double potGet()
+	{
+		//    double potValue = getDegrees();
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		double potValue = getDegrees();
 		return potValue;
 	}
@@ -221,11 +298,20 @@ public class TorSiege
 			setDegrees(this.drawbridgeTop);
 		}
 	}
+<<<<<<< HEAD
 
 	public void intakeTele()
 	{
 		if (this.stick.getRawButton(1)) {
 			setDegrees(this.intakeVal);
+=======
+	public void intakeTele()
+	{
+		if (this.stick.getRawButton(1))
+		{
+			this.setDegrees(intakeVal);
+			//      this.siegeTalon.setSetpoint(this.intakeVal);
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		}
 	}
 
@@ -239,24 +325,42 @@ public class TorSiege
 
 	public void SiegeArmUpdate()
 	{
+<<<<<<< HEAD
 		if (!this.enabled)
 		{
 			if (this.stick.getRawButton(3))
 			{
+=======
+		if(!this.enabled) {
+			if ((this.stick.getRawButton(3))) {
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 				DrawBridge();
 			}
+<<<<<<< HEAD
 			else if (this.stick.getRawButton(4))
 			{
+=======
+			else if ((this.stick.getRawButton(4))) {
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 				SallyPort();
 			}
+<<<<<<< HEAD
 			else if (this.stick.getRawButton(5))
 			{
+=======
+			else if ((this.stick.getRawButton(5))) {
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 				Cheve();
 			}
+<<<<<<< HEAD
 			else if (this.stick.getRawButton(6))
 			{
+=======
+			else if ((this.stick.getRawButton(6))) {
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 				Portcullis();
 			}
+<<<<<<< HEAD
 			else if (-this.siegeStick.getY() < -0.025D)
 			{
 				this.siegeTalon.setProfile(1);
@@ -280,17 +384,52 @@ public class TorSiege
 					this.shift.set(true);
 					this.torcan.highGear();
 					this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+=======
+			else {
+				if (this.siegeStick.getY() < -0.025D)
+				{
+					this.siegeTalon.setProfile(1);
+					this.siegeTalon.set(this.siegeStick.getY() * 30.0D + this.siegeTalon
+							.getAnalogInRaw());
+				}
+				else if (this.siegeStick.getY() > 0.025D)
+				{
+					this.siegeTalon.setProfile(1);
+					this.siegeTalon.set(this.siegeStick.getY() * 30.0D + this.siegeTalon
+							.getAnalogInRaw());
+				}
+				else if (siegeStick.getRawButton(8)){
+					setDegrees(-45.0);
+				}
+				else
+				{
+					this.siegeTalon.setProfile(0);
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 				}
 			}
+<<<<<<< HEAD
 			else if ((this.torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
 			{
 				this.shift.set(false);
 				this.torcan.lowGear();
 				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+=======
+
+			if (this.siegeStick.getRawButton(1))
+			{
+				this.shift.set(true);
+				//System.out.println("!!!!!Solenoid Enabled!!!!!!");
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 			}
+<<<<<<< HEAD
 		}
 		else
 		{
+=======
+			else
+				shift.set(false);
+		} else {
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 			update();
 		}
 	}
@@ -299,8 +438,11 @@ public class TorSiege
 	{
 		if (!this.enabled)
 		{
+<<<<<<< HEAD
 			this.drive.offGear();
 			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+=======
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 			this.enabled = true;
 			this.m_chev = CHEVEL.POS1;
 		}
@@ -320,8 +462,11 @@ public class TorSiege
 	{
 		if (!this.enabled)
 		{
+<<<<<<< HEAD
 			this.drive.offGear();
 			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+=======
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 			this.enabled = true;
 			this.m_port = PORTCULLIS.POS1B;
 		}
@@ -331,8 +476,11 @@ public class TorSiege
 	{
 		if (!this.enabled)
 		{
+<<<<<<< HEAD
 			this.drive.offGear();
 			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+=======
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 			this.enabled = true;
 			this.m_sally = SALLYPORT.POS0;
 		}
@@ -342,11 +490,18 @@ public class TorSiege
 	{
 		if (!this.enabled)
 		{
+<<<<<<< HEAD
 			this.drive.offGear();
 			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
 			this.enabled = true;
 			this.m_states = DRAWBRIDGE.POS0;
 		}
+=======
+			this.enabled = true;
+			this.m_states = DRAWBRIDGE.POS0;
+		}
+		System.out.println("Enabled: " + this.enabled);
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	}
 
 	private void update()
@@ -357,6 +512,7 @@ public class TorSiege
 			this.m_sally = SALLYPORT.IDLE;
 			this.m_chev = CHEVEL.IDLE;
 			this.m_port = PORTCULLIS.IDLE;
+<<<<<<< HEAD
 			this.enabled = false;
 		}
 		if ((this.m_port != PORTCULLIS.NULL) && (this.m_port != PORTCULLIS.IDLE)) {
@@ -584,6 +740,232 @@ public class TorSiege
 				{
 					this.m_states = DRAWBRIDGE.IDLE;
 					this.enabled = false;
+=======
+			enabled = false;
+		}
+
+		if(m_port != PORTCULLIS.NULL && m_port != PORTCULLIS.IDLE) {
+
+			switch (this.m_port)
+			{
+			case NULL: 
+				break;
+			case IDLE: 
+				this.enabled = false;
+				m_port = PORTCULLIS.NULL;
+				break;
+			case POS1B: 
+				this.encoder.reset();
+				this.m_port = PORTCULLIS.POS1;
+				break;
+			case POS1: 
+				this.torcan.SetDrive(-0.2D, 0.2D);
+				if (this.encoder.getDistance() < -3.0D)
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.encoder.reset();
+					this.m_port = PORTCULLIS.POS2;
+				}
+				break;
+			case POS2: 
+				this.intakeSiege.portcullis();
+				haltDrive(0.5D);
+				setDegrees(this.portcullisTop);
+				if (siegeOnTarget(5))
+				{
+					this.intakeSiege.portStop();
+					this.encoder.reset();
+					this.m_port = PORTCULLIS.POS3;
+				}
+				break;
+			case POS3: 
+				this.torcan.SetDrive(0.6D, -0.6D);
+				if (this.encoder.getDistance() > 16.0D) {
+					setDegrees(this.portcullisTop + 40.0D);
+				}
+				if (this.encoder.getDistance() > 70.0D) {
+					torcan.SetDrive(0,0);
+					enabled = false;
+					this.m_port = PORTCULLIS.IDLE;
+				}
+				break;
+			}
+		} else if(m_chev != CHEVEL.NULL && m_chev != CHEVEL.IDLE) {
+
+			switch (this.m_chev)
+			{
+			case NULL: 
+				break;
+			case IDLE: 
+				this.enabled = false;
+				this.m_chev = CHEVEL.NULL;
+				break;
+			case POS1: 
+				setDegrees(this.chevelTop);
+				if (siegeOnTarget(2))
+				{
+					this.m_chev = CHEVEL.POS2;
+					this.encoder.reset();
+				}
+				break;
+			case POS2: 
+				this.torcan.SetDrive(-0.35D, 0.35D);
+				setDegrees(this.chevelTop - 4.0D);
+				if (this.encoder.getDistance() < -8.0D)
+				{
+					haltDrive(0.5D);
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.m_chev = CHEVEL.POS3;
+					this.encoder.reset();
+				}
+				break;
+			case POS3: 
+				this.torcan.SetDrive(0.5D, -0.5D);
+				if (this.encoder.getDistance() > this.chevelArmUp) {
+					setDegrees(45.0D);
+				}
+				if (this.encoder.getDistance() > this.chevelDist)
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					enabled = false;
+					this.m_chev = CHEVEL.IDLE;
+				}
+				break;
+			}
+		} else if(m_sally != SALLYPORT.IDLE && m_sally != SALLYPORT.NULL) {
+
+			switch (m_sally)
+			{
+			case NULL: 
+				break;
+			case IDLE: 
+				this.enabled = false;
+				System.out.println("SallyEnabledFalse: " + this.enabled);
+				this.m_sally = SALLYPORT.NULL;
+				break;
+			case POS0: 
+				this.encoder.reset();
+				this.gyro.reset();
+				this.m_sally = SALLYPORT.POS1;
+				break;
+			case POS1: 
+				this.enabled = true;
+				setDegrees(this.sallyPort);
+				haltDrive(0.5D);
+				if (siegeOnTarget(2))
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.m_sally = SALLYPORT.POS3;
+				}
+				break;
+			case POS3: 
+				this.enabled = true;
+				if (this.encoder.getDistance() > this.sallyPortBack + 10.0D)
+				{
+					this.torcan.SetDrive(-0.5D, 0.5D);
+					setDegrees(-5.0D);
+				}
+				else
+				{
+					this.torcan.SetDrive(-0.2D, 0.2D);
+				}
+				if (this.encoder.getDistance() < this.sallyPortBack)
+				{
+					this.m_sally = SALLYPORT.POS4;
+					this.encoder.reset();
+
+					this.torcan.SetDrive(0.0D, 0.0D);
+				}
+				break;
+			case POS4: 
+				this.enabled = true;
+
+				this.m_sally = SALLYPORT.POS5;
+
+				break;
+			case POS5: 
+				this.enabled = true;
+				turnToTheta(-20.0D);
+				if ((this.gyro.getAngle() < 342.0D) && (this.gyro.getAngle() > 90.0D))
+				{
+					this.m_sally = SALLYPORT.POS6;
+					this.torcan.SetDrive(0.0D, 0.0D);
+				}
+				break;
+			case POS6: 
+				this.enabled = true;
+				turnToTheta(353.0D);
+				if (this.gyro.getAngle() > 355.0D)
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.m_sally = SALLYPORT.POS7;
+				}
+				break;
+			case POS7: 
+				this.enabled = true;
+				this.torcan.SetDrive(0.5D, -0.5D);
+				if (this.encoder.getDistance() > this.sallyPortDist)
+				{
+					this.m_sally = SALLYPORT.IDLE;
+					this.encoder.reset();
+					enabled = false;
+					this.torcan.SetDrive(0.0D, 0.0D);
+				}
+				break;
+			}
+		} else if(m_states != DRAWBRIDGE.NULL && m_states != DRAWBRIDGE.IDLE) {
+
+			switch (this.m_states)
+			{
+			case NULL: 
+				break;
+			case IDLE: 
+				this.enabled = false;
+				System.out.println("DrawbridgeEnabledFalse: " + this.enabled);
+				this.m_states = DRAWBRIDGE.NULL;
+				break;
+			case POS0: 
+				this.encoder.reset();
+				this.m_states = DRAWBRIDGE.POS1;
+			case POS1: 
+				setDegrees(this.drawbridgeTop);
+				haltDrive(0.5D);
+				if (siegeOnTarget(3)) {
+					this.m_states = DRAWBRIDGE.POS2;
+				}
+				break;
+			case POS2: 
+				this.torcan.SetDrive(-0.5D, 0.5D);
+				setDegrees(this.encoder.getDistance() * this.drawbridgeConstant + this.drawbridgeTop);
+				if (this.encoder.getDistance() < this.drawbridgeBack)
+				{
+					this.encoder.reset();
+					haltDrive(0.5D);
+					this.m_states = DRAWBRIDGE.POS3;
+					this.torcan.SetDrive(0.0D, 0.0D);
+				}
+				break;
+			case POS3: 
+				setDegrees(this.drawbridgeBot);
+				haltDrive(0.5D);
+				if (siegeOnTarget(2)) {
+					this.m_states = DRAWBRIDGE.POS4;
+				}
+				break;
+			case POS4: 
+				this.encoder.reset();
+				this.m_states = DRAWBRIDGE.POS5;
+				break;
+			case POS5: 
+				this.torcan.SetDrive(0.5D, -0.5D);
+				if (this.encoder.getDistance() > this.drawbridgeArmUp) {
+					setDegrees(0.0D);
+				}
+				if (this.encoder.getDistance() > this.drawbridgeDist)
+				{
+					this.m_states = DRAWBRIDGE.IDLE;
+					enabled = false;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 					this.torcan.SetDrive(0.0D, -0.0D);
 				}
 				break;
@@ -597,6 +979,7 @@ public class TorSiege
 		this.m_speed = (-p * this.m_distance);
 		this.torcan.SetDrive(this.m_speed, -1.0D * this.m_speed);
 	}
+<<<<<<< HEAD
 
 	public void turnToReference() {}
 
@@ -628,7 +1011,29 @@ public class TorSiege
 			return false;
 		}
 		return true;
+=======
+	
+	public void haltButton(double p){
+		if(stick.getRawButton(12)){
+			switch(m_halt){
+		case NULL: 
+			break;
+		case IDLE:
+			this.m_halt = HALT.NULL;
+			break;
+		case POS1:
+			encoder.reset();
+			this.m_halt = HALT.POS2;
+			break;
+		case POS2:
+			haltDrive(p);
+			this.m_halt = HALT.IDLE;
+			break;
+			}
+		}
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	}
+<<<<<<< HEAD
 
 	public boolean turnToShoot(double desiredAngle)
 	{
@@ -659,6 +1064,48 @@ public class TorSiege
 			return false;
 		}
 		return true;
+=======
+	
+	public void turnToReference(){
+		//	  if(stick3.getRawButton(9)){
+		//		  turnToTheta(5);
+		//	  }
+		//	  if(stick3.getRawButton(10)){
+		//		  turnToTheta(-5);
+		//	  }
+		//	  if(stick3.getRawButton(11)){
+		//		  turnToTheta(10);
+		//	  }
+		//	  if(stick3.getRawButton(12)){
+		//		  turnToTheta(-10);
+		//	  }
+	}
+	
+	public void turnToTheta(double desiredAngle)
+	{
+		this.targetAngle = ((desiredAngle + 360.0D) % 360.0D);
+
+		this.error = (this.gyro.getAngle() - this.targetAngle);
+		if (Math.abs(this.error) > 180.0D) {
+			if (this.error > 0.0D)
+			{
+				this.error -= 180.0D;
+				this.error *= -1.0D;
+			}
+			else
+			{
+				this.error += 180.0D;
+				this.error *= -1.0D;
+			}
+		}
+		if (this.error > 0.0D) {
+			this.turnSpeed = Math.min(0.6D, this.error * this.turnP);
+		} else {
+			this.turnSpeed = Math.max(this.error * this.turnP, -0.6D);
+		}
+		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
+		System.out.println("Angle: " + this.gyro.getAngle());
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	}
 
 	public void SiegeArmDown()

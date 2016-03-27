@@ -16,6 +16,7 @@ public class TorLidar
   {
     this.m_port.writeString("r\n");
     Timer.delay(0.05D);
+<<<<<<< HEAD
     
     String distance = this.m_port.readString();
     if (distance.length() == 0) {
@@ -43,6 +44,29 @@ public class TorLidar
     Integer intDist = new Integer(distance);
     
     return intDist.intValue();
+=======
+    String distance = this.m_port.readString();
+    if (distance.trim().length() >= 4)
+    {
+      distance = distance.substring(0, 3);
+    }
+    else
+    {
+      if (distance.length() < 2) {
+        return 0;
+      }
+      distance = distance.trim();
+    }
+    try
+    {
+      return new Integer(distance).intValue();
+    }
+    catch (NumberFormatException nfe)
+    {
+      DriverStation.reportError("ERROR STRING " + distance + "  LENGITH " + distance.length(), false);
+    }
+    return 0;
+>>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
   }
 }
 
