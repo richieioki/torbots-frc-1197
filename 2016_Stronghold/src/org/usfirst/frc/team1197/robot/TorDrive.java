@@ -1,212 +1,273 @@
 package org.usfirst.frc.team1197.robot;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
-public class TorDrive {
+public class TorDrive
+{
 	private Joystick m_stick;
+	private Joystick overrideStick;
 	private Solenoid m_solenoidshift;
 	private TorCAN m_jagDrive;
 	private Encoder m_encoder;
-
+	static final float ENC_CON = 11.0F;
+	float negOvershoot;
 	private TorCamera cam;
 	private NetworkTable table;
 	private PIDController yawPID;
-	
-	public TorDrive(Joystick stick, TorCAN jagDrive) {
-		m_stick = stick;
-		//m_solenoidshift = solenoidshift;
-		m_jagDrive = jagDrive;
-		
-		table = NetworkTable.getTable("GRIP/myContoursReport");
-        cam = new TorCamera(table);
-        yawPID = new PIDController(0.001, 0, 0, cam, m_jagDrive);
-        
-        yawPID.setContinuous(true);
-        yawPID.setInputRange(-160.0, 160.0);
-        yawPID.setOutputRange(-1.0, 1.0);
-        yawPID.setPercentTolerance(5.0);
-        yawPID.setSetpoint(0.0);
-        yawPID.disable();
+	double m_speed;
+	double m_distance;
+	double previousStick;
+	double stepValue;
+	double dec;
+	int sign;
+
+	public TorDrive(Joystick stick, TorCAN jagDrive)
+	{
+		this.stepValue = -1.0D;
+		this.dec = 0.02D;
+		this.previousStick = 0.0D;
+
+		this.m_stick = stick;
+
+		this.m_jagDrive = jagDrive;
+
+		this.table = NetworkTable.getTable("GRIP/myContoursReport");
+
+		this.yawPID = new PIDController(0.001D, 0.0D, 0.0D, this.cam, this.m_jagDrive);
+
+		this.yawPID.setContinuous(true);
+		this.yawPID.setInputRange(-160.0D, 160.0D);
+		this.yawPID.setOutputRange(-1.0D, 1.0D);
+		this.yawPID.setPercentTolerance(5.0D);
+		this.yawPID.setSetpoint(0.0D);
+		this.yawPID.disable();
 	}
-	
-	public TorDrive(Joystick stick, TorCAN cans, Encoder encoder) {
-		m_stick = stick;
-		m_jagDrive = cans;
-		m_encoder = encoder;
+
+	public TorDrive(Joystick stick, Joystick stick2, TorCAN cans, Encoder encoder, Solenoid shift)
+	{
+		this.m_stick = stick;
+		this.overrideStick = stick2;
+		this.m_jagDrive = cans;
+		this.m_encoder = encoder;
+		this.m_solenoidshift = shift;
 	}
 
-	public void ArcadeDrive(boolean squaredInputs) {
+	public void ArcadeDrive(boolean squaredInputs)
+	{
+		boolean shiftButton = false;
 
-		boolean shiftButton = false; //Button 2
-
-		double leftMotorSpeed;
-		double rightMotorSpeed;
-
-		// get negative of the stick controls. forward on stick gives negative value  
-		double stickX = m_stick.getX();
-		double stickY = m_stick.getY();
+		double stickX = this.m_stick.getX();
+		double stickY = this.m_stick.getY();
 
 		stickX = -stickX;
 		stickY = -stickY;
-
-		// adjust joystick by dead zone
-		if (Math.abs(stickX) <= .2) {
-			stickX = 0.0;
+		if (Math.abs(stickX) <= 0.1D) {
+			stickX = 0.0D;
 		}
-		if (Math.abs(stickY) <= .2) {
-			stickY = 0.0;
+		if (Math.abs(stickY) <= 0.2D) {
+			stickY = 0.0D;
 		}
-
-		// make sure X and Y don't go beyond the limits of -1 to 1
-		if (stickX > 1.0) {
-			stickX = 1.0;
+		if (!this.m_solenoidshift.get())
+		{
+			if ((this.m_jagDrive.m_state != TorCAN.DRIVE_STATE.PIVOTING) && (Math.abs(stickX) > 0.0D) && (Math.abs(stickY) == 0.0D))
+			{
+				this.m_jagDrive.m_state = TorCAN.DRIVE_STATE.PIVOTING;
+				this.m_jagDrive.offGear();
+			}
+			else if (this.m_jagDrive.m_state == TorCAN.DRIVE_STATE.PIVOTING)
+			{
+				this.m_jagDrive.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.m_jagDrive.lowGear();
+			}
+			stickX *= 0.75D;
 		}
-		if (stickX < -1.0) {
-			stickX = -1.0;
+		if (stickX > 1.0D) {
+			stickX = 1.0D;
 		}
-
-		if (stickY > 1.0) {
-			stickY = 1.0;
+		if (stickX < -1.0D) {
+			stickX = -1.0D;
 		}
-		if (stickY < -1.0) {
-			stickY = -1.0;
+		if (stickY > 1.0D) {
+			stickY = 1.0D;
 		}
-
-		// square the inputs to produce an exponential power curve
-		// this allows finer control with joystick movement and full power as you approach joystick limits
-		if (squaredInputs) {
-			if (stickX >= 0.0) {
-				stickX = (stickX * stickX);
+		if (stickY < -1.0D) {
+			stickY = -1.0D;
+		}
+		if (squaredInputs)
+		{
+			if (stickX >= 0.0D) {
+				stickX *= stickX;
 			} else {
 				stickX = -(stickX * stickX);
 			}
-
-			if (stickY >= 0.0) {
-				stickY = (stickY * stickY);
+			if (stickY >= 0.0D) {
+				stickY *= stickY;
 			} else {
 				stickY = -(stickY * stickY);
 			}
 		}
-
-		if (stickY > 0.0) {
-			if (stickX > 0.0) {
+		double rightMotorSpeed;
+		double leftMotorSpeed;
+		if (stickY > 0.0D)
+		{
+			if (stickX > 0.0D)
+			{
 				leftMotorSpeed = stickY - stickX;
 				rightMotorSpeed = Math.max(stickY, stickX);
-			} else {
-				leftMotorSpeed = Math.max(stickY, -stickX);
-				rightMotorSpeed = stickY + stickX ;
 			}
-		} else {
-			if (stickX > 0.0) {
+			else
+			{
+				leftMotorSpeed = Math.max(stickY, -stickX);
+				rightMotorSpeed = stickY + stickX;
+			}
+		}
+		else
+		{
+			if (stickX > 0.0D)
+			{
 				leftMotorSpeed = -Math.max(-stickY, stickX);
 				rightMotorSpeed = stickY + stickX;
-			} else {
-				leftMotorSpeed = stickY - stickX; 
+			}
+			else
+			{
+				leftMotorSpeed = stickY - stickX;
 				rightMotorSpeed = -Math.max(-stickY, -stickX);
 			}
 		}
-
-		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+		if (this.m_solenoidshift.get()) {
+			this.m_jagDrive.SetDrive(rightMotorSpeed * 0.65D, -leftMotorSpeed * 0.65D);
+		} else {
+			this.m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+		}
 	}
 
-	public void ReverseArcadeDrive(boolean squaredInputs) {
+	public void ReverseArcadeDrive(boolean squaredInputs)
+	{
+		boolean shiftButton = false;
 
-
-
-		boolean shiftButton = false; //Button 2
-
-		double leftMotorSpeed;
-		double rightMotorSpeed;
-
-		// get negative of the stick controls. forward on stick gives negative value  
-		double stickX = m_stick.getX();
-		double stickY = m_stick.getY();
+		double stickX = this.m_stick.getX();
+		double stickY = this.m_stick.getY();
 
 		stickX = -stickX;
 		stickY = -stickY;
-		shiftButton = m_stick.getRawButton(1);
-
-
-		// adjust joystick by dead zone
-		if (Math.abs(stickX) <= .2) {
-			stickX = 0.0;
+		shiftButton = this.m_stick.getRawButton(1);
+		if (Math.abs(stickX) <= 0.2D) {
+			stickX = 0.0D;
 		}
-		if (Math.abs(stickY) <= .2) {
-			stickY = 0.0;
+		if (Math.abs(stickY) <= 0.2D) {
+			stickY = 0.0D;
 		}
-
-		// make sure X and Y don't go beyond the limits of -1 to 1
-		if (stickX > 1.0) {
-			stickX = 1.0;
+		if (stickX > 1.0D) {
+			stickX = 1.0D;
 		}
-		if (stickX < -1.0) {
-			stickX = -1.0;
+		if (stickX < -1.0D) {
+			stickX = -1.0D;
 		}
-
-		if (stickY > 1.0) {
-			stickY = 1.0;
+		if (stickY > 1.0D) {
+			stickY = 1.0D;
 		}
-		if (stickY < -1.0) {
-			stickY = -1.0;
+		if (stickY < -1.0D) {
+			stickY = -1.0D;
 		}
-
-
-		//  shift high/low drive gear
 		if (shiftButton) {
-			m_solenoidshift.set(true);
+			this.m_solenoidshift.set(true);
 		} else {
-			m_solenoidshift.set(false);
+			this.m_solenoidshift.set(false);
 		}
-
-
-		// square the inputs to produce an exponential power curve
-		// this allows finer control with joystick movement and full power as you approach joystick limits
-		if (squaredInputs) {
-			if (stickX >= 0.0) {
-				stickX = (stickX * stickX);
+		if (squaredInputs)
+		{
+			if (stickX >= 0.0D) {
+				stickX *= stickX;
 			} else {
 				stickX = -(stickX * stickX);
 			}
-
-			if (stickY >= 0.0) {
+			if (stickY >= 0.0D) {
 				stickY = -(stickY * stickY);
 			} else {
-				stickY = (stickY * stickY);
+				stickY *= stickY;
 			}
 		}
+		double rightMotorSpeed;
+		double leftMotorSpeed;
+		if (stickY > 0.0D)
+		{
 
-		if (stickY > 0.0) {
-			if (stickX > 0.0) {
+			if (stickX > 0.0D)
+			{
 				leftMotorSpeed = stickY - stickX;
-				rightMotorSpeed = (Math.max(stickY, stickX)) * 20;
-			} else {
-				leftMotorSpeed = (Math.max(stickY, -stickX)) * 20;
-				rightMotorSpeed = stickY + stickX;
+				rightMotorSpeed = Math.max(stickY, stickX) * 20.0D;
 			}
-		} else {
-			if (stickX > 0.0) {
-				leftMotorSpeed = (-Math.max(-stickY, stickX)) * 20;
+			else
+			{
+				leftMotorSpeed = Math.max(stickY, -stickX) * 20.0D;
 				rightMotorSpeed = stickY + stickX;
-			} else {
-				leftMotorSpeed = stickY - stickX;
-				rightMotorSpeed = (-Math.max(-stickY, -stickX)) * 20;
 			}
 		}
-		// set the motor speed
-		//  m_driveJag.set(-leftMotorSpeed);
-		//  m_driveJag2.set(-leftMotorSpeed);
-		//  m_driveJag3.set(rightMotorSpeed);
-		//  m_driveJag4.set(rightMotorSpeed);
-		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+		else
+		{
 
+			if (stickX > 0.0D)
+			{
+				leftMotorSpeed = -Math.max(-stickY, stickX) * 20.0D;
+				rightMotorSpeed = stickY + stickX;
+			}
+			else
+			{
+				leftMotorSpeed = stickY - stickX;
+				rightMotorSpeed = -Math.max(-stickY, -stickX) * 20.0D;
+			}
+		}
+		this.m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
 	}
-	public void turnToGoal(){
-		if(m_stick.getRawButton(1)){
-			yawPID.enable();
+
+	public void driveDistance(float distance, float speed, boolean forward)
+	{
+		this.m_encoder.reset();
+		if (forward == true)
+		{
+			if (distance < 20.0F) {
+				this.negOvershoot = 0.0F;
+			} else {
+				this.negOvershoot = 11.0F;
+			}
+			distance -= this.negOvershoot;
+			do
+			{
+				if (this.m_encoder.getDistance() > distance) {
+					break;
+				}
+				this.m_jagDrive.SetDrive(speed, -speed);
+			} while (!this.overrideStick.getRawButton(10));
 		}
-		else{
-			yawPID.disable();
+		else
+		{
+			distance += this.negOvershoot;
+			while (this.m_encoder.getDistance() >= distance)
+			{
+				this.m_jagDrive.SetDrive(-speed, speed);
+				if (this.overrideStick.getRawButton(10)) {
+					break;
+				}
+			}
 		}
+	}
+
+	public void highGear()
+	{
+		this.m_jagDrive.highGear();
+	}
+
+	public void lowGear()
+	{
+		this.m_jagDrive.lowGear();
+	}
+
+	public void offGear()
+	{
+		this.m_jagDrive.offGear();
 	}
 }

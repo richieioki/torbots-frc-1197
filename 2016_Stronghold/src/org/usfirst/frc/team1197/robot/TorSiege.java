@@ -1,442 +1,713 @@
 package org.usfirst.frc.team1197.robot;
 
-
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
+import java.io.PrintStream;
 
-public class TorSiege{
+public class TorSiege
+{
 	private CANTalon siegeTalon;
 	private TorOnTarget target;
-	private Joystick siegeStick, stick;
+	private Joystick siegeStick;
+	private Joystick stick;
+	private Joystick stick3;
 	private AnalogPotentiometer pot;
 	private Ultrasonic sonar;
 	private TorCAN torcan;
+	private TorDrive drive;
 	private TorIntake intakeSiege;
-
+	private Encoder encoder;
+	private AHRS gyro;
 	public boolean enabled;
-
-
-	public static final double SONAR = 10;
+	public static final double SONAR = 10.0D;
 	private DRAWBRIDGE m_states;
+	private HALT m_halt;
 	public TorTeleop tele;
-	
-	public enum DRAWBRIDGE{POS1, POS2, POS3, POS4, POS5, POS6, POS7, IDLE};
-	public enum SALLYPORT{POS1, POS2, POS3, POS4, POS5, POS6, IDLE};
-	public enum PORTCULLIS{IDLE, POS1, POS2, POS3};
-	public enum CHEVEL{POS1, POS2, POS3, IDLE};
+
+	public static enum HALT
+	{
+		IDLE,  NULL,  POS1,  POS2;
+
+		private HALT() {}
+	}
+
+	public static enum DRAWBRIDGE
+	{
+		POS0,  POS1,  POS2,  POS3,  POS4,  POS5,  POS6,  POS7,  IDLE,  NULL,  POS2half;
+
+		private DRAWBRIDGE() {}
+	}
+
+	public static enum SALLYPORT
+	{
+		POS0,  POS1,  POS2,  POS3,  POS4,  POS5,  POS6,  POS7,  IDLE,  NULL;
+
+		private SALLYPORT() {}
+	}
+
+	public static enum PORTCULLIS
+	{
+		IDLE,  POS1,  POS2,  POS3,  POS$,  POS5,  NULL,  POS1B;
+
+		private PORTCULLIS() {}
+	}
+
+	public static enum CHEVEL
+	{
+		POS1,  POS2,  POS3,  IDLE,  NULL;
+
+		private CHEVEL() {}
+	}
 
 	public SALLYPORT m_sally = SALLYPORT.IDLE;
 	public PORTCULLIS m_port = PORTCULLIS.IDLE;
 	public CHEVEL m_chev = CHEVEL.IDLE;
 	private Solenoid shift;
-
-	private double endTime = 0;
+	private double endTime = 0.0D;
 	private double sallyTime;
 	private double startTime;
 	private double chevTime;
 	private double portTime;
-	double ratio = 3.4/5;
-	double armTop = 0;
-	double drawbridgeTop = 0;
-	double drawbridgeBot = 0;
-	double sallyPort = 0;
-	double chevelTop = 0;
-	double portcullisTop = 0;
-	double portcullisBot = 0;
-	double potChecker = 0; //highest value
-	double intakeVal = 0;
+	double ratio = 0.6799999999999999D;
+	double armTop = 0.0D;
+	double drawbridgeTop = 0.0D;
+	double drawbridgeBot = 0.0D;
+	double sallyPort = 0.0D;
+	double chevelTop = 0.0D;
+	double portcullisTop = 0.0D;
+	double portcullisBot = 0.0D;
+	double potChecker = 0.0D;
+	double intakeVal = 0.0D;
+	double degrees;
+	double setDegreesSlope;
+	double readDegreesSlope;
+	double setDegreesInter;
+	double readDegreesInter;
+	double m_speed;
+	double m_distance;
+	double degreesTop;
+	double degreesBot;
+	int bottomArm;
+	double drawbridgeConstant;
+	double drawbridgeBack;
+	double sallyPortInitBack;
+	double sallyPortBack;
+	double chevelBack;
+	double chevelArmUp;
+	double chevelDist;
+	double sallyPortDist;
+	double drawbridgeArmUp;
+	double drawbridgeDist;
+	double turnAngle;
+	double turnP;
+	double turnSpeed;
+	double error;
+	double targetAngle;
+	double sallyStartAngle;
 
-
-	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, 
-			Ultrasonic sonar, TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee){
-
-		siegeTalon = T1;
-		siegeStick = stick2;
+	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee, TorDrive drive, Encoder encoder, AHRS gyro, Joystick stick3)
+	{
+		this.siegeTalon = T1;
+		this.siegeStick = stick2;
 		this.pot = pot;
-		this.sonar = sonar;
 		this.torcan = torcan;
 		this.shift = shift;
 		this.stick = stick;
-		intakeSiege = intakee;
+		this.intakeSiege = intakee;
+		this.drive = drive;
+		this.encoder = encoder;
+		this.gyro = gyro;
+		this.stick3 = stick3;
 
 		calc();
-		enabled = false;
 
-		target = new TorOnTarget(siegeTalon, 13);
-		m_states = DRAWBRIDGE.IDLE;
-
-		//T1.setInverted(true);
-
+		this.enabled = false;
+		this.target = new TorOnTarget(this.siegeTalon, 2);
+		this.m_states = DRAWBRIDGE.NULL;
+		this.m_port = PORTCULLIS.NULL;
+		this.m_chev = CHEVEL.NULL;
+		this.m_sally = SALLYPORT.NULL;
+		this.m_halt = HALT.POS1;
 	}
 
-	public void calc(){
-		ratio = 3.4/5;
-		int rest = siegeTalon.getAnalogInRaw();
-		siegeTalon.setSetpoint(armTop);
-		drawbridgeTop = armTop + 160;
-		drawbridgeBot = armTop + 540; //550 for protobot, 800 for final bot
-		sallyPort = armTop + 250; //260 for protobot, 400 for final bot
-		chevelTop = armTop + 520; //550 for protobot, 800 for final bot
-		portcullisTop = armTop + 90;
-		portcullisBot = armTop + 520; //530 for protobot, 825 for final bot			
-		intakeVal = armTop + 708;
-		armTop = (int)rest;
+	public boolean siegeOnTarget(int tolerance)
+	{
+		double currentAngle = getDegrees();
+		double setpointDegrees = this.readDegreesSlope * this.siegeTalon.getSetpoint() + this.readDegreesInter;
+		if ((currentAngle > setpointDegrees - tolerance) && (currentAngle < setpointDegrees + tolerance)) {
+			return true;
+		}
+		return false;
 	}
 
-
-	public void PID(){
-		siegeTalon.enable();
-		int rest = siegeTalon.getAnalogInRaw();
-		siegeTalon.set(rest);
-		siegeTalon.setSetpoint(rest);
+	public boolean siegeOnTargetRaw(int tolerance)
+	{
+		int rawValue = this.siegeTalon.getAnalogInRaw();
+		if ((rawValue > this.siegeTalon.getSetpoint() - tolerance) && 
+				(rawValue < this.siegeTalon.getSetpoint() + tolerance)) {
+			return true;
+		}
+		return false;
 	}
 
-	public int potGet(){
-		double potValue = siegeTalon.getAnalogInRaw();
-//		System.out.println("Potentiometer value: " + (int)potValue);
-		return (int)potValue;
-	} 
-// 420
-	//we will win 
-	
-	public void potTest(){
-		if(siegeStick.getRawButton(8)){
-			siegeTalon.set(drawbridgeTop);	
+	public void setDegrees(double degrees)
+	{
+		this.degrees = degrees;
+		this.siegeTalon.set(this.setDegreesSlope * degrees + this.setDegreesInter);
+	}
+
+	public double getDegrees()
+	{
+		return this.readDegreesSlope * this.siegeTalon.getAnalogInRaw() + this.readDegreesInter;
+	}
+
+	public void calc()
+	{
+		this.turnP = 0.04D;
+		this.degreesTop = 50.6D;
+		this.degreesBot = -70.3D;
+		this.drawbridgeBack = -32.0D;
+		this.sallyPortInitBack = -6.0D;
+		this.sallyPortBack = -50.0D;
+		this.chevelBack = -8.0D;
+		this.chevelArmUp = 13.0D;
+		this.chevelDist = 80.0D;
+		this.sallyPortDist = 116.0D;
+		this.drawbridgeArmUp = 12.0D;
+		this.drawbridgeDist = 110.0D;
+
+		this.bottomArm = 543;
+		int rest = 315;
+
+		this.setDegreesSlope = ((this.bottomArm - rest) / (this.degreesBot - this.degreesTop));
+		this.setDegreesInter = (rest - this.setDegreesSlope * this.degreesTop);
+		this.readDegreesSlope = (1.0D / this.setDegreesSlope);
+		this.readDegreesInter = (-this.setDegreesInter / this.setDegreesSlope);
+
+		this.siegeTalon.setSetpoint(this.armTop);
+		this.drawbridgeTop = 29.0D;
+		this.drawbridgeBot = -56.0D;
+		this.sallyPort = 0.0D;
+		this.chevelTop = -50.0D;
+		this.portcullisTop = 5.0D;
+		this.portcullisBot = -69.0D;
+		this.intakeVal = -48.0D;
+		this.siegeTalon.setSetpoint(rest);
+		this.drawbridgeConstant = ((this.drawbridgeTop - this.drawbridgeBot) / (-1.0D * this.drawbridgeBack));
+	}
+
+	public void PID()
+	{
+		this.siegeTalon.enable();
+		int rest = this.siegeTalon.getAnalogInRaw();
+		this.siegeTalon.set(rest);
+		this.siegeTalon.setSetpoint(rest);
+	}
+
+	public double potGet()
+	{
+		double potValue = getDegrees();
+		return potValue;
+	}
+
+	public void potTest()
+	{
+		if (this.siegeStick.getRawButton(8)) {
+			setDegrees(this.drawbridgeTop);
 		}
 	}
-	public void intakeTele(){
-		if(siegeStick.getRawButton(3)){
-			siegeTalon.set(intakeVal);
-			siegeTalon.setSetpoint(intakeVal);
+
+	public void intakeTele()
+	{
+		if (this.stick.getRawButton(1)) {
+			setDegrees(this.intakeVal);
 		}
 	}
-	
-	
-	public long checkTime(int wait){
+
+	public long checkTime(int wait)
+	{
 		long time = System.currentTimeMillis();
-		long endTime = System.currentTimeMillis() + wait; 
+		long endTime = System.currentTimeMillis() + wait;
 		long difference = endTime - time;
 		return difference;
 	}
 
-	public void SiegeArmUpdate(){
-		if(stick.getRawButton(3) && !enabled) {
-			DrawBridge();
-		}
-		
-		if(stick.getRawButton(4) && !enabled) {
-			SallyPort();
-		}
-		
-		if(stick.getRawButton(5) && !enabled) {
-			Cheve();
-		}
-		if(stick.getRawButton(6) && !enabled) {
-			Portcullis();
-		}
-
-		
-		if(!enabled) {
-			if(siegeStick.getY() > -.2){
-				siegeTalon.set((-siegeStick.getY() * 100) + siegeTalon.getAnalogInRaw()); //siege arm down
+	public void SiegeArmUpdate()
+	{
+		if (!this.enabled)
+		{
+			if (this.stick.getRawButton(3))
+			{
+				DrawBridge();
 			}
-			else if(siegeStick.getY() < .2){
-				siegeTalon.set((-siegeStick.getY() * 100) + siegeTalon.getAnalogInRaw());
+			else if (this.stick.getRawButton(4))
+			{
+				SallyPort();
 			}
-		}
-
-		if(siegeStick.getRawButton(7)){
-			shift.set(true);
-			System.out.println("!!!!!Solenoid Enabled!!!!!!");
-		}
-		if(siegeStick.getRawButton(9)){
-			shift.set(false);
-		}
-		else {
-			//	siegeTalon.set(siegeTalon.getAnalogInRaw());
-		}
-
-		update();
-
-	}
-
-	private void Cheve() {
-		if(!enabled) {
-			enabled = true;
-			m_chev = CHEVEL.POS1;
-		}
-		
-	}
-	
-	private void Portcullis() {
-		if(!enabled) {
-			enabled = true;
-			m_port = PORTCULLIS.POS1;
-		}
-		
-	}
-
-	private void SallyPort() {
-		if(!enabled) {
-			enabled = true;
-			m_sally = SALLYPORT.POS1;
-		}
-	}
-	public void DrawBridge() {
-		if(!enabled) {
-			enabled = true;
-			m_states = DRAWBRIDGE.POS1;
-		}
-	}
-
-	private void update() {
-
-		//OVER RIDE 
-		if(stick.getRawButton(2)) {
-			m_states = DRAWBRIDGE.IDLE;
-			m_sally = SALLYPORT.IDLE;
-			m_chev = CHEVEL.IDLE;
-			m_port = PORTCULLIS.IDLE;
-		}
-		
-		
-		switch(m_port) {
-		case IDLE:
-			if(portTime != -1){
-				portTime = -1;
-				torcan.SetDrive(0, 0);
-				enabled = false;
+			else if (this.stick.getRawButton(5))
+			{
+				Cheve();
 			}
-			break;
-		
-		case POS1:
-			if(portTime == -1) {
-				portTime = System.currentTimeMillis() + 750;
-				intakeSiege.portcullis();
-				siegeTalon.set(portcullisTop);
-				Timer.delay(0.2);
-				torcan.SetDrive(0.2,-0.2);
-			} else if(portTime <= System.currentTimeMillis()) {
-				m_port = PORTCULLIS.POS2;
-				intakeSiege.portStop();
-				portTime = -1;
-				torcan.SetDrive(0,0);
+			else if (this.stick.getRawButton(6))
+			{
+				Portcullis();
 			}
-			break;
-		case POS2:
-			if(portTime == -1) {
-				portTime = System.currentTimeMillis() + 1700;
-				torcan.SetDrive(0.5,-0.5);
-			} else if(portTime <= System.currentTimeMillis()) {
-				m_port = PORTCULLIS.IDLE;
-				portTime = -1;
-				torcan.SetDrive(0,0);
-				enabled = false;
+			else if (-this.siegeStick.getY() < -0.025D)
+			{
+				this.siegeTalon.setProfile(1);
+				this.siegeTalon.set(-this.siegeStick.getY() * 30.0D + this.siegeTalon
+						.getAnalogInRaw());
 			}
-			break;
-			
-		}
-		
-		
-		switch(m_chev) {
-		case IDLE:
-			if(chevTime != -1) {
-				chevTime = -1;
-				torcan.SetDrive(0, 0);
-				enabled = false;
+			else if (-this.siegeStick.getY() > 0.025D)
+			{
+				this.siegeTalon.setProfile(1);
+				this.siegeTalon.set(-this.siegeStick.getY() * 30.0D + this.siegeTalon
+						.getAnalogInRaw());
 			}
-			break;
-		
-		case POS1:
-			siegeTalon.set(chevelTop);
-			Timer.delay(0.7);
-			m_chev = CHEVEL.POS2;
-			break;
-			
-		case POS2:
-			if(chevTime == -1) {
-				chevTime = System.currentTimeMillis() + 250;
-				torcan.SetDrive(-0.5, 0.5);
-			} else if(chevTime <= System.currentTimeMillis()) {
-				torcan.SetDrive(0, 0);
-				chevTime = -1;
-				m_chev = CHEVEL.POS3;
+			else
+			{
+				this.siegeTalon.setProfile(0);
 			}
-			break;
-		case POS3:
-			if(chevTime == -1) {
-				chevTime = System.currentTimeMillis() + 2500;
-				torcan.SetDrive(0.5, -0.5);
-				Timer.delay(0.3);
-				siegeTalon.set(chevelTop - 250);
-			} else if(chevTime <= System.currentTimeMillis()) {
-				torcan.SetDrive(0, 0);
-				enabled = false;
-				m_chev = CHEVEL.IDLE;
-			}
-			break;
-			
-		}
-		
-		switch(m_sally) {
-		case IDLE:
-			if(sallyTime != -1) {
-				sallyTime = -1;
-				torcan.SetDrive(0, 0);
-				enabled = false;
-			}
-			break;
-			
-			
-		case POS1:
-			if(sallyTime == -1) {
-				torcan.SetDrive(-0.5, 0.5);
-				sallyTime = System.currentTimeMillis() + 100;
-			} 
-			else if(sallyTime <= System.currentTimeMillis()){
-				m_sally = SALLYPORT.POS2;
-				torcan.SetDrive(0,0);
-				sallyTime = -1;
-			}
-			break;
-			
-		case POS2:
-			//if(sallyTime <= System.currentTimeMillis()) {
-				m_sally = SALLYPORT.POS3;
-				torcan.SetDrive(0, 0);
-				siegeTalon.set(sallyPort);
-			//}
-			break;
-		case POS3:
-			if(target.OnTarget((int)sallyPort)) {
-				m_sally = SALLYPORT.POS4;				
-			}
-			break;
-		
-		case POS4:
-			if(sallyTime == -1) {
-				torcan.SetDrive(-0.5, 0.5);
-				sallyTime = System.currentTimeMillis() + 1500;//originally 2200
-			} else if(sallyTime <= System.currentTimeMillis()) {
-				m_sally = SALLYPORT.POS5;
-				torcan.SetDrive(0, 0);
-				sallyTime = -1;
-			}
-			break;
-		case POS5:
-			Timer.delay(0.7);
-			torcan.SetDrive(0.6, 0.6);
-			Timer.delay(0.25);
-			torcan.SetDrive(0,0);
-			Timer.delay(0.2);
-			torcan.SetDrive(-0.6,-0.6);
-			Timer.delay(0.2);
-			torcan.SetDrive(0,0);
-			torcan.SetDrive(0.5,-0.5);
-			m_sally = SALLYPORT.POS6;
-			break;
-			
-		case POS6:
-			if(sallyTime == -1) {
-				sallyTime = System.currentTimeMillis() + 1000;
-			} else if(sallyTime <= System.currentTimeMillis()) {
-				enabled = false;
-				m_sally = SALLYPORT.IDLE;
-			}
-			break;
-		}
-
-		switch(m_states) {
-		case IDLE:
-			//do something if idle
-			if(endTime != -1) {
-				endTime = -1;
-				torcan.SetDrive(0, 0);
-				enabled = false;
-			}
-
-			break;
-		case POS1: //driving against and lower arm
-			siegeTalon.set(drawbridgeTop);
-			Timer.delay(0.5);
-			m_states = DRAWBRIDGE.POS2;
-			break;
-		case POS2:
-			if(endTime == -1) {
-				endTime = System.currentTimeMillis() + 1250;
-				siegeTalon.set(drawbridgeTop + 140);
-				torcan.SetDrive(-0.5, 0.5);
-			} else {
-				double startTime = System.currentTimeMillis();
-				if(startTime > endTime) {
-					m_states = DRAWBRIDGE.POS3;
-					torcan.SetDrive(0, 0);
+			if ((this.siegeStick.getRawButton(1)) && (this.torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
+			{
+				if ((this.torcan.m_state != TorCAN.DRIVE_STATE.HIGHGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
+				{
+					this.shift.set(true);
+					this.torcan.highGear();
+					this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
 				}
 			}
-			break;
-		case POS3:
-			siegeTalon.set(drawbridgeBot);
-			m_states = DRAWBRIDGE.POS4;
-			endTime = -1;
-			break;
-
-		case POS4:
-			if(target.OnTarget((int)drawbridgeBot)) {
-				torcan.SetDrive(0.5, -0.5);
-				m_states = DRAWBRIDGE.POS5;
+			else if ((this.torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
+			{
+				this.shift.set(false);
+				this.torcan.lowGear();
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 			}
-			break;
-
-		case POS5:
-			if(endTime == -1) {
-				endTime = System.currentTimeMillis() + 2000;
-			} else if(endTime <= System.currentTimeMillis()) {
-				//YOU HAVE REACHED THE END
-				m_states = DRAWBRIDGE.IDLE;
-				enabled = false;
-			}
-			break;
+		}
+		else
+		{
+			update();
 		}
 	}
 
-	public void SiegeArmDown(){
-		siegeTalon.set(chevelTop);
+	public void Cheve()
+	{
+		if (!this.enabled)
+		{
+			this.drive.offGear();
+			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+			this.enabled = true;
+			this.m_chev = CHEVEL.POS1;
+		}
 	}
-	public void SiegeArmUp(){
-		siegeTalon.set(chevelTop-100);
+
+	public void highGear()
+	{
+		this.shift.set(true);
 	}
-	public void drawbridgeTop(){
-		siegeTalon.set(drawbridgeTop);
+
+	public void lowGear()
+	{
+		this.shift.set(false);
 	}
-	public void drawbridgeMid(){
-		siegeTalon.set(drawbridgeTop+150);
+
+	public void Portcullis()
+	{
+		if (!this.enabled)
+		{
+			this.drive.offGear();
+			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+			this.enabled = true;
+			this.m_port = PORTCULLIS.POS1B;
+		}
 	}
-	public void drawbridgeBot(){
-		siegeTalon.set(drawbridgeBot);
+
+	public void SallyPort()
+	{
+		if (!this.enabled)
+		{
+			this.drive.offGear();
+			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+			this.enabled = true;
+			this.m_sally = SALLYPORT.POS0;
+		}
 	}
-	public void sally(){
-		siegeTalon.set(sallyPort);
+
+	public void DrawBridge()
+	{
+		if (!this.enabled)
+		{
+			this.drive.offGear();
+			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+			this.enabled = true;
+			this.m_states = DRAWBRIDGE.POS0;
+		}
 	}
-	public void portBot(){
-		siegeTalon.set(portcullisBot);
+
+	private void update()
+	{
+		if (this.stick.getRawButton(2))
+		{
+			this.m_states = DRAWBRIDGE.IDLE;
+			this.m_sally = SALLYPORT.IDLE;
+			this.m_chev = CHEVEL.IDLE;
+			this.m_port = PORTCULLIS.IDLE;
+			this.enabled = false;
+		}
+		if ((this.m_port != PORTCULLIS.NULL) && (this.m_port != PORTCULLIS.IDLE)) {
+			switch (this.m_port)
+			{
+			case NULL: 
+				break;
+			case IDLE: 
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.drive.lowGear();
+				this.enabled = false;
+				this.m_port = PORTCULLIS.NULL;
+				break;
+			case POS1B: 
+				this.encoder.reset();
+				this.m_port = PORTCULLIS.POS1;
+				break;
+			case POS1: 
+				this.torcan.SetDrive(-0.2D, 0.2D);
+				if (this.encoder.getDistance() < -3.0D)
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.encoder.reset();
+					this.m_port = PORTCULLIS.POS2;
+				}
+				break;
+			case POS2: 
+				this.intakeSiege.portcullis();
+				haltDrive(0.5D);
+				setDegrees(this.portcullisTop);
+				if (siegeOnTarget(5))
+				{
+					this.intakeSiege.portStop();
+					this.encoder.reset();
+					this.m_port = PORTCULLIS.POS3;
+				}
+				break;
+			case POS3: 
+				this.torcan.SetDrive(0.6D, -0.6D);
+				if (this.encoder.getDistance() > 16.0D) {
+					setDegrees(this.portcullisTop + 40.0D);
+				}
+				if (this.encoder.getDistance() > 70.0D)
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.enabled = false;
+					this.m_port = PORTCULLIS.IDLE;
+				}
+				break;
+			}
+		} else if ((this.m_chev != CHEVEL.NULL) && (this.m_chev != CHEVEL.IDLE)) {
+			switch (this.m_chev)
+			{
+			case NULL: 
+				break;
+			case IDLE: 
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.drive.lowGear();
+				this.enabled = false;
+				this.m_chev = CHEVEL.NULL;
+				break;
+			case POS1: 
+				setDegrees(this.chevelTop);
+				if (siegeOnTarget(2))
+				{
+					this.m_chev = CHEVEL.POS2;
+					this.encoder.reset();
+				}
+				break;
+			case POS2: 
+				this.torcan.SetDrive(-0.35D, 0.35D);
+				setDegrees(this.chevelTop - 4.0D);
+				if (this.encoder.getDistance() < -8.0D)
+				{
+					haltDrive(0.5D);
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.m_chev = CHEVEL.POS3;
+					this.encoder.reset();
+				}
+				break;
+			case POS3: 
+				this.torcan.SetDrive(0.5D, -0.5D);
+				if (this.encoder.getDistance() > this.chevelArmUp) {
+					setDegrees(45.0D);
+				}
+				if (this.encoder.getDistance() > this.chevelDist)
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.enabled = false;
+					this.m_chev = CHEVEL.IDLE;
+				}
+				break;
+			}
+		} else if ((this.m_sally != SALLYPORT.IDLE) && (this.m_sally != SALLYPORT.NULL)) {
+			switch (this.m_sally)
+			{
+			case NULL: 
+				break;
+			case IDLE: 
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.drive.lowGear();
+				this.enabled = false;
+
+				this.m_sally = SALLYPORT.NULL;
+				break;
+			case POS0: 
+				this.encoder.reset();
+				this.gyro.reset();
+				this.m_sally = SALLYPORT.POS1;
+				break;
+			case POS1: 
+				this.enabled = true;
+				setDegrees(this.sallyPort);
+				haltDrive(0.5D);
+				if (siegeOnTarget(2))
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.m_sally = SALLYPORT.POS3;
+				}
+				break;
+			case POS3: 
+				this.enabled = true;
+				if (this.encoder.getDistance() > this.sallyPortBack + 10.0D)
+				{
+					this.torcan.SetDrive(-0.5D, 0.5D);
+					setDegrees(-5.0D);
+				}
+				else
+				{
+					this.torcan.SetDrive(-0.2D, 0.2D);
+				}
+				if (this.encoder.getDistance() < this.sallyPortBack)
+				{
+					this.m_sally = SALLYPORT.POS4;
+					this.encoder.reset();
+
+					this.torcan.SetDrive(0.0D, 0.0D);
+				}
+				break;
+			case POS4: 
+				this.enabled = true;
+
+				this.m_sally = SALLYPORT.POS5;
+
+				break;
+			case POS5: 
+				this.enabled = true;
+				turnToTheta(-20.0D);
+				if ((this.gyro.getAngle() < 342.0D) && (this.gyro.getAngle() > 90.0D))
+				{
+					this.m_sally = SALLYPORT.POS6;
+					this.torcan.SetDrive(0.0D, 0.0D);
+				}
+				break;
+			case POS6: 
+				this.enabled = true;
+				turnToTheta(353.0D);
+				if (this.gyro.getAngle() > 355.0D)
+				{
+					this.torcan.SetDrive(0.0D, 0.0D);
+					this.m_sally = SALLYPORT.POS7;
+				}
+				break;
+			case POS7: 
+				this.enabled = true;
+				this.torcan.SetDrive(0.5D, -0.5D);
+				if (this.encoder.getDistance() > this.sallyPortDist)
+				{
+					this.m_sally = SALLYPORT.IDLE;
+					this.encoder.reset();
+					this.enabled = false;
+					this.torcan.SetDrive(0.0D, 0.0D);
+				}
+				break;
+			}
+		} else if ((this.m_states != DRAWBRIDGE.NULL) && (this.m_states != DRAWBRIDGE.IDLE)) {
+			switch (this.m_states)
+			{
+			case NULL: 
+				break;
+			case IDLE: 
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.drive.lowGear();
+				this.enabled = false;
+				this.m_states = DRAWBRIDGE.NULL;
+				break;
+			case POS0: 
+				this.encoder.reset();
+				this.m_states = DRAWBRIDGE.POS1;
+			case POS1: 
+				setDegrees(this.drawbridgeTop);
+				haltDrive(0.5D);
+				if (siegeOnTarget(3)) {
+					this.m_states = DRAWBRIDGE.POS2;
+				}
+				break;
+			case POS2: 
+				this.torcan.SetDrive(-0.5D, 0.5D);
+				setDegrees(this.encoder.getDistance() * this.drawbridgeConstant + this.drawbridgeTop);
+				if (this.encoder.getDistance() < this.drawbridgeBack)
+				{
+					this.encoder.reset();
+					haltDrive(0.5D);
+					this.m_states = DRAWBRIDGE.POS3;
+					this.torcan.SetDrive(0.0D, 0.0D);
+				}
+				break;
+			case POS3: 
+				setDegrees(this.drawbridgeBot);
+				haltDrive(0.5D);
+				if (siegeOnTarget(2)) {
+					this.m_states = DRAWBRIDGE.POS4;
+				}
+				break;
+			case POS4: 
+				this.encoder.reset();
+				this.m_states = DRAWBRIDGE.POS5;
+				break;
+			case POS5: 
+				this.torcan.SetDrive(0.5D, -0.5D);
+				if (this.encoder.getDistance() > this.drawbridgeArmUp) {
+					setDegrees(0.0D);
+				}
+				if (this.encoder.getDistance() > this.drawbridgeDist)
+				{
+					this.m_states = DRAWBRIDGE.IDLE;
+					this.enabled = false;
+					this.torcan.SetDrive(0.0D, -0.0D);
+				}
+				break;
+			}
+		}
 	}
-	public void portTop(){
-		siegeTalon.set(portcullisTop);
+
+	public void haltDrive(double p)
+	{
+		this.m_distance = this.encoder.getDistance();
+		this.m_speed = (-p * this.m_distance);
+		this.torcan.SetDrive(this.m_speed, -1.0D * this.m_speed);
 	}
-	public void stopArm(){
-		siegeTalon.set(0);
+
+	public void turnToReference() {}
+
+	public boolean turnToTheta(double desiredAngle)
+	{
+		this.targetAngle = ((desiredAngle + 360.0D) % 360.0D);
+
+		this.error = (this.gyro.getAngle() - this.targetAngle);
+		if (Math.abs(this.error) > 180.0D) {
+			if (this.error > 0.0D)
+			{
+				this.error -= 180.0D;
+				this.error *= -1.0D;
+			}
+			else
+			{
+				this.error += 180.0D;
+				this.error *= -1.0D;
+			}
+		}
+		System.out.println("Error " + this.error);
+		if (this.error > 0.0D) {
+			this.turnSpeed = Math.min(0.6D, this.error * this.turnP);
+		} else {
+			this.turnSpeed = Math.max(this.error * this.turnP, -0.6D);
+		}
+		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
+		if (Math.abs(this.error) > 0.5D) {
+			return false;
+		}
+		return true;
 	}
-	public void reset() {
+
+	public boolean turnToShoot(double desiredAngle)
+	{
+		this.targetAngle = ((desiredAngle + 360.0D) % 360.0D);
+
+		System.out.println("TargetAngle: " + this.targetAngle);
+		System.out.println("Current Angle: " + this.gyro.getAngle());
+
+		this.error = (this.gyro.getAngle() - this.targetAngle);
+		System.out.println("Error " + this.error);
+		if (Math.abs(this.error) > 180.0D) {
+			if (this.error > 0.0D) {
+				this.error -= 360.0D;
+			} else {
+				this.error += 360.0D;
+			}
+		}
+		if (this.error > 0.0D) {
+			this.turnSpeed = Math.min(6.0D, this.error * this.turnP * 12.0D);
+		} else {
+			this.turnSpeed = Math.max(this.error * this.turnP * 12.0D, -6.0D);
+		}
+		if (Math.abs(this.turnSpeed) < 1.6D) {
+			this.turnSpeed = (1.6D * (this.turnSpeed / Math.abs(this.turnSpeed)));
+		}
+		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
+		if (Math.abs(this.error) > 0.1D) {
+			return false;
+		}
+		return true;
+	}
+
+	public void SiegeArmDown()
+	{
+		this.siegeTalon.set(this.chevelTop);
+	}
+
+	public void SiegeArmUp()
+	{
+		this.siegeTalon.set(this.chevelTop - 100.0D);
+	}
+
+	public void drawbridgeTop()
+	{
+		this.siegeTalon.set(this.drawbridgeTop);
+	}
+
+	public void drawbridgeMid()
+	{
+		this.siegeTalon.set(this.drawbridgeTop + 130.0D);
+	}
+
+	public void drawbridgeBot()
+	{
+		this.siegeTalon.set(this.drawbridgeBot);
+	}
+
+	public void sally()
+	{
+		this.siegeTalon.set(this.sallyPort);
+	}
+
+	public void portBot()
+	{
+		this.siegeTalon.set(this.portcullisBot);
+	}
+
+	public void portTop()
+	{
+		this.siegeTalon.set(this.portcullisTop);
+	}
+
+	public void stopArm()
+	{
+		this.siegeTalon.set(0.0D);
+	}
+
+	public void reset()
+	{
 		System.out.println("!!!!!!!!!!!RESET!!!!!!!!!!!!");
-		m_states = DRAWBRIDGE.IDLE;
-		//siegeTalon.set(siegeTalon.getAnalogInRaw());
-		//siegeTalon.setProfile(0);
 	}
 }
-
