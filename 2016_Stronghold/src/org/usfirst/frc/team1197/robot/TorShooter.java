@@ -20,19 +20,11 @@ public class TorShooter
 	public boolean shooterEnabled;
 	private ShooterState m_state;
 	float angleToTurn;
-<<<<<<< HEAD
 	private double closeHood = 1690.0D;
 	private double midHood = 1150.0D;
 	private double farHood = 440.0D;
 	private double leftHood = 702.0D;
-=======
-	private double closeHood = 1690;
-	private double midHood = 1150;
-	private double farHood = 440;
-	private double leftHood = 702;
 	//1690 close, 440 far, 1150/1168 mid, 702 left
-	
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	double hoodTopLimit;
 	double hoodBotLimit;
 	double setHoodDegreesSlope;
@@ -51,13 +43,9 @@ public class TorShooter
 		private ShooterState() {}
 	}
 
-<<<<<<< HEAD
-	public TorShooter(TorIntake intake, CANTalon shooter1, CANTalon shooter2, CANTalon hood, CANTalon elevate, CANTalon arm, Joystick stick3, Joystick stick2, AHRS gyro, TorCAN can, TorCamera camera)
-=======
 	public TorShooter(TorIntake intake, CANTalon shooter1, CANTalon shooter2, 
 			CANTalon hood, CANTalon elevate, CANTalon arm, Joystick stick3, 
 			Joystick stick2, AHRS gyro, TorCAN can, TorCamera camera)
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	{
 		this.intake = intake;
 		this.shooter1 = shooter1;
@@ -70,7 +58,6 @@ public class TorShooter
 		this.gyro = gyro;
 		this.cans = can;
 		this.camera = camera;
-<<<<<<< HEAD
 
 		this.shootFlag = false;
 
@@ -78,29 +65,8 @@ public class TorShooter
 
 		this.shooterEnabled = false;
 		this.m_state = ShooterState.MANUAL;
-=======
-		
-		shootFlag = false;
-		
-		hoodCalc();
-		
-		this.shooterEnabled = false;
-		this.m_state = ShooterState.MANUAL;
-	}
-	public void elevateShoot(){
-		shooter1.set(0.75);
-		shooter2.set(0.75);
-		Timer.delay(1.0);
-		elevate.set(-0.95);
-		Timer.delay(1.0);
-		shooter1.set(0);
-		shooter2.set(0);
-		elevate.set(0);
-		shooterEnabled = false;
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	}
 
-<<<<<<< HEAD
 	public void elevateShoot()
 	{
 		this.shooter1.set(0.75D);
@@ -114,8 +80,6 @@ public class TorShooter
 		this.shooterEnabled = false;
 	}
 
-=======
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	public void shoot()
 	{
 		if (this.stick3.getRawButton(1))
@@ -128,29 +92,8 @@ public class TorShooter
 			this.shooter1.set(0.0D);
 			this.shooter2.set(0.0D);
 		}
-<<<<<<< HEAD
-=======
-	}
-	
-	public void hoodCalc(){
-		hoodTopLimit = -1.8099;
-		hoodBotLimit = -2.6365;
-		hoodDegreesTop = 59.0;
-		hoodDegreesBot = 17;
-		
-		this.setHoodDegreesSlope = ((hoodBotLimit - hoodTopLimit) / (this.hoodDegreesBot - this.hoodDegreesTop));
-		this.setHoodDegreesInter = (hoodTopLimit - this.setHoodDegreesSlope * this.hoodDegreesTop);
-		this.readHoodDegreesSlope = (1.0D / this.setHoodDegreesSlope);
-		this.readHoodDegreesInter = (-this.setHoodDegreesInter / this.setHoodDegreesSlope);
-	}
-	
-	public void hoodSetDegrees(double degrees)
-	{
-		this.hood.set(this.setHoodDegreesSlope * degrees + this.setHoodDegreesInter);
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	}
 
-<<<<<<< HEAD
 	public void hoodCalc()
 	{
 		this.hoodTopLimit = -1.8099D;
@@ -187,102 +130,14 @@ public class TorShooter
 	public void adjustShooter()
 	{
 		if (this.stick3.getRawButton(1)) {
-=======
-	public double hoodGetDegrees()
-	{
-		return this.readHoodDegreesSlope * this.hood.get() + this.readHoodDegreesInter;
-	}
-	
-	public void hoodSet(){
-		if(stick3.getRawButton(5)){
-			hoodSetDegrees(59);
-		}
-		if(stick3.getRawButton(6)){
-			hoodSetDegrees(30);
-		}
-	}
-	public void adjustShooter()
-	{
-		if (this.stick3.getRawButton(1))
-		{
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 			shoot();
-<<<<<<< HEAD
 		} else if (this.stick3.getY() > 0.05D) {
 			this.hood.set(-this.stick3.getY() * 50000.0D + this.hood.getPulseWidthPosition());
 		} else {
 			this.hood.set(this.hood.getPulseWidthPosition());
-=======
-		}
-//		else if (this.stick3.getRawButton(2))
-//		{
-//			this.m_state = ShooterState.TURNING;
-//			this.gyro.reset();
-//			this.angleToTurn = 25.0F;
-//		}
-//		else if (this.stick3.getRawButton(3))
-//		{
-//			this.m_state = ShooterState.TURNING;
-//			this.gyro.reset();
-//			this.angleToTurn = 15.0F;
-//		}
-//		else if (this.stick3.getRawButton(4))
-//		{
-//			this.m_state = ShooterState.TURNING;
-//			this.gyro.reset();
-//			this.angleToTurn = 5.0F;
-//		}
-		else if (this.stick3.getY() > 0.05D)
-		{
-			this.hood.set(-this.stick3.getY() * 50000.0D + this.hood.getPulseWidthPosition());
-		}
-//		else if (this.stick3.getRawButton(5))
-//		{
-//			this.m_state = ShooterState.TURNING;
-//			this.gyro.reset();
-//			this.angleToTurn = 335.0F;
-//		}
-//		else if (this.stick3.getRawButton(6))
-//		{
-//			this.m_state = ShooterState.TURNING;
-//			this.gyro.reset();
-//			this.angleToTurn = 345.0F;
-//		}
-//		else if (this.stick3.getRawButton(7))
-//		{
-//			this.m_state = ShooterState.TURNING;
-//			this.gyro.reset();
-//			this.angleToTurn = 355.0F;
-//		}
-		//    else if(stick3.getRawButton(8)){
-			//    	hoodSet(closeHood);
-			//    	Timer.delay(0.5);
-			//    }
-		//    else if(stick3.getRawButton(9)){
-		//    	hoodSet(midHood);
-		//    }
-		//    else if(stick3.getRawButton(10)){
-		//    	hoodSet(farHood);
-		//    }
-		else
-		{
-			this.hood.set(this.hood.getPulseWidthPosition());
 		}
 	}
 
-	public void update()
-	{
-		if(this.stick3.getRawButton(1)) {
-			this.elevateShoot();
-		} 
-		
-		if(!this.stick3.getRawButton(2)) {
-			shooterEnabled = false;
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
-		}
-	}
-
-<<<<<<< HEAD
 	public void update()
 	{
 		if (this.stick3.getRawButton(1)) {
@@ -291,16 +146,8 @@ public class TorShooter
 		if (!this.stick3.getRawButton(2)) {
 			this.shooterEnabled = false;
 		}
-=======
-	private void shooterReset()
-	{
-		this.m_state = ShooterState.MANUAL;
-		this.shooter1.set(0.0D);
-		this.shooter2.set(0.0D);
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 	}
 
-<<<<<<< HEAD
 	private void shooterReset()
 	{
 		this.m_state = ShooterState.MANUAL;
@@ -332,28 +179,6 @@ public class TorShooter
 		{
 			this.shooter1.set(0.8D);
 			this.shooter2.set(0.8D);
-=======
-	public void setEnbled(boolean input) {
-		shooterEnabled = input;
-	}
-	
-	public void shooting(){
-		shooter1.set(0.8);
-		shooter2.set(0.8);
-	}
-	
-	public void shooter(){
-		if(stick3.getRawButton(2) && !shootFlag){
-			shooting();
-//			double value = camera.GetValue();
-			camera.AutoShoot(10);
-			shootFlag = true;
-		} else if(!stick3.getRawButton(2)) {
-			intake.stopElevator();
-			shooter1.set(0.3);
-			shooter2.set(0.3);
-//			intake.stopElevator();
->>>>>>> branch 'master' of https://github.com/richieioki/torbots-frc-1197.git
 		}
 	}
 }
