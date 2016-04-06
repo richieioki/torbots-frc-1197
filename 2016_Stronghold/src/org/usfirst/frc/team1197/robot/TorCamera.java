@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.networktables.NetworkTable;
 import java.io.PrintStream;
 
 public class TorCamera
-implements PIDSource
 {
 	static double CENTER = 63.0D;
 	NetworkTable m_networkTable;
@@ -57,19 +56,6 @@ implements PIDSource
 		return null;
 	}
 
-	public double pidGet()
-	{
-		double[] defaultValue = new double[0];
-
-		double[] centerx = this.m_networkTable.getNumberArray("centerX", defaultValue);
-		try
-		{
-			return CENTER - centerx[0];
-		}
-		catch (Exception localException) {}
-		return 0.0D;
-	}
-
 	public double GetValue()
 	{
 		double[] defaultValue = new double[0];
@@ -101,19 +87,29 @@ implements PIDSource
 			if (value < CENTER)
 			{
 				this.deltaX = (value - CENTER);
+				if(Math.abs(deltaX) > 28){
+					deltaX = deltaX - 4;
+					angleDeltaX = (this.deltaX * 0.342D);
+					return angleDeltaX;
+				}
+				deltaX = deltaX - 1;
 				this.angleDeltaX = (this.deltaX * 0.342D);
 				return this.angleDeltaX;
 			}
 			if (value > CENTER)
 			{
 				this.deltaX = (value - CENTER);
+				if(Math.abs(deltaX) > 50){
+					deltaX = deltaX + 5;
+					angleDeltaX = (this.deltaX * 0.342D);
+					return angleDeltaX;
+				}
 				this.angleDeltaX = (this.deltaX * 0.342D);
 				return this.angleDeltaX;
 			}
-			return 2.147483647E9D;
 		}
 		System.out.println("ARRAY IS EMPTY!");
-		return 2.147483647E9D;
+		return Integer.MAX_VALUE;
 	}
 
 	public double angleMapper()
@@ -128,7 +124,7 @@ implements PIDSource
 	public void AutoShoot(double deltaX)
 	{
 		double TargetAngle = deltaX;
-		if (deltaX != 2.147483647E9D)
+		if (deltaX != Integer.MAX_VALUE)
 		{
 			System.out.println("CURRENT ANGLE " + this.ahrs.getAngle());
 
@@ -152,7 +148,7 @@ implements PIDSource
 	public void AutonomousShoot(double deltaX)
 	{
 		double TargetAngle = deltaX;
-		if (deltaX != 2.147483647E9D)
+		if (deltaX != Integer.MAX_VALUE)
 		{
 			System.out.println("CURRENT ANGLE " + this.ahrs.getAngle());
 			boolean breakout = false;
@@ -175,11 +171,34 @@ implements PIDSource
 		}
 	}
 
-	public double widthCalc()
+	public double getCenterX()
 	{
 		double[] defaultValue = new double[0];
+		double[] centerx = this.m_networkTable.getNumberArray("centerX", defaultValue);
 		double[] width = this.m_networkTable.getNumberArray("width", defaultValue);
-		double idealwidth = 23.0D;
-		return width[0] / idealwidth;
+		int keeper = 0;
+		double widthTemp = 0.0D;
+		
+		if (centerx.length > 0) {
+			for (int i = 0; i < width.length; i++) {
+				if (widthTemp == 0.0D)
+				{
+					keeper = i;
+					widthTemp = width[i];
+				}
+				else if (widthTemp < width[i])
+				{
+					widthTemp = width[i];
+					keeper = i;
+				}
+			}
+		}
+		
+		return centerx[keeper];
+		
+	}
+	
+	public double centerX(){
+		return getCenterX();
 	}
 }

@@ -172,13 +172,14 @@ public class TorShooter
 			this.cans.m_state = TorCAN.DRIVE_STATE.PIVOTING;
 			this.gyro.reset();
 			this.camera.AutoShoot(value);
+			Timer.delay(0.2);
 			this.cans.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 			this.cans.lowGear();
 		}
 		else
 		{
-			this.shooter1.set(0.8D);
-			this.shooter2.set(0.8D);
+			this.shooter1.set(10.0);
+			this.shooter2.set(10.0);
 		}
 	}
 }

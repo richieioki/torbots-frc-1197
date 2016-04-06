@@ -111,49 +111,49 @@ implements PIDOutput
 	{
 		this.m_Rtalon1.setVoltageRampRate(this.highgear);
 		this.m_Rtalon2.setVoltageRampRate(this.highgear);
-		this.m_Rtalon3.setVoltageRampRate(this.highgear);
+//		this.m_Rtalon3.setVoltageRampRate(this.highgear);
 		this.m_Ltalon1.setVoltageRampRate(this.highgear);
 		this.m_Ltalon2.setVoltageRampRate(this.highgear);
-		this.m_Ltalon3.setVoltageRampRate(this.highgear);
+//		this.m_Ltalon3.setVoltageRampRate(this.highgear);
 	}
 
 	public void lowGear()
 	{
 		this.m_Rtalon1.setVoltageRampRate(this.lowgear);
 		this.m_Rtalon2.setVoltageRampRate(this.lowgear);
-		this.m_Rtalon3.setVoltageRampRate(this.lowgear);
+//		this.m_Rtalon3.setVoltageRampRate(this.lowgear);
 		this.m_Ltalon1.setVoltageRampRate(this.lowgear);
 		this.m_Ltalon2.setVoltageRampRate(this.lowgear);
-		this.m_Ltalon3.setVoltageRampRate(this.lowgear);
+//		this.m_Ltalon3.setVoltageRampRate(this.lowgear);
 	}
 
 	public void offGear()
 	{
 		this.m_Rtalon1.setVoltageRampRate(1200.0D);
 		this.m_Rtalon2.setVoltageRampRate(1200.0D);
-		this.m_Rtalon3.setVoltageRampRate(1200.0D);
+//		this.m_Rtalon3.setVoltageRampRate(1200.0D);
 		this.m_Ltalon1.setVoltageRampRate(1200.0D);
 		this.m_Ltalon2.setVoltageRampRate(1200.0D);
-		this.m_Ltalon3.setVoltageRampRate(1200.0D);
+//		this.m_Ltalon3.setVoltageRampRate(1200.0D);
 	}
 
 	public void pivot()
 	{
 		this.m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
 		this.m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		this.m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
+//		this.m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
 		this.m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
 		this.m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		this.m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
+//		this.m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
 	}
 
 	public void unpivot()
 	{
 		this.m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 		this.m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		this.m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		this.m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 		this.m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 		this.m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		this.m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		this.m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 	}
 }

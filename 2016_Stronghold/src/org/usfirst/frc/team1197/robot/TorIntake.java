@@ -9,6 +9,7 @@ public class TorIntake
 {
 	private CANTalon armTalon;
 	private CANTalon elevatorTalon;
+	private CANTalon verticalTalon;
 	private Joystick stick;
 	private DigitalInput bottomBreakBeam;
 	private DigitalInput shooterBreakBeam;
@@ -25,12 +26,13 @@ public class TorIntake
 		private IntakeState() {}
 	}
 
-	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, 
+	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, CANTalon cantalon3, 
 			DigitalInput breakBeam, DigitalInput breakBeam2, TorSiege siege, 
 			TorShooter shoot, Joystick stick3)
 	{
 		this.armTalon = cantalon;
 		this.elevatorTalon = cantalon2;
+		verticalTalon = cantalon3;
 		this.bottomBreakBeam = breakBeam;
 		this.shooterBreakBeam = breakBeam2;
 		this.siege = siege;
@@ -45,20 +47,22 @@ public class TorIntake
 		if (this.stick.getRawButton(4))
 		{
 			this.m_state = IntakeState.IDLE;
-			this.elevatorTalon.set(0.95D);
-			this.armTalon.set(0.95D);
+			this.elevatorTalon.set(1);
+			verticalTalon.set(0.95);
+			this.armTalon.set(0.75D);
 		}
 		else if (this.stick.getRawButton(5))
 		{
 			this.m_state = IntakeState.IDLE;
-			this.armTalon.set(-0.95D);
-			this.elevatorTalon.set(-0.95D);
+			this.armTalon.set(-0.75);
+			verticalTalon.set(-0.95);
+			this.elevatorTalon.set(-1);
 		}
 		else if (this.stick.getRawButton(6))
 		{
 			this.m_state = IntakeState.IDLE;
-
-			this.elevatorTalon.set(-0.95D);
+			armTalon.set(0.0);
+			this.elevatorTalon.set(-1);
 		}
 		else if ((this.stick.getRawButton(3)) && (this.m_state == IntakeState.IDLE))
 		{
@@ -66,15 +70,16 @@ public class TorIntake
 			{
 				this.m_state = IntakeState.BOTH;
 
-				this.elevatorTalon.set(-0.95D);
-				this.armTalon.set(-0.95D);
+				this.elevatorTalon.set(-1);
+				verticalTalon.set(-0.95);
+				this.armTalon.set(-0.75);
 			}
 		}
 		else if (this.m_state == IntakeState.BOTH)
 		{
 			if (this.bottomBreakBeam.get() == true)
 			{
-				this.armTalon.set(0.0D);
+				armTalon.set(0.0);
 				this.m_state = IntakeState.ELEVATOR;
 			}
 		}
@@ -83,13 +88,14 @@ public class TorIntake
 			if (this.shooterBreakBeam.get() == true)
 			{
 				this.elevatorTalon.set(0.0D);
-
+				verticalTalon.set(0.0);
 				this.m_state = IntakeState.IDLE;
 			}
 		}
 		else if (this.m_state == IntakeState.PORT)
 		{
-			this.armTalon.set(0.95D);
+			this.armTalon.set(0.75D);
+			verticalTalon.set(0.95);
 			this.elevatorTalon.set(0.0D);
 		}
 		else if ((!this.stick3.getRawButton(2)) && (this.m_state == IntakeState.SHOOTING) && (!this.shooterBreakBeam.get()))
@@ -99,6 +105,7 @@ public class TorIntake
 		else if (this.m_state == IntakeState.IDLE)
 		{
 			this.elevatorTalon.set(0.0D);
+			verticalTalon.set(0.0);
 			this.armTalon.set(0.0D);
 		}
 	}
@@ -157,7 +164,7 @@ public class TorIntake
 	public void fire()
 	{
 		this.m_state = IntakeState.SHOOTING;
-		this.elevatorTalon.set(-0.95D);
+		this.elevatorTalon.set(-1);
 	}
 
 	public boolean shooterBreakBeam()

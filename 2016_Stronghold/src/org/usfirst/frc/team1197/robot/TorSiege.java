@@ -28,6 +28,8 @@ public class TorSiege
 	private DRAWBRIDGE m_states;
 	private HALT m_halt;
 	public TorTeleop tele;
+	private double[] errorHistory = {50, 40, 30, 20, 10};
+	private TorCamera camera;
 
 	public static enum HALT
 	{
@@ -112,7 +114,7 @@ public class TorSiege
 
 	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, 
 			TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee, TorDrive drive, 
-			Encoder encoder, AHRS gyro, Joystick stick3)
+			Encoder encoder, AHRS gyro, Joystick stick3, TorCamera camera)
 	{
 		this.siegeTalon = T1;
 		this.siegeStick = stick2;
@@ -125,6 +127,7 @@ public class TorSiege
 		this.encoder = encoder;
 		this.gyro = gyro;
 		this.stick3 = stick3;
+		this.camera = camera;
 
 		calc();
 
@@ -636,11 +639,11 @@ public class TorSiege
 	{
 		this.targetAngle = ((desiredAngle + 360.0D) % 360.0D);
 
-		System.out.println("TargetAngle: " + this.targetAngle);
-		System.out.println("Current Angle: " + this.gyro.getAngle());
+//		System.out.println("TargetAngle: " + this.targetAngle);
+//		System.out.println("Current Angle: " + this.gyro.getAngle());
 
 		this.error = (this.gyro.getAngle() - this.targetAngle);
-		System.out.println("Error " + this.error);
+//		System.out.println("Error " + this.error);
 		if (Math.abs(this.error) > 180.0D) {
 			if (this.error > 0.0D) {
 				this.error -= 360.0D;
@@ -648,19 +651,48 @@ public class TorSiege
 				this.error += 360.0D;
 			}
 		}
+		
+		for(int i=4; i>0; i--){
+			errorHistory[i] = errorHistory[i - 1];
+		}
+		errorHistory[0] = error;
+		
+//		System.out.println("Error " + this.error);
+		
 		if (this.error > 0.0D) {
 			this.turnSpeed = Math.min(6.0D, this.error * this.turnP * 12.0D);
 		} else {
-			this.turnSpeed = Math.max(this.error * this.turnP * 12.0D, -6.0D);
+			this.turnSpeed = Math.max(this.error * this.turnP * 12.0D, -6.0D); //originally -4.0 and 4.0
 		}
-		if (Math.abs(this.turnSpeed) < 1.6D) {
-			this.turnSpeed = (1.6D * (this.turnSpeed / Math.abs(this.turnSpeed)));
+		
+		if (Math.abs(this.turnSpeed) < 2.2) { //originally 2.1 for both
+			this.turnSpeed = (2.2 * (this.turnSpeed / Math.abs(this.turnSpeed)));
 		}
 		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
-		if (Math.abs(this.error) > 0.1D) {
+		
+		System.out.println("Error " + this.error);
+		if (Math.abs(this.error) < 0.75D || stdev(errorHistory) < (0.75/10)){
+			torcan.SetDrive(0.0,0.0);
+		}
+		if (Math.abs(this.error) > 0.75D || stdev(errorHistory) > (0.75/10)) {
 			return false;
 		}
 		return true;
+	}
+	public double stdev(double[] data){
+		double mean = 0;
+		for(int i=0; i<data.length; i++){
+			mean += data[i];
+		}
+		mean = mean / data.length;
+	    
+		double variance = 0;
+	    for(int i=0; i<data.length; i++){
+			variance += (data[i] - mean)*(data[i] - mean);
+		}
+	    variance = variance / data.length;
+		
+	    return Math.sqrt(variance);
 	}
 
 	public void SiegeArmDown()

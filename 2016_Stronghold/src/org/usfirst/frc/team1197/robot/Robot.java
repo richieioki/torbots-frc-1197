@@ -42,6 +42,7 @@ extends SampleRobot
 	private CANTalon T1;
 	private CANTalon P1;
 	private CANTalon P2;
+	private CANTalon P3;
 	private CANTalon E1;
 	private CANTalon shooter1;
 	private CANTalon shooter2;
@@ -91,11 +92,9 @@ extends SampleRobot
 
 		R1 = new CANTalon(1);
 		R2 = new CANTalon(2);
-		R3 = new CANTalon(3);
 
-		this.L1 = new CANTalon(4);
-		this.L2 = new CANTalon(5);
-		this.L3 = new CANTalon(6);
+		this.L1 = new CANTalon(5);
+		this.L2 = new CANTalon(6);
 
 		this.T1 = new CANTalon(7);
 
@@ -115,11 +114,14 @@ extends SampleRobot
 
 		this.P1 = new CANTalon(8);
 		this.P2 = new CANTalon(9);
+		P3 = new CANTalon(4);
 
 		this.S1 = new Solenoid(0);
 
 		this.shooter1 = new CANTalon(11);
 		this.shooter2 = new CANTalon(12);
+		shooter1.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		shooter2.changeControlMode(CANTalon.TalonControlMode.Voltage);
 
 		this.hood = new CANTalon(10);
 		this.hood.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Absolute);
@@ -132,13 +134,13 @@ extends SampleRobot
 		this.pot = new AnalogPotentiometer(0);
 		this.encoder = new Encoder(0, 1);
 		this.encoder.setDistancePerPulse(0.017857142857142856D);
-		this.driveCANS = new TorCAN(this.R1, this.R2, this.R3, this.L1, this.L2, this.L3);
+		this.driveCANS = new TorCAN(this.R1, this.R2, this.L1, this.L2);
 
-		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, this.breakBeam, this.breakBeam2, this.siege, this.shoot, this.stick3);
+		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, P3, this.breakBeam, this.breakBeam2, this.siege, this.shoot, this.stick3);
 
 		this.drive = new TorDrive(this.stick, this.stick2, this.driveCANS, this.encoder, this.S1);
 
-		this.siege = new TorSiege(this.T1, this.stick2, this.pot, this.driveCANS, this.S1, this.stick, this.intakee, this.drive, this.encoder, this.gyro, this.stick3);
+		this.siege = new TorSiege(this.T1, this.stick2, this.pot, this.driveCANS, this.S1, this.stick, this.intakee, this.drive, this.encoder, this.gyro, this.stick3, camera);
 
 		this.camera = new TorCamera(this.table, this.gyro, this.driveCANS, this.siege, this.stick3, this.lidar, this.intakee);
 
@@ -193,9 +195,7 @@ extends SampleRobot
 		this.compressor.start();
 		while (isEnabled())
 		{
-			System.out.println("Lidar " + this.lidar.getDistance());
-
-			Timer.delay(0.5D);
+			
 		}
 	}
 }

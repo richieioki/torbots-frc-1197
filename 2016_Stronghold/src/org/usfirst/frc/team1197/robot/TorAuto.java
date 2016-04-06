@@ -243,7 +243,8 @@ public class TorAuto
 			this.siege.SiegeArmUpdate();
 		}
 	}
-
+	
+	//testShoot 1, 2, 3, 4 is just a test function for autoshooting in the shop.
 	public void testShoot3()
 	{
 		AutoDriving();
@@ -270,7 +271,7 @@ public class TorAuto
 		turnLane1();
 		ShootAuto();
 	}
-
+	//ShootAuto is a function that will shoot automatically.
 	public void ShootAuto()
 	{
 		System.out.println("AUTO SHOOTING");
@@ -279,7 +280,7 @@ public class TorAuto
 		this.gyro.reset();
 		this.camera.AutonomousShoot(value);
 	}
-
+	//AutoDriving was just for testing auto in the shop.
 	public void AutoDriving()
 	{
 		this.siege.setDegrees(-50.0D);
@@ -288,7 +289,11 @@ public class TorAuto
 		}
 		this.m_cans.SetDrive(0.0D, 0.0D);
 	}
-
+	
+	//turnLane1, 3, 4 is a pre-turn function for the autonomous.
+	//lane 2 does not require pre-turn.
+	//we might need to adjust the pre-turn.
+	
 	public void turnLane1()
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
@@ -374,114 +379,135 @@ public class TorAuto
 
 		//position 1
 		if(laneAndDefense[0] == 1 && laneAndDefense[1] == 1){
-			RockWall();
+		
 		}		
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 2){
 			ChevelDeFrise();
+			turnLane1();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 3){
-			Ramparts();
+			
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 4){
-			Moat();
+			
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 5){
-			RoughTerrain();
+			
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 6){
 			DrawBridge();
+			turnLane1();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 7){
 			Sallyport();
+			turnLane1();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 8){
 			Portcullis();
+			turnLane1();
+			ShootAuto();
 		}
 
 		//position 2
+		//lane 2 does not require turning
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 1){
-			System.out.println("Pos 2 Rock Wall");
-			RockWall();
+			
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 2){
-			System.out.println("Pos 2 Chevel De Frise");
 			ChevelDeFrise();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 3){
-			System.out.println("Pos 2 Ramparts");
-			Ramparts();
+			
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 4){
-			System.out.println("Pos 2 Moat");
-			Moat();
+			
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 5){
-			System.out.println("Pos 2 Rough Terrain");
-			RoughTerrain();
+			
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 6){
-			System.out.println("Pos 2 drawbridge");
-			DrawBridge(); //adjust potentiometer
+			DrawBridge();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 7){
-			System.out.println("Pos 2 sallyport");
 			Sallyport();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 8){
-			System.out.println("Pos 2 portcullis");
 			Portcullis();
+			ShootAuto();
 		}
 
 		//position 3
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 1){
-			RockWall();
+			
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 2){
 			ChevelDeFrise();
+			turnLane3();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 3){
-			Ramparts();
+			
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 4){
-			Moat();
+			
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 5){
-			RoughTerrain();
+			
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 6){
 			DrawBridge();
+			turnLane3();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 7){
 			Sallyport();
+			turnLane3();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 8){
 			Portcullis();
+			turnLane3();
+			ShootAuto();
 		}
 
 		//position 4
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 1){
-			RockWall();
+			
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 2){
 			ChevelDeFrise();
+			turnLane4();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 3){
-			Ramparts();
+			
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 4){
-			Moat();
+			
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 5){
-			RoughTerrain();
+			
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 6){
 			DrawBridge();
+			turnLane4();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 7){
 			Sallyport();
+			turnLane4();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 8){
 			Portcullis();
+			turnLane4();
+			ShootAuto();
 		}
 
 		else {
