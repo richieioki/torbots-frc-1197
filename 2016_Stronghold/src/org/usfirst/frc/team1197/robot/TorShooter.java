@@ -164,7 +164,7 @@ public class TorShooter
 
 	public void shooter()
 	{
-		if ((this.stick3.getRawButton(2)) && (this.intake.shooterBreakBeam()) && (this.intake.shooterMotor()))
+		if ((this.stick3.getRawButton(2) || stick2.getRawButton(7)) && (this.intake.shooterBreakBeam()))
 		{
 			shooting();
 			double value = this.camera.GetValue();

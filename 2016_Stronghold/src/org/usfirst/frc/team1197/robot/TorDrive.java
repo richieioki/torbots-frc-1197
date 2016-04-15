@@ -74,7 +74,7 @@ public class TorDrive
 				this.m_jagDrive.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 				this.m_jagDrive.lowGear();
 			}
-			stickX *= 0.75D;
+			stickX *= 0.9D;
 		}
 		if (stickX > 1.0D) {
 			stickX = 1.0D;

@@ -43,6 +43,7 @@ extends SampleRobot
 	private CANTalon P1;
 	private CANTalon P2;
 	private CANTalon P3;
+	private CANTalon P4;
 	private CANTalon E1;
 	private CANTalon shooter1;
 	private CANTalon shooter2;
@@ -82,7 +83,7 @@ extends SampleRobot
 
 	public Robot()
 	{
-		this.lidar = new TorLidar(new SerialPort(38400, SerialPort.Port.kOnboard));
+		//this.lidar = new TorLidar(new SerialPort(38400, SerialPort.Port.kOnboard));
 
 		gyro = new AHRS(SPI.Port.kMXP);
 		stick = new Joystick(0);
@@ -98,8 +99,7 @@ extends SampleRobot
 
 		this.T1 = new CANTalon(7);
 
-		this.T1.changeControlMode(CANTalon.TalonControlMode.Position);
-		this.T1.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
+		
 
 		double p = 40.0D;
 		double i = 0.005D;
@@ -109,24 +109,29 @@ extends SampleRobot
 		int profile = 0;
 		RampRate = 0.0D;
 		profile = 0;
+		
+		this.T1.changeControlMode(CANTalon.TalonControlMode.Position);
+		this.T1.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
+//		this.T1.reverseOutput(true);
+		
 		this.T1.setPID(20.0D, 0.0D, 0.0D, 0.0D, 0, RampRate, 1);
 		this.T1.setPID(16.0D, 0.0D, 0.0D, 0.0D, 0, RampRate, 0);
-
+		//profile 1 = 20 profile 0 = 16
 		this.P1 = new CANTalon(8);
 		this.P2 = new CANTalon(9);
+	
 		P3 = new CANTalon(4);
-
+		P4 = new CANTalon(3);
 		this.S1 = new Solenoid(0);
 
 		this.shooter1 = new CANTalon(11);
 		this.shooter2 = new CANTalon(12);
-		shooter1.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		shooter2.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		
 
 		this.hood = new CANTalon(10);
-		this.hood.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Absolute);
+//		this.hood.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Absolute);
 
-		this.hoodPosition = this.hood.getPulseWidthPosition();
+//		this.hoodPosition = this.hood.getPulseWidthPosition();
 
 		this.breakBeam = new DigitalInput(4);
 		this.breakBeam2 = new DigitalInput(5);
@@ -136,13 +141,13 @@ extends SampleRobot
 		this.encoder.setDistancePerPulse(0.017857142857142856D);
 		this.driveCANS = new TorCAN(this.R1, this.R2, this.L1, this.L2);
 
-		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, P3, this.breakBeam, this.breakBeam2, this.siege, this.shoot, this.stick3);
+		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, P3, P4, this.breakBeam, this.breakBeam2, this.siege, this.shoot, this.stick3);
 
 		this.drive = new TorDrive(this.stick, this.stick2, this.driveCANS, this.encoder, this.S1);
 
 		this.siege = new TorSiege(this.T1, this.stick2, this.pot, this.driveCANS, this.S1, this.stick, this.intakee, this.drive, this.encoder, this.gyro, this.stick3, camera);
 
-		this.camera = new TorCamera(this.table, this.gyro, this.driveCANS, this.siege, this.stick3, this.lidar, this.intakee);
+		this.camera = new TorCamera(this.table, this.gyro, this.driveCANS, this.siege, this.stick3, this.intakee, stick2);
 
 		this.shoot = new TorShooter(this.intakee, this.shooter1, this.shooter2, this.hood, this.P2, this.P1, this.stick3, this.stick2, this.gyro, this.driveCANS, this.camera);
 
@@ -156,13 +161,21 @@ extends SampleRobot
 
 	public void autonomous()
 	{
+		shooter1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		shooter2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		this.shooter1.set(1);
+		this.shooter2.set(1);
 		this.encoder.reset();
 		this.siege.PID();
 		this.auto.ModeChooser();
+		shooter1.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		shooter2.changeControlMode(CANTalon.TalonControlMode.Voltage);
 	}
 
 	public void operatorControl()
 	{
+		shooter1.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		shooter2.changeControlMode(CANTalon.TalonControlMode.Voltage);
 		boolean shootEnabled = false;
 		this.encoder.reset();
 		this.gyro.reset();
@@ -195,7 +208,8 @@ extends SampleRobot
 		this.compressor.start();
 		while (isEnabled())
 		{
-			
+			System.out.println("Encode " + encoder.getDistance());
+			drive.ArcadeDrive(true);
 		}
 	}
 }

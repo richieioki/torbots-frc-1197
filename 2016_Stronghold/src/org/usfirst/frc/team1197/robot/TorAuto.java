@@ -219,6 +219,10 @@ public class TorAuto
 		this.siege.DrawBridge();
 		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
 			this.siege.SiegeArmUpdate();
+			if(siege.m_states == TorSiege.DRAWBRIDGE.IDLE) {
+				System.out.println("Breaking");
+				break;
+			}
 		}
 	}
 
@@ -230,6 +234,10 @@ public class TorAuto
 		this.siege.Cheve();
 		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
 			this.siege.SiegeArmUpdate();
+			if(siege.m_chev == TorSiege.CHEVEL.IDLE) {
+				System.out.println("Breaking");
+				break;
+			}
 		}
 	}
 
@@ -241,6 +249,10 @@ public class TorAuto
 		this.siege.SallyPort();
 		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
 			this.siege.SiegeArmUpdate();
+			if(siege.m_sally == TorSiege.SALLYPORT.IDLE) {
+				System.out.println("Breaking");
+				break;
+			}
 		}
 	}
 	
@@ -274,7 +286,13 @@ public class TorAuto
 	//ShootAuto is a function that will shoot automatically.
 	public void ShootAuto()
 	{
+		double breakTime = System.currentTimeMillis()+1000;
 		System.out.println("AUTO SHOOTING");
+		siege.setDegrees(siege.intakeVal);
+		while(siege.siegeOnTarget(2)){
+			if(System.currentTimeMillis()<breakTime)
+				break;
+	}
 		Timer.delay(1.0D);
 		double value = this.camera.GetValue();
 		this.gyro.reset();
@@ -357,6 +375,10 @@ public class TorAuto
 		this.siege.Portcullis();
 		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
 			this.siege.SiegeArmUpdate();
+			if(siege.m_port == TorSiege.PORTCULLIS.IDLE) {
+				System.out.println("Beaking");
+				break;
+			}
 		}
 	}
 

@@ -25,7 +25,7 @@ public class TorSiege
 	private AHRS gyro;
 	public boolean enabled;
 	public static final double SONAR = 10.0D;
-	private DRAWBRIDGE m_states;
+	public DRAWBRIDGE m_states;
 	private HALT m_halt;
 	public TorTeleop tele;
 	private double[] errorHistory = {50, 40, 30, 20, 10};
@@ -186,8 +186,8 @@ public class TorSiege
 		this.drawbridgeArmUp = 12.0D;
 		this.drawbridgeDist = 110.0D;
 
-		this.bottomArm = 543;
-		int rest = 315;
+		this.bottomArm = 388;//543
+		int rest = 736;//315
 
 		this.setDegreesSlope = ((this.bottomArm - rest) / (this.degreesBot - this.degreesTop));
 		this.setDegreesInter = (rest - this.setDegreesSlope * this.degreesTop);
@@ -265,13 +265,13 @@ public class TorSiege
 			else if (-this.siegeStick.getY() < -0.025D)
 			{
 				this.siegeTalon.setProfile(1);
-				this.siegeTalon.set(-this.siegeStick.getY() * 30.0D + this.siegeTalon
+				this.siegeTalon.set(this.siegeStick.getY() * 30.0D + this.siegeTalon
 						.getAnalogInRaw());
 			}
 			else if (-this.siegeStick.getY() > 0.025D)
 			{
 				this.siegeTalon.setProfile(1);
-				this.siegeTalon.set(-this.siegeStick.getY() * 30.0D + this.siegeTalon
+				this.siegeTalon.set(this.siegeStick.getY() * 30.0D + this.siegeTalon
 						.getAnalogInRaw());
 			}
 			else
@@ -406,9 +406,12 @@ public class TorSiege
 				}
 				if (this.encoder.getDistance() > 70.0D)
 				{
+//					setDegrees(sallyPort);
+//					if(siegeOnTarget(10)){
 					this.torcan.SetDrive(0.0D, 0.0D);
 					this.enabled = false;
 					this.m_port = PORTCULLIS.IDLE;
+//					}
 				}
 				break;
 			}
@@ -445,7 +448,7 @@ public class TorSiege
 			case POS3: 
 				this.torcan.SetDrive(0.5D, -0.5D);
 				if (this.encoder.getDistance() > this.chevelArmUp) {
-					setDegrees(45.0D);
+					setDegrees(sallyPort);
 				}
 				if (this.encoder.getDistance() > this.chevelDist)
 				{
@@ -518,8 +521,8 @@ public class TorSiege
 				break;
 			case POS6: 
 				this.enabled = true;
-				turnToTheta(353.0D);
-				if (this.gyro.getAngle() > 355.0D)
+				turnToTheta(356.0D);
+				if (this.gyro.getAngle() > 357.5D || (gyro.getAngle() > 0 && gyro.getAngle() < 30))
 				{
 					this.torcan.SetDrive(0.0D, 0.0D);
 					this.m_sally = SALLYPORT.POS7;
@@ -611,18 +614,13 @@ public class TorSiege
 
 		this.error = (this.gyro.getAngle() - this.targetAngle);
 		if (Math.abs(this.error) > 180.0D) {
-			if (this.error > 0.0D)
-			{
-				this.error -= 180.0D;
-				this.error *= -1.0D;
-			}
-			else
-			{
-				this.error += 180.0D;
-				this.error *= -1.0D;
+			if (this.error > 0.0D) {
+				this.error -= 360.0D;
+			} else {
+				this.error += 360.0D;
 			}
 		}
-		System.out.println("Error " + this.error);
+//		System.out.println("Error " + this.error);
 		if (this.error > 0.0D) {
 			this.turnSpeed = Math.min(0.6D, this.error * this.turnP);
 		} else {
@@ -668,15 +666,19 @@ public class TorSiege
 		if (Math.abs(this.turnSpeed) < 2.2) { //originally 2.1 for both
 			this.turnSpeed = (2.2 * (this.turnSpeed / Math.abs(this.turnSpeed)));
 		}
-		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
+		
 		
 		System.out.println("Error " + this.error);
-		if (Math.abs(this.error) < 0.75D || stdev(errorHistory) < (0.75/10)){
-			torcan.SetDrive(0.0,0.0);
+		if (Math.abs(this.error) < 0.75D ){
+			turnSpeed = 0.0D;
 		}
+		
+		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
+		
 		if (Math.abs(this.error) > 0.75D || stdev(errorHistory) > (0.75/10)) {
 			return false;
 		}
+		
 		return true;
 	}
 	public double stdev(double[] data){

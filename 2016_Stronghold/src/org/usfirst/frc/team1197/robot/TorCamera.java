@@ -26,6 +26,7 @@ public class TorCamera
 	private TorIntake intake;
 	private TorSiege siege;
 	int counter;
+	Joystick stick2;
 
 	public static enum CAMERA
 	{
@@ -36,9 +37,9 @@ public class TorCamera
 
 	public CAMERA m_camera = CAMERA.IDLE;
 
-	public TorCamera(NetworkTable tb, AHRS ahrs, TorCAN torcan, TorSiege siege, Joystick stick3, TorLidar lidar, TorIntake intake)
+	public TorCamera(NetworkTable tb, AHRS ahrs, TorCAN torcan, TorSiege siege, Joystick stick3, TorIntake intake, Joystick stick2)
 	{
-		this.lidar = lidar;
+		this.stick2 = stick2;
 		this.siege = siege;
 		this.torcan = torcan;
 		this.ahrs = ahrs;
@@ -139,7 +140,7 @@ public class TorCamera
 			this.torcan.SetDrive(0.0D, 0.0D);
 
 			this.counter += 1;
-			while (this.stick3.getRawButton(2)) {
+			while (this.stick3.getRawButton(2) || stick2.getRawButton(7)) {
 				this.intake.fire();
 			}
 		}

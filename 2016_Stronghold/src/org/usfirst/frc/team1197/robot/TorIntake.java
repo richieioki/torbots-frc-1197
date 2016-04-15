@@ -9,7 +9,7 @@ public class TorIntake
 {
 	private CANTalon armTalon;
 	private CANTalon elevatorTalon;
-	private CANTalon verticalTalon;
+	private CANTalon verticalTalon, verticalTalon1;
 	private Joystick stick;
 	private DigitalInput bottomBreakBeam;
 	private DigitalInput shooterBreakBeam;
@@ -27,7 +27,7 @@ public class TorIntake
 	}
 
 	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, CANTalon cantalon3, 
-			DigitalInput breakBeam, DigitalInput breakBeam2, TorSiege siege, 
+			CANTalon cantalon4, DigitalInput breakBeam, DigitalInput breakBeam2, TorSiege siege, 
 			TorShooter shoot, Joystick stick3)
 	{
 		this.armTalon = cantalon;
@@ -40,31 +40,34 @@ public class TorIntake
 		this.m_state = IntakeState.IDLE;
 		this.m_shoot = shoot;
 		this.stick3 = stick3;
+		verticalTalon1 = cantalon4;
 	}
 
 	public void intake()
 	{
-		if (this.stick.getRawButton(4))
+		if (this.stick.getRawButton(5)||this.stick.getRawButton(3))
 		{
 			this.m_state = IntakeState.IDLE;
 			this.elevatorTalon.set(1);
 			verticalTalon.set(0.95);
-			this.armTalon.set(0.75D);
+			verticalTalon1.set(0.95);
+			this.armTalon.set(1);
 		}
-		else if (this.stick.getRawButton(5))
+		else if (this.stick.getRawButton(6)||this.stick.getRawButton(4))
 		{
 			this.m_state = IntakeState.IDLE;
-			this.armTalon.set(-0.75);
+			this.armTalon.set(-1);
 			verticalTalon.set(-0.95);
+			verticalTalon1.set(-0.95);
 			this.elevatorTalon.set(-1);
 		}
-		else if (this.stick.getRawButton(6))
-		{
-			this.m_state = IntakeState.IDLE;
-			armTalon.set(0.0);
-			this.elevatorTalon.set(-1);
-		}
-		else if ((this.stick.getRawButton(3)) && (this.m_state == IntakeState.IDLE))
+//		else if (this.stick.getRawButton(7))
+//		{
+//			this.m_state = IntakeState.IDLE;
+//			armTalon.set(0.0);
+//			this.elevatorTalon.set(-1);
+//		}
+		else if ((this.stick.getRawButton(2)) && (this.m_state == IntakeState.IDLE))
 		{
 			if (this.shooterBreakBeam.get() != true)
 			{
@@ -72,7 +75,8 @@ public class TorIntake
 
 				this.elevatorTalon.set(-1);
 				verticalTalon.set(-0.95);
-				this.armTalon.set(-0.75);
+				verticalTalon1.set(-0.95);
+				this.armTalon.set(-1);
 			}
 		}
 		else if (this.m_state == IntakeState.BOTH)
@@ -88,7 +92,8 @@ public class TorIntake
 			if (this.shooterBreakBeam.get() == true)
 			{
 				this.elevatorTalon.set(0.0D);
-				verticalTalon.set(0.0);
+				verticalTalon.set(0);
+				verticalTalon1.set(0);
 				this.m_state = IntakeState.IDLE;
 			}
 		}
@@ -105,7 +110,8 @@ public class TorIntake
 		else if (this.m_state == IntakeState.IDLE)
 		{
 			this.elevatorTalon.set(0.0D);
-			verticalTalon.set(0.0);
+			verticalTalon.set(0);
+			verticalTalon1.set(0);
 			this.armTalon.set(0.0D);
 		}
 	}
