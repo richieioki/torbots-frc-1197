@@ -161,12 +161,17 @@ extends SampleRobot
 
 	public void autonomous()
 	{
+		float rampRate = 4.0f;
 		shooter1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 		shooter2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		this.shooter1.set(1);
-		this.shooter2.set(1);
+		shooter1.setVoltageRampRate(rampRate);
+		shooter2.setVoltageRampRate(rampRate);
+		this.shooter1.set(0.7);
+		this.shooter2.set(0.7);
 		this.encoder.reset();
 		this.siege.PID();
+		this.driveCANS.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+		drive.lowGear();
 		this.auto.ModeChooser();
 		shooter1.changeControlMode(CANTalon.TalonControlMode.Voltage);
 		shooter2.changeControlMode(CANTalon.TalonControlMode.Voltage);
@@ -174,17 +179,20 @@ extends SampleRobot
 
 	public void operatorControl()
 	{
+		float rampRate = 3.0f;
+		
 		shooter1.changeControlMode(CANTalon.TalonControlMode.Voltage);
 		shooter2.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		shooter1.setVoltageRampRate(rampRate);
+		shooter2.setVoltageRampRate(rampRate);
 		boolean shootEnabled = false;
 		this.encoder.reset();
 		this.gyro.reset();
 		this.siege.PID();
+		this.shoot.shooter();
 
-		float rampRate = 15.0F;
-
-		this.driveCANS.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-		this.drive.lowGear();
+		this.driveCANS.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+//		this.drive.highGear();
 		while (isEnabled())
 		{
 			this.siege.SiegeArmUpdate();
@@ -193,7 +201,6 @@ extends SampleRobot
 			if (!this.siege.enabled) {
 				this.drive.ArcadeDrive(true);
 			}
-			this.shoot.shooter();
 		}
 	}
 
@@ -206,10 +213,11 @@ extends SampleRobot
 	{
 		this.compressor = new Compressor();
 		this.compressor.start();
+		
 		while (isEnabled())
 		{
-			System.out.println("Encode " + encoder.getDistance());
 			drive.ArcadeDrive(true);
+			
 		}
 	}
 }

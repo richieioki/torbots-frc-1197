@@ -111,6 +111,7 @@ public class TorSiege
 	double error;
 	double targetAngle;
 	double sallyStartAngle;
+	double degreeCommand;
 
 	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, 
 			TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee, TorDrive drive, 
@@ -176,7 +177,7 @@ public class TorSiege
 		this.turnP = 0.04D;
 		this.degreesTop = 50.6D;
 		this.degreesBot = -70.3D;
-		this.drawbridgeBack = -32.0D;
+		this.drawbridgeBack = -37D;
 		this.sallyPortInitBack = -6.0D;
 		this.sallyPortBack = -50.0D;
 		this.chevelBack = -8.0D;
@@ -186,8 +187,8 @@ public class TorSiege
 		this.drawbridgeArmUp = 12.0D;
 		this.drawbridgeDist = 110.0D;
 
-		this.bottomArm = 388;//543
-		int rest = 736;//315
+		this.bottomArm = 543;//543 practice //388 competition
+		int rest = 315;//315 practice //736 competition
 
 		this.setDegreesSlope = ((this.bottomArm - rest) / (this.degreesBot - this.degreesTop));
 		this.setDegreesInter = (rest - this.setDegreesSlope * this.degreesTop);
@@ -195,7 +196,7 @@ public class TorSiege
 		this.readDegreesInter = (-this.setDegreesInter / this.setDegreesSlope);
 
 		this.siegeTalon.setSetpoint(this.armTop);
-		this.drawbridgeTop = 29.0D;
+		this.drawbridgeTop = 36.0D;
 		this.drawbridgeBot = -56.0D;
 		this.sallyPort = 0.0D;
 		this.chevelTop = -50.0D;
@@ -204,6 +205,7 @@ public class TorSiege
 		this.intakeVal = -48.0D;
 		this.siegeTalon.setSetpoint(rest);
 		this.drawbridgeConstant = ((this.drawbridgeTop - this.drawbridgeBot) / (-1.0D * this.drawbridgeBack));
+		degreeCommand = 0.0;
 	}
 
 	public void PID()
@@ -262,16 +264,16 @@ public class TorSiege
 			{
 				Portcullis();
 			}
-			else if (-this.siegeStick.getY() < -0.025D)
+			else if (this.siegeStick.getY() < -0.025D) //COMPETITION ROBOT: FLIP SIGN ON ALL INSTANCES OF this.siegeStick.getY()
 			{
 				this.siegeTalon.setProfile(1);
-				this.siegeTalon.set(this.siegeStick.getY() * 30.0D + this.siegeTalon
+				this.siegeTalon.set(-this.siegeStick.getY() * 30.0D + this.siegeTalon
 						.getAnalogInRaw());
 			}
-			else if (-this.siegeStick.getY() > 0.025D)
+			else if (this.siegeStick.getY() > 0.025D)
 			{
 				this.siegeTalon.setProfile(1);
-				this.siegeTalon.set(this.siegeStick.getY() * 30.0D + this.siegeTalon
+				this.siegeTalon.set(-this.siegeStick.getY() * 30.0D + this.siegeTalon
 						.getAnalogInRaw());
 			}
 			else
@@ -280,18 +282,18 @@ public class TorSiege
 			}
 			if ((this.siegeStick.getRawButton(1)) && (this.torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
 			{
-				if ((this.torcan.m_state != TorCAN.DRIVE_STATE.HIGHGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
+				if ((this.torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
 				{
-					this.shift.set(true);
-					this.torcan.highGear();
-					this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+					this.shift.set(false);
+//					this.torcan.lowGear();
+					this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 				}
 			}
-			else if ((this.torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
+			else if ((this.torcan.m_state != TorCAN.DRIVE_STATE.HIGHGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
 			{
-				this.shift.set(false);
-				this.torcan.lowGear();
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.shift.set(true);
+//				this.torcan.highGear();
+				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
 			}
 		}
 		else
@@ -435,7 +437,7 @@ public class TorSiege
 				}
 				break;
 			case POS2: 
-				this.torcan.SetDrive(-0.35D, 0.35D);
+				this.torcan.SetDrive(-0.35D, 0.35D); //ADJUST
 				setDegrees(this.chevelTop - 4.0D);
 				if (this.encoder.getDistance() < -8.0D)
 				{
@@ -512,8 +514,7 @@ public class TorSiege
 				break;
 			case POS5: 
 				this.enabled = true;
-				turnToTheta(-20.0D);
-				if ((this.gyro.getAngle() < 342.0D) && (this.gyro.getAngle() > 90.0D))
+				if (turnToTheta(-20.0D))//(this.gyro.getAngle() < 342.0D) && (this.gyro.getAngle() > 90.0D)
 				{
 					this.m_sally = SALLYPORT.POS6;
 					this.torcan.SetDrive(0.0D, 0.0D);
@@ -521,8 +522,7 @@ public class TorSiege
 				break;
 			case POS6: 
 				this.enabled = true;
-				turnToTheta(356.0D);
-				if (this.gyro.getAngle() > 357.5D || (gyro.getAngle() > 0 && gyro.getAngle() < 30))
+				if (turnToTheta(0))//this.gyro.getAngle() > 353.0 || (gyro.getAngle() > 0 && gyro.getAngle() < 30)
 				{
 					this.torcan.SetDrive(0.0D, 0.0D);
 					this.m_sally = SALLYPORT.POS7;
@@ -530,7 +530,7 @@ public class TorSiege
 				break;
 			case POS7: 
 				this.enabled = true;
-				this.torcan.SetDrive(0.5D, -0.5D);
+				this.torcan.SetDrive(1D, -1D);
 				if (this.encoder.getDistance() > this.sallyPortDist)
 				{
 					this.m_sally = SALLYPORT.IDLE;
@@ -553,6 +553,7 @@ public class TorSiege
 				break;
 			case POS0: 
 				this.encoder.reset();
+				intakeSiege.armtalon();
 				this.m_states = DRAWBRIDGE.POS1;
 			case POS1: 
 				setDegrees(this.drawbridgeTop);
@@ -562,8 +563,20 @@ public class TorSiege
 				}
 				break;
 			case POS2: 
-				this.torcan.SetDrive(-0.5D, 0.5D);
-				setDegrees(this.encoder.getDistance() * this.drawbridgeConstant + this.drawbridgeTop);
+				if (this.encoder.getDistance() > this.drawbridgeBack + 10.0D)
+				{
+					this.torcan.SetDrive(-0.5D, 0.5D);
+				}
+				else
+				{
+					this.torcan.SetDrive(-0.2D, 0.2D);
+				}
+//				setDegrees(this.encoder.getDistance() * this.drawbridgeConstant + this.drawbridgeTop);
+				degreeCommand = 20*Math.log(-((encoder.getDistance()/drawbridgeBack)-1.001))+36;
+				if(degreeCommand < -56){
+					degreeCommand = -56;
+				}
+				setDegrees(degreeCommand);
 				if (this.encoder.getDistance() < this.drawbridgeBack)
 				{
 					this.encoder.reset();
@@ -593,6 +606,7 @@ public class TorSiege
 					this.m_states = DRAWBRIDGE.IDLE;
 					this.enabled = false;
 					this.torcan.SetDrive(0.0D, -0.0D);
+					intakeSiege.stopArmTalon();
 				}
 				break;
 			}
@@ -622,12 +636,12 @@ public class TorSiege
 		}
 //		System.out.println("Error " + this.error);
 		if (this.error > 0.0D) {
-			this.turnSpeed = Math.min(0.6D, this.error * this.turnP);
+			this.turnSpeed = Math.min(0.6D, this.error * 0.08);
 		} else {
-			this.turnSpeed = Math.max(this.error * this.turnP, -0.6D);
+			this.turnSpeed = Math.max(this.error * 0.08, -0.6D);
 		}
 		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
-		if (Math.abs(this.error) > 0.5D) {
+		if (Math.abs(this.error) > 1) {
 			return false;
 		}
 		return true;

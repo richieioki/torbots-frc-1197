@@ -21,7 +21,7 @@ public class TorIntake
 
 	private static enum IntakeState
 	{
-		BOTH,  ELEVATOR,  IDLE,  NULL,  PORT,  SHOOTING;
+		BOTH,  ELEVATOR,  IDLE,  NULL,  PORT,  SHOOTING, ARM;
 
 		private IntakeState() {}
 	}
@@ -114,6 +114,11 @@ public class TorIntake
 			verticalTalon1.set(0);
 			this.armTalon.set(0.0D);
 		}
+		else if (m_state == IntakeState.ARM ){
+			armTalon.set(-1);
+			elevatorTalon.set(0);
+			verticalTalon.set(0);
+		}
 	}
 
 	public void autoLoad() {}
@@ -165,6 +170,12 @@ public class TorIntake
 
 			this.elevatorTalon.set(0.0D);
 		}
+	}
+	public void armtalon(){
+		m_state = IntakeState.ARM;
+	}
+	public void stopArmTalon(){
+		m_state = IntakeState.IDLE;
 	}
 
 	public void fire()

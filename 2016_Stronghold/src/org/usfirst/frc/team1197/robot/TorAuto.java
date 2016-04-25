@@ -401,7 +401,7 @@ public class TorAuto
 
 		//position 1
 		if(laneAndDefense[0] == 1 && laneAndDefense[1] == 1){
-		
+			touchAuto();
 		}		
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 2){
 			ChevelDeFrise();
@@ -465,6 +465,9 @@ public class TorAuto
 		}
 
 		//position 3
+		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 0){
+			touchAuto();
+		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 1){
 			
 		}

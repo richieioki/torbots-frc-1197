@@ -178,8 +178,11 @@ public class TorShooter
 		}
 		else
 		{
-			this.shooter1.set(10.0);
-			this.shooter2.set(10.0);
+			shooter1.set(5.0);
+			shooter2.set(5.0);
+			Timer.delay(5);
+			this.shooter1.set(7.0);
+			this.shooter2.set(7.0);
 		}
 	}
 }

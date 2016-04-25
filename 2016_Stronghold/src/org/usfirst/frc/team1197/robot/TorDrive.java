@@ -64,12 +64,12 @@ public class TorDrive
 		}
 		if (!this.m_solenoidshift.get())
 		{
-			if ((this.m_jagDrive.m_state != TorCAN.DRIVE_STATE.PIVOTING) && (Math.abs(stickX) > 0.0D) && (Math.abs(stickY) == 0.0D))
-			{
-				this.m_jagDrive.m_state = TorCAN.DRIVE_STATE.PIVOTING;
-				this.m_jagDrive.offGear();
-			}
-			else if (this.m_jagDrive.m_state == TorCAN.DRIVE_STATE.PIVOTING)
+//			if ((this.m_jagDrive.m_state != TorCAN.DRIVE_STATE.PIVOTING) && (Math.abs(stickX) > 0.0D) && (Math.abs(stickY) == 0.0D))
+//			{
+//				this.m_jagDrive.m_state = TorCAN.DRIVE_STATE.PIVOTING;
+//				this.m_jagDrive.offGear();
+//			}
+			if (this.m_jagDrive.m_state == TorCAN.DRIVE_STATE.PIVOTING)
 			{
 				this.m_jagDrive.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 				this.m_jagDrive.lowGear();
@@ -165,11 +165,11 @@ public class TorDrive
 		if (stickY < -1.0D) {
 			stickY = -1.0D;
 		}
-		if (shiftButton) {
-			this.m_solenoidshift.set(true);
-		} else {
-			this.m_solenoidshift.set(false);
-		}
+//		if (shiftButton) {
+//			this.m_solenoidshift.set(true);
+//		} else {
+//			this.m_solenoidshift.set(false);
+//		}
 		if (squaredInputs)
 		{
 			if (stickX >= 0.0D) {
