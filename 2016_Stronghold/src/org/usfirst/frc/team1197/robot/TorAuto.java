@@ -424,6 +424,7 @@ public class TorAuto
 		}
 		else if(laneAndDefense[0] == 1 && laneAndDefense[1] == 7){
 			Sallyport();
+			Timer.delay(0.5);
 			turnLane1();
 			ShootAuto();
 		}
@@ -457,6 +458,7 @@ public class TorAuto
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 7){
 			Sallyport();
+			Timer.delay(0.5);
 			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 2 && laneAndDefense[1] == 8){
@@ -466,7 +468,8 @@ public class TorAuto
 
 		//position 3
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 0){
-			touchAuto();
+			DrawBridge();
+			ShootAuto();
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 1){
 			
@@ -492,6 +495,7 @@ public class TorAuto
 		}
 		else if(laneAndDefense[0] == 3 && laneAndDefense[1] == 7){
 			Sallyport();
+			Timer.delay(0.5);
 			turnLane3();
 			ShootAuto();
 		}
@@ -526,6 +530,7 @@ public class TorAuto
 		}
 		else if(laneAndDefense[0] == 4 && laneAndDefense[1] == 7){
 			Sallyport();
+			Timer.delay(0.5);
 			turnLane4();
 			ShootAuto();
 		}

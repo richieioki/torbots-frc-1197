@@ -365,6 +365,7 @@ public class TorSiege
 			this.m_chev = CHEVEL.IDLE;
 			this.m_port = PORTCULLIS.IDLE;
 			this.enabled = false;
+			intakeSiege.stopArmTalon();
 		}
 		if ((this.m_port != PORTCULLIS.NULL) && (this.m_port != PORTCULLIS.IDLE)) {
 			switch (this.m_port)
@@ -372,12 +373,14 @@ public class TorSiege
 			case NULL: 
 				break;
 			case IDLE: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				this.drive.lowGear();
+				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				this.drive.highGear();
 				this.enabled = false;
 				this.m_port = PORTCULLIS.NULL;
 				break;
 			case POS1B: 
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.drive.lowGear();
 				this.encoder.reset();
 				this.m_port = PORTCULLIS.POS1;
 				break;
@@ -423,12 +426,14 @@ public class TorSiege
 			case NULL: 
 				break;
 			case IDLE: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				this.drive.lowGear();
+				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				this.drive.highGear();
 				this.enabled = false;
 				this.m_chev = CHEVEL.NULL;
 				break;
 			case POS1: 
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.drive.lowGear();
 				setDegrees(this.chevelTop);
 				if (siegeOnTarget(2))
 				{
@@ -466,13 +471,15 @@ public class TorSiege
 			case NULL: 
 				break;
 			case IDLE: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				this.drive.lowGear();
+				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				this.drive.highGear();
 				this.enabled = false;
 
 				this.m_sally = SALLYPORT.NULL;
 				break;
 			case POS0: 
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.drive.lowGear();
 				this.encoder.reset();
 				this.gyro.reset();
 				this.m_sally = SALLYPORT.POS1;
@@ -530,7 +537,7 @@ public class TorSiege
 				break;
 			case POS7: 
 				this.enabled = true;
-				this.torcan.SetDrive(1D, -1D);
+				this.torcan.SetDrive(1, -1);
 				if (this.encoder.getDistance() > this.sallyPortDist)
 				{
 					this.m_sally = SALLYPORT.IDLE;
@@ -546,12 +553,14 @@ public class TorSiege
 			case NULL: 
 				break;
 			case IDLE: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				this.drive.lowGear();
+				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				this.drive.highGear();
 				this.enabled = false;
 				this.m_states = DRAWBRIDGE.NULL;
 				break;
 			case POS0: 
+				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				this.drive.lowGear();
 				this.encoder.reset();
 				intakeSiege.armtalon();
 				this.m_states = DRAWBRIDGE.POS1;
@@ -579,6 +588,7 @@ public class TorSiege
 				setDegrees(degreeCommand);
 				if (this.encoder.getDistance() < this.drawbridgeBack)
 				{
+					intakeSiege.stopArmTalon();
 					this.encoder.reset();
 					haltDrive(0.5D);
 					this.m_states = DRAWBRIDGE.POS3;
@@ -606,7 +616,6 @@ public class TorSiege
 					this.m_states = DRAWBRIDGE.IDLE;
 					this.enabled = false;
 					this.torcan.SetDrive(0.0D, -0.0D);
-					intakeSiege.stopArmTalon();
 				}
 				break;
 			}
