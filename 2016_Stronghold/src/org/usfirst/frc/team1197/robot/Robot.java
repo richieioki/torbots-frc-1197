@@ -141,15 +141,15 @@ extends SampleRobot
 		this.encoder.setDistancePerPulse(0.017857142857142856D);
 		this.driveCANS = new TorCAN(this.R1, this.R2, this.L1, this.L2);
 
-		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, P3, P4, this.breakBeam, this.breakBeam2, this.siege, this.shoot, this.stick3);
+		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, P3, P4, this.breakBeam, this.breakBeam2, this.siege, this.shoot);
 
 		this.drive = new TorDrive(this.stick, this.stick2, this.driveCANS, this.encoder, this.S1);
 
-		this.siege = new TorSiege(this.T1, this.stick2, this.pot, this.driveCANS, this.S1, this.stick, this.intakee, this.drive, this.encoder, this.gyro, this.stick3, camera);
+		this.siege = new TorSiege(this.T1, this.stick2, this.pot, this.driveCANS, this.S1, this.stick, this.intakee, this.drive, this.encoder, this.gyro, camera);
 
-		this.camera = new TorCamera(this.table, this.gyro, this.driveCANS, this.siege, this.stick3, this.intakee, stick2);
+		this.camera = new TorCamera(this.table, this.gyro, this.driveCANS, this.siege, this.intakee, stick2);
 
-		this.shoot = new TorShooter(this.intakee, this.shooter1, this.shooter2, this.hood, this.P2, this.P1, this.stick3, this.stick2, this.gyro, this.driveCANS, this.camera);
+		this.shoot = new TorShooter(this.intakee, this.shooter1, this.shooter2, this.hood, this.P2, this.P1, this.stick2, this.gyro, this.driveCANS, this.camera);
 
 		this.auto = new TorAuto(this.cypress, this.stick, this.stick2, this.gyro, this.encoder, this.driveCANS, this.S1, this.siege, this.intakee, this.drive, this.shoot, this, this.camera);
 	}
@@ -209,10 +209,13 @@ extends SampleRobot
 		this.compressor = new Compressor();
 		this.compressor.start();
 		
+		gyro.reset();
+		
 		while (isEnabled())
 		{
-//			drive.ArcadeDrive(true);
-			
+			drive.ArcadeDrive(true);
+//			System.out.println("POT: " + T1.getAnalogInRaw());
+//			System.out.println("ENCODER: " + encoder.getDistance());
 		}
 	}
 }

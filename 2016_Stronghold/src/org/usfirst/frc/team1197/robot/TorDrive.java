@@ -232,7 +232,7 @@ public class TorDrive
 					break;
 				}
 				this.m_jagDrive.SetDrive(speed, -speed);
-			} while (!this.overrideStick.getRawButton(10));
+			} while (!this.overrideStick.getRawButton(10)); //??? 4/29 hotel pmn
 		}
 		else
 		{

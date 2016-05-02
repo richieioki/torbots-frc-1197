@@ -1,6 +1,7 @@
 package org.usfirst.frc.team1197.robot;
 
 import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
@@ -8,6 +9,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.io.PrintStream;
 
 public class TorAuto
@@ -214,13 +216,13 @@ public class TorAuto
 	public void DrawBridge()
 	{
 		this.m_encoder.reset();
-		this.drive.driveDistance(62.0F, 0.5F, true);
+		this.drive.driveDistance(62.0F, 0.5F, true); //65
 		this.m_cans.SetDrive(0.0D, 0.0D);
 		this.siege.DrawBridge();
 		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
 			this.siege.SiegeArmUpdate();
 			if(siege.m_states == TorSiege.DRAWBRIDGE.IDLE) {
-				System.out.println("Breaking");
+//				System.out.println("Breaking");
 				break;
 			}
 		}
@@ -228,6 +230,7 @@ public class TorAuto
 
 	public void ChevelDeFrise()
 	{
+		
 		this.m_encoder.reset();
 		this.drive.driveDistance(60.0F, 0.5F, true);
 		this.m_cans.SetDrive(0.0D, 0.0D);
@@ -235,7 +238,7 @@ public class TorAuto
 		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
 			this.siege.SiegeArmUpdate();
 			if(siege.m_chev == TorSiege.CHEVEL.IDLE) {
-				System.out.println("Breaking");
+//				System.out.println("Breaking");
 				break;
 			}
 		}
@@ -243,6 +246,7 @@ public class TorAuto
 
 	public void Sallyport()
 	{
+		
 		this.m_encoder.reset();
 		this.drive.driveDistance(60.0F, 0.5F, true);
 		this.m_cans.SetDrive(0.0D, 0.0D);
@@ -250,7 +254,7 @@ public class TorAuto
 		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
 			this.siege.SiegeArmUpdate();
 			if(siege.m_sally == TorSiege.SALLYPORT.IDLE) {
-				System.out.println("Breaking");
+//				System.out.println("Breaking");
 				break;
 			}
 		}
@@ -287,7 +291,7 @@ public class TorAuto
 	public void ShootAuto()
 	{
 		double breakTime = System.currentTimeMillis()+1000;
-		System.out.println("AUTO SHOOTING");
+//		System.out.println("AUTO SHOOTING");
 		siege.setDegrees(siege.intakeVal);
 		while(siege.siegeOnTarget(2)){
 			if(System.currentTimeMillis()<breakTime)
@@ -316,7 +320,7 @@ public class TorAuto
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
 		this.gyro.reset();
-		System.out.println("GYRO: " + this.gyro.getAngle());
+//		System.out.println("GYRO: " + this.gyro.getAngle());
 		this.m_cans.pivot();
 		while (!this.siege.turnToShoot(-15.0D)) {
 			if (timeout < System.currentTimeMillis()) {
@@ -331,7 +335,7 @@ public class TorAuto
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
 		this.gyro.reset();
-		System.out.println("GYRO: " + this.gyro.getAngle());
+//		System.out.println("GYRO: " + this.gyro.getAngle());
 		this.m_cans.pivot();
 		while (!this.siege.turnToShoot(10.0D)) {
 			if (timeout < System.currentTimeMillis()) {
@@ -346,7 +350,7 @@ public class TorAuto
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
 		this.gyro.reset();
-		System.out.println("GYRO: " + this.gyro.getAngle());
+//		System.out.println("GYRO: " + this.gyro.getAngle());
 		this.m_cans.pivot();
 		while (!this.siege.turnToShoot(30.0D)) {
 			if (timeout < System.currentTimeMillis()) {
@@ -376,7 +380,7 @@ public class TorAuto
 		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
 			this.siege.SiegeArmUpdate();
 			if(siege.m_port == TorSiege.PORTCULLIS.IDLE) {
-				System.out.println("Beaking");
+//				System.out.println("Beaking");
 				break;
 			}
 		}
@@ -396,8 +400,7 @@ public class TorAuto
 
 		int laneAndDefense[] = initialize();
 
-		System.out.println("lane: " + laneAndDefense[0]);
-		System.out.println("defense: " + laneAndDefense[1]);
+
 
 		//position 1
 		if(laneAndDefense[0] == 1 && laneAndDefense[1] == 1){

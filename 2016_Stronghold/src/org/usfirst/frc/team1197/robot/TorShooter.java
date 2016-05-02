@@ -14,7 +14,7 @@ public class TorShooter
 	CANTalon hood;
 	CANTalon elevate;
 	CANTalon arm;
-	Joystick stick3;
+//	Joystick stick3;
 	Joystick stick2;
 	AHRS gyro;
 	public boolean shooterEnabled;
@@ -44,7 +44,7 @@ public class TorShooter
 	}
 
 	public TorShooter(TorIntake intake, CANTalon shooter1, CANTalon shooter2, 
-			CANTalon hood, CANTalon elevate, CANTalon arm, Joystick stick3, 
+			CANTalon hood, CANTalon elevate, CANTalon arm, 
 			Joystick stick2, AHRS gyro, TorCAN can, TorCamera camera)
 	{
 		this.intake = intake;
@@ -53,7 +53,7 @@ public class TorShooter
 		this.hood = hood;
 		this.elevate = elevate;
 		this.arm = arm;
-		this.stick3 = stick3;
+//		this.stick3 = stick3;
 		this.stick2 = stick2;
 		this.gyro = gyro;
 		this.cans = can;
@@ -80,19 +80,19 @@ public class TorShooter
 		this.shooterEnabled = false;
 	}
 
-	public void shoot()
-	{
-		if (this.stick3.getRawButton(1))
-		{
-			this.shooter1.set(0.75D);
-			this.shooter2.set(0.75D);
-		}
-		else
-		{
-			this.shooter1.set(0.0D);
-			this.shooter2.set(0.0D);
-		}
-	}
+//	public void shoot()
+//	{
+//		if (this.stick3.getRawButton(1))
+//		{
+//			this.shooter1.set(0.75D);
+//			this.shooter2.set(0.75D);
+//		}
+//		else
+//		{
+//			this.shooter1.set(0.0D);
+//			this.shooter2.set(0.0D);
+//		}
+//	}
 
 	public void hoodCalc()
 	{
@@ -117,36 +117,36 @@ public class TorShooter
 		return this.readHoodDegreesSlope * this.hood.get() + this.readHoodDegreesInter;
 	}
 
-	public void hoodSet()
-	{
-		if (this.stick3.getRawButton(5)) {
-			hoodSetDegrees(59.0D);
-		}
-		if (this.stick3.getRawButton(6)) {
-			hoodSetDegrees(30.0D);
-		}
-	}
+//	public void hoodSet()
+//	{
+//		if (this.stick3.getRawButton(5)) {
+//			hoodSetDegrees(59.0D);
+//		}
+//		if (this.stick3.getRawButton(6)) {
+//			hoodSetDegrees(30.0D);
+//		}
+//	}
 
-	public void adjustShooter()
-	{
-		if (this.stick3.getRawButton(1)) {
-			shoot();
-		} else if (this.stick3.getY() > 0.05D) {
-			this.hood.set(-this.stick3.getY() * 50000.0D + this.hood.getPulseWidthPosition());
-		} else {
-			this.hood.set(this.hood.getPulseWidthPosition());
-		}
-	}
+//	public void adjustShooter()
+//	{
+//		if (this.stick3.getRawButton(1)) {
+//			shoot();
+//		} else if (this.stick3.getY() > 0.05D) {
+//			this.hood.set(-this.stick3.getY() * 50000.0D + this.hood.getPulseWidthPosition());
+//		} else {
+//			this.hood.set(this.hood.getPulseWidthPosition());
+//		}
+//	}
 
-	public void update()
-	{
-		if (this.stick3.getRawButton(1)) {
-			elevateShoot();
-		}
-		if (!this.stick3.getRawButton(2)) {
-			this.shooterEnabled = false;
-		}
-	}
+//	public void update()
+//	{
+//		if (this.stick3.getRawButton(1)) {
+//			elevateShoot();
+//		}
+//		if (!this.stick3.getRawButton(2)) {
+//			this.shooterEnabled = false;
+//		}
+//	}
 
 	private void shooterReset()
 	{
@@ -164,7 +164,7 @@ public class TorShooter
 
 	public void shooter()
 	{
-		if ((this.stick3.getRawButton(2) || stick2.getRawButton(7)) && (this.intake.shooterBreakBeam()))
+		if ((stick2.getRawButton(2))) // && (this.intake.shooterBreakBeam())
 		{
 			shooting();
 			double value = this.camera.GetValue();

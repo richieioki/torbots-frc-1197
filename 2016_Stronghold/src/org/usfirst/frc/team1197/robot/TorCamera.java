@@ -10,7 +10,7 @@ import java.io.PrintStream;
 
 public class TorCamera
 {
-	static double CENTER = 63.0D;
+	static double CENTER = 67.0D; //54.0  //63.0 4/30 987 practice goal am
 	NetworkTable m_networkTable;
 	AHRS ahrs;
 	private double targetArea = 0.0D;
@@ -19,7 +19,7 @@ public class TorCamera
 	private double angleDeltaX = 0.0D;
 	private double targetAngle = 0.0D;
 	private double ahrsAngle = 0.0D;
-	private Joystick stick3;
+//	private Joystick stick3;
 	public boolean empty = true;
 	private TorLidar lidar;
 	public TorCAN torcan;
@@ -37,14 +37,14 @@ public class TorCamera
 
 	public CAMERA m_camera = CAMERA.IDLE;
 
-	public TorCamera(NetworkTable tb, AHRS ahrs, TorCAN torcan, TorSiege siege, Joystick stick3, TorIntake intake, Joystick stick2)
+	public TorCamera(NetworkTable tb, AHRS ahrs, TorCAN torcan, TorSiege siege, TorIntake intake, Joystick stick2)
 	{
 		this.stick2 = stick2;
 		this.siege = siege;
 		this.torcan = torcan;
 		this.ahrs = ahrs;
 		this.m_networkTable = NetworkTable.getTable("GRIP/myContoursReport");
-		this.stick3 = stick3;
+//		this.stick3 = stick3;
 		this.intake = intake;
 
 		this.counter = 0;
@@ -89,27 +89,28 @@ public class TorCamera
 			{
 				this.deltaX = (value - CENTER);
 				if(Math.abs(deltaX) > 28){
-					deltaX = deltaX - 4;
-					angleDeltaX = (this.deltaX * 0.342D);
+					deltaX = deltaX; //-4
+					angleDeltaX = (this.deltaX * 0.368D);
 					return angleDeltaX;
 				}
-				deltaX = deltaX - 1;
-				this.angleDeltaX = (this.deltaX * 0.342D);
+				deltaX = deltaX; //-1
+				this.angleDeltaX = (this.deltaX * 0.368D);
 				return this.angleDeltaX;
 			}
 			if (value > CENTER)
 			{
 				this.deltaX = (value - CENTER);
 				if(Math.abs(deltaX) > 50){
-					deltaX = deltaX + 5;
+					deltaX = deltaX; // +5
 					angleDeltaX = (this.deltaX * 0.342D);
 					return angleDeltaX;
 				}
+				deltaX = deltaX; //-2
 				this.angleDeltaX = (this.deltaX * 0.342D);
 				return this.angleDeltaX;
 			}
 		}
-		System.out.println("ARRAY IS EMPTY!");
+//		System.out.println("ARRAY IS EMPTY!");
 		return Integer.MAX_VALUE;
 	}
 
@@ -127,12 +128,12 @@ public class TorCamera
 		double TargetAngle = deltaX;
 		if (deltaX != Integer.MAX_VALUE)
 		{
-			System.out.println("CURRENT ANGLE " + this.ahrs.getAngle());
+//			System.out.println("CURRENT ANGLE " + this.ahrs.getAngle());
 
-			double timeout = System.currentTimeMillis() + 2500L;
+			double timeout = System.currentTimeMillis() + 5000L;
 			this.torcan.pivot();
-			while (!this.siege.turnToShoot(TargetAngle)) {
-				if ((timeout < System.currentTimeMillis()) && (!this.stick3.getRawButton(2))) {
+			while (!this.siege.turnToShoot(TargetAngle)) { //check - 4/29 hotel pm
+				if (timeout < System.currentTimeMillis() || !stick2.getRawButton(2)) {
 					break;
 				}
 			}
@@ -140,7 +141,7 @@ public class TorCamera
 			this.torcan.SetDrive(0.0D, 0.0D);
 
 			this.counter += 1;
-			while (this.stick3.getRawButton(2) || stick2.getRawButton(7)) {
+			while (stick2.getRawButton(2)) {
 				this.intake.fire();
 			}
 		}
@@ -151,9 +152,9 @@ public class TorCamera
 		double TargetAngle = deltaX;
 		if (deltaX != Integer.MAX_VALUE)
 		{
-			System.out.println("CURRENT ANGLE " + this.ahrs.getAngle());
+//			System.out.println("CURRENT ANGLE " + this.ahrs.getAngle());
 			boolean breakout = false;
-			double timeout = System.currentTimeMillis() + 2500L;
+			double timeout = System.currentTimeMillis() + 5000L;
 			this.torcan.pivot();
 			while (!this.siege.turnToShoot(TargetAngle)) {
 				if (timeout < System.currentTimeMillis()) {
@@ -165,7 +166,7 @@ public class TorCamera
 			{
 				this.torcan.SetDrive(0.0D, 0.0D);
 				this.intake.fire();
-				System.out.println("AUTO FIRE");
+//				System.out.println("AUTO FIRE");
 				Timer.delay(0.6D);
 				this.intake.stopElevator();
 			}

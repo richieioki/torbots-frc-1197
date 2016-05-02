@@ -17,7 +17,7 @@ public class TorIntake
 	private IntakeState m_state;
 	private boolean override;
 	private TorShooter m_shoot;
-	private Joystick stick3;
+//	private Joystick stick3;
 
 	private static enum IntakeState
 	{
@@ -28,7 +28,7 @@ public class TorIntake
 
 	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, CANTalon cantalon3, 
 			CANTalon cantalon4, DigitalInput breakBeam, DigitalInput breakBeam2, TorSiege siege, 
-			TorShooter shoot, Joystick stick3)
+			TorShooter shoot)
 	{
 		this.armTalon = cantalon;
 		this.elevatorTalon = cantalon2;
@@ -39,13 +39,12 @@ public class TorIntake
 		this.stick = stick;
 		this.m_state = IntakeState.IDLE;
 		this.m_shoot = shoot;
-		this.stick3 = stick3;
 		verticalTalon1 = cantalon4;
 	}
 
 	public void intake()
 	{
-		if (this.stick.getRawButton(5)||this.stick.getRawButton(3))
+		if (this.stick.getRawButton(4))
 		{
 			this.m_state = IntakeState.IDLE;
 			this.elevatorTalon.set(1);
@@ -53,7 +52,7 @@ public class TorIntake
 			verticalTalon1.set(0.95);
 			this.armTalon.set(1);
 		}
-		else if (this.stick.getRawButton(6)||this.stick.getRawButton(4))
+		else if (this.stick.getRawButton(6)||this.stick.getRawButton(5))
 		{
 			this.m_state = IntakeState.IDLE;
 			this.armTalon.set(-1);
@@ -67,7 +66,7 @@ public class TorIntake
 //			armTalon.set(0.0);
 //			this.elevatorTalon.set(-1);
 //		}
-		else if ((this.stick.getRawButton(2)) && (this.m_state == IntakeState.IDLE))
+		else if ((this.stick.getRawButton(3)) && (this.m_state == IntakeState.IDLE))
 		{
 			if (this.shooterBreakBeam.get() != true)
 			{
@@ -103,10 +102,10 @@ public class TorIntake
 			verticalTalon.set(0.95);
 			this.elevatorTalon.set(0.0D);
 		}
-		else if ((!this.stick3.getRawButton(2)) && (this.m_state == IntakeState.SHOOTING) && (!this.shooterBreakBeam.get()))
-		{
-			this.m_state = IntakeState.IDLE;
-		}
+//		else if ((!this.stick3.getRawButton(2)) && (this.m_state == IntakeState.SHOOTING) && (!this.shooterBreakBeam.get()))
+//		{
+//			this.m_state = IntakeState.IDLE;
+//		}
 		else if (this.m_state == IntakeState.IDLE)
 		{
 			this.elevatorTalon.set(0.0D);
@@ -147,7 +146,7 @@ public class TorIntake
 
 	public void printCurrentOutput()
 	{
-		System.out.println("Current: " + this.armTalon.getOutputCurrent());
+//		System.out.println("Current: " + this.armTalon.getOutputCurrent());
 	}
 
 	public double intakeOutputCurrent()
