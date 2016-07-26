@@ -2,26 +2,23 @@ package org.usfirst.frc.team1197.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
+
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 
-import java.io.PrintStream;
-
 public class TorSiege
 {
-	private SmartDashboard dashboard;
 	private CANTalon siegeTalon;
 	private TorOnTarget target;
 	private Joystick siegeStick;
 	private Joystick stick;
-//	private Joystick stick3;
 	private AnalogPotentiometer pot;
-	private Ultrasonic sonar;
 	private TorCAN torcan;
 	private TorDrive drive;
 	private TorIntake intakeSiege;
@@ -31,7 +28,6 @@ public class TorSiege
 	public static final double SONAR = 10.0D;
 	public DRAWBRIDGE m_states;
 	private HALT m_halt;
-	public TorTeleop tele;
 	private double[] errorHistory = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
 	private TorCamera camera;
 
@@ -74,11 +70,6 @@ public class TorSiege
 	public PORTCULLIS m_port = PORTCULLIS.IDLE;
 	public CHEVEL m_chev = CHEVEL.IDLE;
 	private Solenoid shift;
-	private double endTime = 0.0D;
-	private double sallyTime;
-	private double startTime;
-	private double chevTime;
-	private double portTime;
 	double ratio = 0.6799999999999999D;
 	double armTop = 0.0D;
 	double drawbridgeTop = 0.0D;
@@ -88,7 +79,8 @@ public class TorSiege
 	double portcullisTop = 0.0D;
 	double portcullisBot = 0.0D;
 	double potChecker = 0.0D;
-	double intakeVal = 0.0D;
+	double intakeVal1 = 0.0D;
+	double intakeVal2 = 0.0D;
 	double degrees;
 	double setDegreesSlope;
 	double readDegreesSlope;
@@ -121,34 +113,34 @@ public class TorSiege
 			TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee, TorDrive drive, 
 			Encoder encoder, AHRS gyro, TorCamera camera)
 	{
-		this.siegeTalon = T1;
-		this.siegeStick = stick2;
+		siegeTalon = T1;
+		siegeStick = stick2;
 		this.pot = pot;
 		this.torcan = torcan;
 		this.shift = shift;
 		this.stick = stick;
-		this.intakeSiege = intakee;
+		intakeSiege = intakee;
 		this.drive = drive;
 		this.encoder = encoder;
 		this.gyro = gyro;
-//		this.stick3 = stick3;
+//		stick3 = stick3;
 		this.camera = camera;
 
 		calc();
 
-		this.enabled = false;
-		this.target = new TorOnTarget(this.siegeTalon, 2);
-		this.m_states = DRAWBRIDGE.NULL;
-		this.m_port = PORTCULLIS.NULL;
-		this.m_chev = CHEVEL.NULL;
-		this.m_sally = SALLYPORT.NULL;
-		this.m_halt = HALT.POS1;
+		enabled = false;
+		target = new TorOnTarget(siegeTalon, 2);
+		m_states = DRAWBRIDGE.NULL;
+		m_port = PORTCULLIS.NULL;
+		m_chev = CHEVEL.NULL;
+		m_sally = SALLYPORT.NULL;
+		m_halt = HALT.POS1;
 	}
 
 	public boolean siegeOnTarget(int tolerance)
 	{
 		double currentAngle = getDegrees();
-		double setpointDegrees = this.readDegreesSlope * this.siegeTalon.getSetpoint() + this.readDegreesInter;
+		double setpointDegrees = readDegreesSlope * siegeTalon.getSetpoint() + readDegreesInter;
 		if ((currentAngle > setpointDegrees - tolerance) && (currentAngle < setpointDegrees + tolerance)) {
 			return true;
 		}
@@ -157,9 +149,9 @@ public class TorSiege
 
 	public boolean siegeOnTargetRaw(int tolerance)
 	{
-		int rawValue = this.siegeTalon.getAnalogInRaw();
-		if ((rawValue > this.siegeTalon.getSetpoint() - tolerance) && 
-				(rawValue < this.siegeTalon.getSetpoint() + tolerance)) {
+		int rawValue = siegeTalon.getAnalogInRaw();
+		if ((rawValue > siegeTalon.getSetpoint() - tolerance) && 
+				(rawValue < siegeTalon.getSetpoint() + tolerance)) {
 			return true;
 		}
 		return false;
@@ -168,56 +160,57 @@ public class TorSiege
 	public void setDegrees(double degrees)
 	{
 		this.degrees = degrees;
-		this.siegeTalon.set(this.setDegreesSlope * degrees + this.setDegreesInter);
+		siegeTalon.set(setDegreesSlope * degrees + setDegreesInter);
 	}
 
 	public double getDegrees()
 	{
-		return this.readDegreesSlope * this.siegeTalon.getAnalogInRaw() + this.readDegreesInter;
+		return readDegreesSlope * siegeTalon.getAnalogInRaw() + readDegreesInter;
 	}
 
 	public void calc()
 	{
-		this.turnP = 0.03D;
-		this.degreesTop = 50.6D;
-		this.degreesBot = -70.3D;
-		this.drawbridgeBack = -39D;
-		this.sallyPortInitBack = -6.0D;
-		this.sallyPortBack = -50.0D;
-		this.chevelBack = -8.0D;
-		this.chevelArmUp = 13.0D;
-		this.chevelDist = 80.0D;
-		this.sallyPortDist = 116.0D;
-		this.drawbridgeArmUp = 12.0D;
-		this.drawbridgeDist = 122.0D;
+		turnP = 0.03D;
+		degreesTop = 50.6D;
+		degreesBot = -70.3D;
+		drawbridgeBack = -39D;
+		sallyPortInitBack = -6.0D;
+		sallyPortBack = -50.0D;
+		chevelBack = -8.0D;
+		chevelArmUp = 13.0D;
+		chevelDist = 80.0D;
+		sallyPortDist = 116.0D;
+		drawbridgeArmUp = 12.0D;
+		drawbridgeDist = 122.0D;
 
-		this.bottomArm = 388;//543 practice //388 competition
-		int rest = 736;//315 practice //736 competition
+		bottomArm = 543;//543 practice //447 competition
+		int rest = 315;//315 practice //789 competition
 
-		this.setDegreesSlope = ((this.bottomArm - rest) / (this.degreesBot - this.degreesTop));
-		this.setDegreesInter = (rest - this.setDegreesSlope * this.degreesTop);
-		this.readDegreesSlope = (1.0D / this.setDegreesSlope);
-		this.readDegreesInter = (-this.setDegreesInter / this.setDegreesSlope);
+		setDegreesSlope = ((bottomArm - rest) / (degreesBot - degreesTop));
+		setDegreesInter = (rest - setDegreesSlope * degreesTop);
+		readDegreesSlope = (1.0D / setDegreesSlope);
+		readDegreesInter = (-setDegreesInter / setDegreesSlope);
 
-		this.siegeTalon.setSetpoint(this.armTop);
-		this.drawbridgeTop = 36.0D;
-		this.drawbridgeBot = -56.0D;
-		this.sallyPort = 0.0D;
-		this.chevelTop = -50.0D;
-		this.portcullisTop = 5.0D;
-		this.portcullisBot = -69.0D;
-		this.intakeVal = -46.0D;
-		this.siegeTalon.setSetpoint(rest);
-		this.drawbridgeConstant = ((this.drawbridgeTop - this.drawbridgeBot) / (-1.0D * this.drawbridgeBack));
+		siegeTalon.setSetpoint(armTop);
+		drawbridgeTop = 36.0D;
+		drawbridgeBot = -56.0D;
+		sallyPort = 0.0D;
+		chevelTop = -50.0D;
+		portcullisTop = 5.0D;
+		portcullisBot = -69.0D;
+		intakeVal1 = -45.0D; //-50 comp //-45proto
+		intakeVal2 = -35.0; //?? comp //-35proto
+		siegeTalon.setSetpoint(rest);
+		drawbridgeConstant = ((drawbridgeTop - drawbridgeBot) / (-1.0D * drawbridgeBack));
 		degreeCommand = 0.0;
 	}
 
 	public void PID()
 	{
-		this.siegeTalon.enable();
-		int rest = this.siegeTalon.getAnalogInRaw();
-		this.siegeTalon.set(rest);
-		this.siegeTalon.setSetpoint(rest);
+		siegeTalon.enable();
+		int rest = siegeTalon.getAnalogInRaw();
+		siegeTalon.set(rest);
+		siegeTalon.setSetpoint(rest);
 	}
 
 	public double potGet()
@@ -228,15 +221,17 @@ public class TorSiege
 
 	public void potTest()
 	{
-		if (this.siegeStick.getRawButton(8)) {
-			setDegrees(this.drawbridgeTop);
+		if (siegeStick.getRawButton(8)) {
+			setDegrees(drawbridgeTop);
 		}
 	}
 
 	public void intakeTele()
 	{
-		if (this.stick.getRawButton(1)) {
-			setDegrees(this.intakeVal);
+		if(stick.getRawButton(1)) {
+			setDegrees(intakeVal1);
+			Timer.delay(0.5);
+			setDegrees(intakeVal2);
 		}
 	}
 
@@ -250,54 +245,54 @@ public class TorSiege
 
 	public void SiegeArmUpdate()
 	{
-		if (!this.enabled)
+		if (!enabled)
 		{
-			if (this.stick.getRawButton(3))
+			if (stick.getRawButton(3))
 			{
 				DrawBridge();
 			}
-			else if (this.stick.getRawButton(4))
+			else if (stick.getRawButton(4))
 			{
 				SallyPort();
 			}
-			else if (this.stick.getRawButton(5))
+			else if (stick.getRawButton(5))
 			{
 				Cheve();
 			}
-			else if (this.stick.getRawButton(6))
+			else if (stick.getRawButton(6))
 			{
 				Portcullis();
 			}
-			else if (this.siegeStick.getY() < -0.025D) //COMPETITION ROBOT: FLIP SIGN ON ALL INSTANCES OF this.siegeStick.getY()
+			else if (siegeStick.getY() < -0.025D) //siegeStick.getY() -> stick.getY()
 			{
-				this.siegeTalon.setProfile(1);
-				this.siegeTalon.set(this.siegeStick.getY() * 30.0D + this.siegeTalon
+				siegeTalon.setProfile(1);
+				siegeTalon.set(siegeStick.getY() * 30.0D + siegeTalon
 						.getAnalogInRaw());
 			}
-			else if (this.siegeStick.getY() > 0.025D)
+			else if (siegeStick.getY() > 0.025D)
 			{
-				this.siegeTalon.setProfile(1);
-				this.siegeTalon.set(this.siegeStick.getY() * 30.0D + this.siegeTalon
+				siegeTalon.setProfile(1);
+				siegeTalon.set(siegeStick.getY() * 30.0D + siegeTalon
 						.getAnalogInRaw());
 			}
 			else
 			{
-				this.siegeTalon.setProfile(0);
+				siegeTalon.setProfile(0);
 			}
-			if ((this.siegeStick.getRawButton(1)) && (this.torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
+			if ((siegeStick.getRawButton(1)) && (torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
 			{
-				if ((this.torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
+				if ((torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
 				{
-					this.shift.set(false);
-//					this.torcan.lowGear();
-					this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+					shift.set(false);
+//					torcan.lowGear();
+					torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 				}
 			}
-			else if ((this.torcan.m_state != TorCAN.DRIVE_STATE.HIGHGEAR) && (this.torcan.m_state != TorCAN.DRIVE_STATE.OFF))
+			else if ((torcan.m_state != TorCAN.DRIVE_STATE.HIGHGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
 			{
-				this.shift.set(true);
-//				this.torcan.highGear();
-				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				shift.set(true);
+//				torcan.highGear();
+				torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
 			}
 		}
 		else
@@ -308,324 +303,324 @@ public class TorSiege
 
 	public void Cheve()
 	{
-		if (!this.enabled)
+		if (!enabled)
 		{
-			this.drive.offGear();
-			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
-			this.enabled = true;
-			this.m_chev = CHEVEL.POS1;
+			drive.offGear();
+			torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+			enabled = true;
+			m_chev = CHEVEL.POS1;
 		}
 	}
 
 	public void highGear()
 	{
-		this.shift.set(true);
+		shift.set(true);
 	}
 
 	public void lowGear()
 	{
-		this.shift.set(false);
+		shift.set(false);
 	}
 
 	public void Portcullis()
 	{
-		if (!this.enabled)
+		if (!enabled)
 		{
-			this.drive.offGear();
-			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
-			this.enabled = true;
-			this.m_port = PORTCULLIS.POS1B;
+			drive.offGear();
+			torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+			enabled = true;
+			m_port = PORTCULLIS.POS1B;
 		}
 	}
 
 	public void SallyPort()
 	{
-		if (!this.enabled)
+		if (!enabled)
 		{
-			this.drive.offGear();
-			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
-			this.enabled = true;
-			this.m_sally = SALLYPORT.POS0;
+			drive.offGear();
+			torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+			enabled = true;
+			m_sally = SALLYPORT.POS0;
 		}
 	}
 
 	public void DrawBridge()
 	{
-		if (!this.enabled)
+		if (!enabled)
 		{
-			this.drive.offGear();
-			this.torcan.m_state = TorCAN.DRIVE_STATE.OFF;
-			this.enabled = true;
-			this.m_states = DRAWBRIDGE.POS0;
+			drive.offGear();
+			torcan.m_state = TorCAN.DRIVE_STATE.OFF;
+			enabled = true;
+			m_states = DRAWBRIDGE.POS0;
 		}
 	}
 
 	private void update()
 	{
-		if (this.stick.getRawButton(2))
+		if (stick.getRawButton(2))
 		{
-			this.m_states = DRAWBRIDGE.IDLE;
-			this.m_sally = SALLYPORT.IDLE;
-			this.m_chev = CHEVEL.IDLE;
-			this.m_port = PORTCULLIS.IDLE;
-			this.enabled = false;
+			m_states = DRAWBRIDGE.IDLE;
+			m_sally = SALLYPORT.IDLE;
+			m_chev = CHEVEL.IDLE;
+			m_port = PORTCULLIS.IDLE;
+			enabled = false;
 			intakeSiege.stopArmTalon();
 		}
-		if ((this.m_port != PORTCULLIS.NULL) && (this.m_port != PORTCULLIS.IDLE)) {
-			switch (this.m_port)
+		if ((m_port != PORTCULLIS.NULL) && (m_port != PORTCULLIS.IDLE)) {
+			switch (m_port)
 			{
 			case NULL: 
 				break;
 			case IDLE: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
-				this.drive.highGear();
-				this.enabled = false;
-				this.m_port = PORTCULLIS.NULL;
+				torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				drive.highGear();
+				enabled = false;
+				m_port = PORTCULLIS.NULL;
 				break;
 			case POS1B: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				this.drive.lowGear();
-				this.encoder.reset();
-				this.m_port = PORTCULLIS.POS1;
+				torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				drive.lowGear();
+				encoder.reset();
+				m_port = PORTCULLIS.POS1;
 				break;
 			case POS1: 
-				this.torcan.SetDrive(-0.2D, 0.2D);
-				if (this.encoder.getDistance() < -3.0D)
+				torcan.SetDrive(-0.2D, 0.2D);
+				if (encoder.getDistance() < -3.0D)
 				{
-					this.torcan.SetDrive(0.0D, 0.0D);
-					this.encoder.reset();
-					this.m_port = PORTCULLIS.POS2;
+					torcan.SetDrive(0.0D, 0.0D);
+					encoder.reset();
+					m_port = PORTCULLIS.POS2;
 				}
 				break;
 			case POS2: 
-				this.intakeSiege.portcullis();
+				intakeSiege.portcullis();
 				haltDrive(0.5D);
-				setDegrees(this.portcullisTop);
+				setDegrees(portcullisTop);
 				if (siegeOnTarget(5))
 				{
-					this.intakeSiege.portStop();
-					this.encoder.reset();
-					this.m_port = PORTCULLIS.POS3;
+					intakeSiege.portStop();
+					encoder.reset();
+					m_port = PORTCULLIS.POS3;
 				}
 				break;
 			case POS3: 
-				this.torcan.SetDrive(0.6D, -0.6D);
-				if (this.encoder.getDistance() > 16.0D) {
-					setDegrees(this.portcullisTop + 40.0D);
+				torcan.SetDrive(0.6D, -0.6D);
+				if (encoder.getDistance() > 16.0D) {
+					setDegrees(portcullisTop + 40.0D);
 				}
-				if (this.encoder.getDistance() > 70.0D)
+				if (encoder.getDistance() > 70.0D)
 				{
 //					setDegrees(sallyPort);
 //					if(siegeOnTarget(10)){
-					this.torcan.SetDrive(0.0D, 0.0D);
-					this.enabled = false;
-					this.m_port = PORTCULLIS.IDLE;
+					torcan.SetDrive(0.0D, 0.0D);
+					enabled = false;
+					m_port = PORTCULLIS.IDLE;
 //					}
 				}
 				break;
 			}
-		} else if ((this.m_chev != CHEVEL.NULL) && (this.m_chev != CHEVEL.IDLE)) {
-			switch (this.m_chev)
+		} else if ((m_chev != CHEVEL.NULL) && (m_chev != CHEVEL.IDLE)) {
+			switch (m_chev)
 			{
 			case NULL: 
 				break;
 			case IDLE: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
-				this.drive.highGear();
-				this.enabled = false;
-				this.m_chev = CHEVEL.NULL;
+				torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				drive.highGear();
+				enabled = false;
+				m_chev = CHEVEL.NULL;
 				break;
 			case POS1: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				this.drive.lowGear();
-				setDegrees(this.chevelTop);
+				torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				drive.lowGear();
+				setDegrees(chevelTop);
 				if (siegeOnTarget(2))
 				{
-					this.m_chev = CHEVEL.POS2;
-					this.encoder.reset();
+					m_chev = CHEVEL.POS2;
+					encoder.reset();
 				}
 				break;
 			case POS2: 
-				this.torcan.SetDrive(-0.35D, 0.35D); //ADJUST
-				setDegrees(this.chevelTop - 4.0D);
-				if (this.encoder.getDistance() < -5.0D)
+				torcan.SetDrive(-0.35D, 0.35D); //ADJUST
+				setDegrees(chevelTop - 4.0D);
+				if (encoder.getDistance() < -5.0D)
 				{
 					haltDrive(0.5D);
-					this.torcan.SetDrive(0.0D, 0.0D);
-					this.m_chev = CHEVEL.POS3;
-					this.encoder.reset();
+					torcan.SetDrive(0.0D, 0.0D);
+					m_chev = CHEVEL.POS3;
+					encoder.reset();
 				}
 				break;
 			case POS3: 
-				this.torcan.SetDrive(0.5D, -0.5D);
-				if (this.encoder.getDistance() > this.chevelArmUp) {
+				torcan.SetDrive(0.5D, -0.5D);
+				if (encoder.getDistance() > chevelArmUp) {
 					setDegrees(sallyPort);
 				}
-				if (this.encoder.getDistance() > this.chevelDist)
+				if (encoder.getDistance() > chevelDist)
 				{
-					this.torcan.SetDrive(0.0D, 0.0D);
-					this.enabled = false;
-					this.m_chev = CHEVEL.IDLE;
+					torcan.SetDrive(0.0D, 0.0D);
+					enabled = false;
+					m_chev = CHEVEL.IDLE;
 				}
 				break;
 			}
-		} else if ((this.m_sally != SALLYPORT.IDLE) && (this.m_sally != SALLYPORT.NULL)) { 
-			switch (this.m_sally)
+		} else if ((m_sally != SALLYPORT.IDLE) && (m_sally != SALLYPORT.NULL)) { 
+			switch (m_sally)
 			{
 			case NULL: 
 				break;
 			case IDLE: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
-				this.drive.highGear();
-				this.enabled = false;
+				torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				drive.highGear();
+				enabled = false;
 
-				this.m_sally = SALLYPORT.NULL;
+				m_sally = SALLYPORT.NULL;
 				break;
 			case POS0: 
 				enabled = true;
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 				torcan.offGear();
-				this.encoder.reset();
-				this.gyro.reset();
-				this.m_sally = SALLYPORT.POS1;
+				encoder.reset();
+				gyro.reset();
+				m_sally = SALLYPORT.POS1;
 				break;
 			case POS1: 
 				torcan.offGear();
-				this.enabled = true; //try in POS0?
-				setDegrees(this.sallyPort);
+				enabled = true; //try in POS0?
+				setDegrees(sallyPort);
 				haltDrive(0.5D);
 				if (siegeOnTarget(2))
 				{
-					this.torcan.SetDrive(0.0D, 0.0D);
-					this.m_sally = SALLYPORT.POS3;
+					torcan.SetDrive(0.0D, 0.0D);
+					m_sally = SALLYPORT.POS3;
 				}
 				break;
 			case POS3: 
 				torcan.offGear();
-				this.enabled = true;
-				if (this.encoder.getDistance() > this.sallyPortBack + 10.0D)
+				enabled = true;
+				if (encoder.getDistance() > sallyPortBack + 10.0D)
 				{
-					this.torcan.SetDrive(-0.5D, 0.5D);
+					torcan.SetDrive(-0.5D, 0.5D);
 					setDegrees(-1.0D);
 				}
 				else
 				{
-					this.torcan.SetDrive(-0.2D, 0.2D);
+					torcan.SetDrive(-0.2D, 0.2D);
 				}
-				if (this.encoder.getDistance() < this.sallyPortBack)
+				if (encoder.getDistance() < sallyPortBack)
 				{
-					this.m_sally = SALLYPORT.POS4;
-					this.encoder.reset();
+					m_sally = SALLYPORT.POS4;
+					encoder.reset();
 
-					this.torcan.SetDrive(0.0D, 0.0D);
+					torcan.SetDrive(0.0D, 0.0D);
 				}
 				break;
 			case POS4: 
-				this.enabled = true;
+				enabled = true;
 
-				this.m_sally = SALLYPORT.POS5;
+				m_sally = SALLYPORT.POS5;
 
 				break;
 			case POS5: 
-				this.enabled = true;
+				enabled = true;
 				torcan.offGear();
-				if (turnToTheta(-10.0))//turnToTheta(-20.0) //(this.gyro.getAngle() < 342.0D) && (this.gyro.getAngle() > 90.0D)
+				if (turnToTheta(-10.0))//turnToTheta(-20.0) //(gyro.getAngle() < 342.0D) && (gyro.getAngle() > 90.0D)
 				{
-					this.m_sally = SALLYPORT.POS6;
-					this.torcan.SetDrive(0.0D, 0.0D);
+					m_sally = SALLYPORT.POS6;
+					torcan.SetDrive(0.0D, 0.0D);
 				}
 				break;
 			case POS6: 
-				this.enabled = true;
+				enabled = true;
 				torcan.offGear();
-				if (turnToTheta(0))//turnToTheta(0) //this.gyro.getAngle() > 353.0 || (gyro.getAngle() > 0 && gyro.getAngle() < 30)
+				if (turnToTheta(0))//turnToTheta(0) //gyro.getAngle() > 353.0 || (gyro.getAngle() > 0 && gyro.getAngle() < 30)
 				{
-					this.torcan.SetDrive(0.0D, 0.0D);
-					this.m_sally = SALLYPORT.POS7;
+					torcan.SetDrive(0.0D, 0.0D);
+					m_sally = SALLYPORT.POS7;
 				}
 				break;
 			case POS7: 
-				this.enabled = true;
+				enabled = true;
 				torcan.lowGear();
-				this.torcan.SetDrive(1, -1);
-				if (this.encoder.getDistance() > this.sallyPortDist)
+				torcan.SetDrive(1, -1);
+				if (encoder.getDistance() > sallyPortDist)
 				{
-					this.m_sally = SALLYPORT.IDLE;
-					this.encoder.reset();
-					this.enabled = false;
-					this.torcan.SetDrive(0.0D, 0.0D);
+					m_sally = SALLYPORT.IDLE;
+					encoder.reset();
+					enabled = false;
+					torcan.SetDrive(0.0D, 0.0D);
 				}
 				break;
 			}
-		} else if ((this.m_states != DRAWBRIDGE.NULL) && (this.m_states != DRAWBRIDGE.IDLE)) {
-			switch (this.m_states)
+		} else if ((m_states != DRAWBRIDGE.NULL) && (m_states != DRAWBRIDGE.IDLE)) {
+			switch (m_states)
 			{
 			case NULL: 
 				break;
 			case IDLE: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
-				this.drive.highGear();
-				this.enabled = false;
-				this.m_states = DRAWBRIDGE.NULL;
+				torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+				drive.highGear();
+				enabled = false;
+				m_states = DRAWBRIDGE.NULL;
 				break;
 			case POS0: 
-				this.torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				this.drive.lowGear();
-				this.encoder.reset();
+				torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				drive.lowGear();
+				encoder.reset();
 				intakeSiege.armtalon();
-				this.m_states = DRAWBRIDGE.POS1;
+				m_states = DRAWBRIDGE.POS1;
 			case POS1: 
-				setDegrees(this.drawbridgeTop);
+				setDegrees(drawbridgeTop);
 				haltDrive(0.5D);
 				if (siegeOnTarget(3)) {
-					this.m_states = DRAWBRIDGE.POS2;
+					m_states = DRAWBRIDGE.POS2;
 				}
 				break;
 			case POS2: 
-				if (this.encoder.getDistance() > this.drawbridgeBack + 10.0D)
+				if (encoder.getDistance() > drawbridgeBack + 10.0D)
 				{
-					this.torcan.SetDrive(-0.5D, 0.5D);
+					torcan.SetDrive(-0.5D, 0.5D);
 				}
 				else
 				{
-					this.torcan.SetDrive(-0.2D, 0.2D);
+					torcan.SetDrive(-0.2D, 0.2D);
 				}
-//				setDegrees(this.encoder.getDistance() * this.drawbridgeConstant + this.drawbridgeTop);
+//				setDegrees(encoder.getDistance() * drawbridgeConstant + drawbridgeTop);
 				degreeCommand = 20*Math.log(-((encoder.getDistance()/drawbridgeBack)-1.001))+36;
 				if(degreeCommand < -56){
 					degreeCommand = -56;
 				}
 				setDegrees(degreeCommand);
-				if (this.encoder.getDistance() < this.drawbridgeBack)
+				if (encoder.getDistance() < drawbridgeBack)
 				{
 					intakeSiege.stopArmTalon();
-					this.encoder.reset();
+					encoder.reset();
 					haltDrive(0.5D);
-					this.m_states = DRAWBRIDGE.POS3;
-					this.torcan.SetDrive(0.0D, 0.0D);
+					m_states = DRAWBRIDGE.POS3;
+					torcan.SetDrive(0.0D, 0.0D);
 				}
 				break;
 			case POS3: 
-				setDegrees(this.drawbridgeBot);
+				setDegrees(drawbridgeBot);
 				haltDrive(0.5D);
 				if (siegeOnTarget(2)) {
-					this.m_states = DRAWBRIDGE.POS4;
+					m_states = DRAWBRIDGE.POS4;
 				}
 				break;
 			case POS4: 
-				this.encoder.reset();
-				this.m_states = DRAWBRIDGE.POS5;
+				encoder.reset();
+				m_states = DRAWBRIDGE.POS5;
 				break;
 			case POS5: 
-				this.torcan.SetDrive(0.5D, -0.5D);
-				if (this.encoder.getDistance() > this.drawbridgeArmUp) {
+				torcan.SetDrive(0.5D, -0.5D);
+				if (encoder.getDistance() > drawbridgeArmUp) {
 					setDegrees(0.0D);
 				}
-				if (this.encoder.getDistance() > this.drawbridgeDist)
+				if (encoder.getDistance() > drawbridgeDist)
 				{
-					this.m_states = DRAWBRIDGE.IDLE;
-					this.enabled = false;
-					this.torcan.SetDrive(0.0D, -0.0D);
+					m_states = DRAWBRIDGE.IDLE;
+					enabled = false;
+					torcan.SetDrive(0.0D, -0.0D);
 				}
 				break;
 			}
@@ -634,35 +629,35 @@ public class TorSiege
 
 	public void haltDrive(double p)
 	{
-		this.m_distance = this.encoder.getDistance();
-		this.m_speed = (-p * this.m_distance);
-		this.torcan.SetDrive(this.m_speed, -1.0D * this.m_speed);
+		m_distance = encoder.getDistance();
+		m_speed = (-p * m_distance);
+		torcan.SetDrive(m_speed, -1.0D * m_speed);
 	}
 
 	public void turnToReference() {}
 
 	public boolean turnToTheta(double desiredAngle)
 	{
-		this.targetAngle = ((desiredAngle + 360.0D) % 360.0D);
+		targetAngle = ((desiredAngle + 360.0D) % 360.0D);
 
-		this.error = (this.gyro.getAngle() - this.targetAngle);
-		if (Math.abs(this.error) > 180.0D) {
-			if (this.error > 0.0D) {
-				this.error -= 360.0D;
+		error = (gyro.getAngle() - targetAngle);
+		if (Math.abs(error) > 180.0D) {
+			if (error > 0.0D) {
+				error -= 360.0D;
 			} else {
-				this.error += 360.0D;
+				error += 360.0D;
 			}
 		}
-//		System.out.println("Error " + this.error);
+//		System.out.println("Error " + error);
 //		SmartDashboard.getNumber("Gyro", gyro.getAngle());
 		
-		if (this.error > 0.0D) {
-			this.turnSpeed = Math.min(0.6D, this.error * 0.05);
+		if (error > 0.0D) {
+			turnSpeed = Math.min(0.6D, error * 0.05);
 		} else {
-			this.turnSpeed = Math.max(this.error * 0.05, -0.6D);
+			turnSpeed = Math.max(error * 0.05, -0.6D);
 		}
-		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
-		if (Math.abs(this.error) > 1) {
+		torcan.SetDrive(turnSpeed, turnSpeed);
+		if (Math.abs(error) > 1) {
 			return false;
 		}
 		torcan.SetDrive(0, 0);
@@ -671,18 +666,14 @@ public class TorSiege
 
 	public boolean turnToShoot(double desiredAngle)
 	{
-		this.targetAngle = ((desiredAngle + 360.0D) % 360.0D);
+		targetAngle = ((desiredAngle + 360.0D) % 360.0D);
 
-//		System.out.println("TargetAngle: " + this.targetAngle);
-//		System.out.println("Current Angle: " + this.gyro.getAngle());
-
-		this.error = (this.gyro.getAngle() - this.targetAngle);
-//		System.out.println("Error " + this.error);
-		if (Math.abs(this.error) > 180.0D) {
-			if (this.error > 0.0D) {
-				this.error -= 360.0D;
+		error = (gyro.getAngle() - targetAngle);
+		if (Math.abs(error) > 180.0D) {
+			if (error > 0.0D) {
+				error -= 360.0D;
 			} else {
-				this.error += 360.0D;
+				error += 360.0D;
 			}
 		}
 		
@@ -691,27 +682,27 @@ public class TorSiege
 		}
 		errorHistory[0] = error;
 		
-//		System.out.println("Error " + this.error);
+//		System.out.println("Error " + error);
 		
-		if (this.error > 0.0D) {
-			this.turnSpeed = Math.min(4.0D, this.error * 0.04 * 12.0); //this.error * this.turnP * 12.0  - (stdev(errorHistory) * 1.0)
+		if (error > 0.0D) {
+			turnSpeed = Math.min(4.0D, error * 0.04 * 12.0); //error * turnP * 12.0  - (stdev(errorHistory) * 1.0)
 		} else {
-			this.turnSpeed = Math.max(this.error * 0.04 * 12.0D, -4.0D); //originally -4.0 and 4.0  - (stdev(errorHistory) * 1.0)
+			turnSpeed = Math.max(error * 0.04 * 12.0D, -4.0D); //originally -4.0 and 4.0  - (stdev(errorHistory) * 1.0)
 		} 
 		
-		if (Math.abs(this.turnSpeed) < 3.0) { //originally 2.1 for both
-			this.turnSpeed = (3.0 * (this.turnSpeed / Math.abs(this.turnSpeed)));
+		if (Math.abs(turnSpeed) < 3.0) { //originally 2.1 for both
+			turnSpeed = (3.0 * (turnSpeed / Math.abs(turnSpeed)));
 		}
 		
 		
 		
-		if (Math.abs(this.error) < 0.75D ){
+		if (Math.abs(error) < 0.75D ){
 			turnSpeed = 0.0D;
 		}
 		
-		this.torcan.SetDrive(this.turnSpeed, this.turnSpeed);
+		torcan.SetDrive(turnSpeed, turnSpeed);
 		
-		if (Math.abs(this.error) > 0.75D || stdev(errorHistory) > (0.75/20)) {
+		if (Math.abs(error) > 0.75D || stdev(errorHistory) > (0.75/20)) {
 			return false;
 		}
 		
@@ -735,47 +726,47 @@ public class TorSiege
 
 	public void SiegeArmDown()
 	{
-		this.siegeTalon.set(this.chevelTop);
+		siegeTalon.set(chevelTop);
 	}
 
 	public void SiegeArmUp()
 	{
-		this.siegeTalon.set(this.chevelTop - 100.0D);
+		siegeTalon.set(chevelTop - 100.0D);
 	}
 
 	public void drawbridgeTop()
 	{
-		this.siegeTalon.set(this.drawbridgeTop);
+		siegeTalon.set(drawbridgeTop);
 	}
 
 	public void drawbridgeMid()
 	{
-		this.siegeTalon.set(this.drawbridgeTop + 130.0D);
+		siegeTalon.set(drawbridgeTop + 130.0D);
 	}
 
 	public void drawbridgeBot()
 	{
-		this.siegeTalon.set(this.drawbridgeBot);
+		siegeTalon.set(drawbridgeBot);
 	}
 
 	public void sally()
 	{
-		this.siegeTalon.set(this.sallyPort);
+		siegeTalon.set(sallyPort);
 	}
 
 	public void portBot()
 	{
-		this.siegeTalon.set(this.portcullisBot);
+		siegeTalon.set(portcullisBot);
 	}
 
 	public void portTop()
 	{
-		this.siegeTalon.set(this.portcullisTop);
+		siegeTalon.set(portcullisTop);
 	}
 
 	public void stopArm()
 	{
-		this.siegeTalon.set(0.0D);
+		siegeTalon.set(0.0D);
 	}
 
 	public void reset()

@@ -43,11 +43,11 @@ public class TorCamera
 		this.siege = siege;
 		this.torcan = torcan;
 		this.ahrs = ahrs;
-		this.m_networkTable = NetworkTable.getTable("GRIP/myContoursReport");
-//		this.stick3 = stick3;
+		m_networkTable = NetworkTable.getTable("GRIP/myContoursReport");
+//		stick3 = stick3;
 		this.intake = intake;
 
-		this.counter = 0;
+		counter = 0;
 	}
 
 	public void setPIDSourceType(PIDSourceType pidSource) {}
@@ -60,9 +60,9 @@ public class TorCamera
 	public double GetValue()
 	{
 		double[] defaultValue = new double[0];
-		double[] centerx = this.m_networkTable.getNumberArray("centerX", defaultValue);
+		double[] centerx = m_networkTable.getNumberArray("centerX", defaultValue);
 
-		double[] width = this.m_networkTable.getNumberArray("width", defaultValue);
+		double[] width = m_networkTable.getNumberArray("width", defaultValue);
 
 		int keeper = 0;
 		double widthTemp = 0.0D;
@@ -87,40 +87,35 @@ public class TorCamera
 			double value = centerx[keeper];
 			if (value < CENTER)
 			{
-				this.deltaX = (value - CENTER);
+				deltaX = (value - CENTER);
 				if(Math.abs(deltaX) > 28){
-					deltaX = deltaX; //-4
-					angleDeltaX = (this.deltaX * 0.368D);
+					angleDeltaX = (deltaX * 0.368D);
 					return angleDeltaX;
 				}
-				deltaX = deltaX; //-1
-				this.angleDeltaX = (this.deltaX * 0.368D);
-				return this.angleDeltaX;
+				angleDeltaX = (deltaX * 0.368D);
+				return angleDeltaX;
 			}
 			if (value > CENTER)
 			{
-				this.deltaX = (value - CENTER);
+				deltaX = (value - CENTER);
 				if(Math.abs(deltaX) > 50){
-					deltaX = deltaX; // +5
-					angleDeltaX = (this.deltaX * 0.342D);
+					angleDeltaX = (deltaX * 0.342D);
 					return angleDeltaX;
 				}
-				deltaX = deltaX; //-2
-				this.angleDeltaX = (this.deltaX * 0.342D);
-				return this.angleDeltaX;
+				angleDeltaX = (deltaX * 0.342D);
+				return angleDeltaX;
 			}
 		}
-//		System.out.println("ARRAY IS EMPTY!");
 		return Integer.MAX_VALUE;
 	}
 
 	public double angleMapper()
 	{
-		this.ahrsAngle = this.ahrs.getAngle();
-		if (this.ahrsAngle > 180.0D) {
-			this.ahrsAngle = (360.0D - this.ahrsAngle);
+		ahrsAngle = ahrs.getAngle();
+		if (ahrsAngle > 180.0D) {
+			ahrsAngle = (360.0D - ahrsAngle);
 		}
-		return this.ahrsAngle;
+		return ahrsAngle;
 	}
 
 	public void AutoShoot(double deltaX)
@@ -128,21 +123,21 @@ public class TorCamera
 		double TargetAngle = deltaX;
 		if (deltaX != Integer.MAX_VALUE)
 		{
-//			System.out.println("CURRENT ANGLE " + this.ahrs.getAngle());
+//			System.out.println("CURRENT ANGLE " + ahrs.getAngle());
 
 			double timeout = System.currentTimeMillis() + 5000L;
-			this.torcan.pivot();
-			while (!this.siege.turnToShoot(TargetAngle)) { //check - 4/29 hotel pm
+			torcan.pivot();
+			while (!siege.turnToShoot(TargetAngle)) { //check - 4/29 hotel pm
 				if (timeout < System.currentTimeMillis() || !stick2.getRawButton(2)) {
 					break;
 				}
 			}
-			this.torcan.unpivot();
-			this.torcan.SetDrive(0.0D, 0.0D);
+			torcan.unpivot();
+			torcan.SetDrive(0.0D, 0.0D);
 
-			this.counter += 1;
+			counter += 1;
 			while (stick2.getRawButton(2)) {
-				this.intake.fire();
+				intake.fire();
 			}
 		}
 	}
@@ -152,23 +147,23 @@ public class TorCamera
 		double TargetAngle = deltaX;
 		if (deltaX != Integer.MAX_VALUE)
 		{
-//			System.out.println("CURRENT ANGLE " + this.ahrs.getAngle());
+//			System.out.println("CURRENT ANGLE " + ahrs.getAngle());
 			boolean breakout = false;
 			double timeout = System.currentTimeMillis() + 5000L;
-			this.torcan.pivot();
-			while (!this.siege.turnToShoot(TargetAngle)) {
+			torcan.pivot();
+			while (!siege.turnToShoot(TargetAngle)) {
 				if (timeout < System.currentTimeMillis()) {
 					breakout = true;
 				}
 			}
-			this.torcan.unpivot();
+			torcan.unpivot();
 			if (!breakout)
 			{
-				this.torcan.SetDrive(0.0D, 0.0D);
-				this.intake.fire();
+				torcan.SetDrive(0.0D, 0.0D);
+				intake.fire();
 //				System.out.println("AUTO FIRE");
 				Timer.delay(0.6D);
-				this.intake.stopElevator();
+				intake.stopElevator();
 			}
 		}
 	}
@@ -176,8 +171,8 @@ public class TorCamera
 	public double getCenterX()
 	{
 		double[] defaultValue = new double[0];
-		double[] centerx = this.m_networkTable.getNumberArray("centerX", defaultValue);
-		double[] width = this.m_networkTable.getNumberArray("width", defaultValue);
+		double[] centerx = m_networkTable.getNumberArray("centerX", defaultValue);
+		double[] width = m_networkTable.getNumberArray("width", defaultValue);
 		int keeper = 0;
 		double widthTemp = 0.0D;
 		

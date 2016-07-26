@@ -28,33 +28,33 @@ implements PIDOutput
 
 	public TorCAN(CANTalon R1, CANTalon R2, CANTalon L1, CANTalon L2)
 	{
-		this.numOfJags = 4;
-		this.m_Rtalon1 = R1;
-		this.m_Rtalon2 = R2;
+		numOfJags = 4;
+		m_Rtalon1 = R1;
+		m_Rtalon2 = R2;
 
-		this.m_Ltalon1 = L1;
-		this.m_Ltalon2 = L2;
+		m_Ltalon1 = L1;
+		m_Ltalon2 = L2;
 	}
 
 	public TorCAN(CANTalon R1, CANTalon L1)
 	{
-		this.numOfJags = 2;
-		this.m_Rtalon1 = R1;
-		this.m_Ltalon1 = L1;
+		numOfJags = 2;
+		m_Rtalon1 = R1;
+		m_Ltalon1 = L1;
 	}
 
 	public TorCAN(CANTalon R1, CANTalon R2, CANTalon R3, CANTalon L1, CANTalon L2, CANTalon L3)
 	{
-		this.numOfJags = 6;
-		this.m_state = DRIVE_STATE.LOWGEAR;
+		numOfJags = 6;
+		m_state = DRIVE_STATE.LOWGEAR;
 
-		this.m_Rtalon1 = R1;
-		this.m_Rtalon2 = R2;
-		this.m_Rtalon3 = R3;
+		m_Rtalon1 = R1;
+		m_Rtalon2 = R2;
+		m_Rtalon3 = R3;
 
-		this.m_Ltalon1 = L1;
-		this.m_Ltalon2 = L2;
-		this.m_Ltalon3 = L3;
+		m_Ltalon1 = L1;
+		m_Ltalon2 = L2;
+		m_Ltalon3 = L3;
 	}
 
 	public void SetDrive(double leftSpeed, double rightSpeed)
@@ -65,39 +65,39 @@ implements PIDOutput
 
 	public void SetLeft(double speed)
 	{
-		if (this.numOfJags == 2)
+		if (numOfJags == 2)
 		{
-			this.m_Ltalon1.set(-speed);
+			m_Ltalon1.set(-speed);
 		}
-		else if (this.numOfJags == 4)
+		else if (numOfJags == 4)
 		{
-			this.m_Ltalon1.set(-speed);
-			this.m_Ltalon2.set(-speed);
+			m_Ltalon1.set(-speed);
+			m_Ltalon2.set(-speed);
 		}
 		else
 		{
-			this.m_Ltalon1.set(-speed);
-			this.m_Ltalon2.set(-speed);
-			this.m_Ltalon3.set(-speed);
+			m_Ltalon1.set(-speed);
+			m_Ltalon2.set(-speed);
+			m_Ltalon3.set(-speed);
 		}
 	}
 
 	public void SetRight(double speed)
 	{
-		if (this.numOfJags == 2)
+		if (numOfJags == 2)
 		{
-			this.m_Rtalon1.set(speed);
+			m_Rtalon1.set(speed);
 		}
-		else if (this.numOfJags == 4)
+		else if (numOfJags == 4)
 		{
-			this.m_Rtalon1.set(speed);
-			this.m_Rtalon2.set(speed);
+			m_Rtalon1.set(speed);
+			m_Rtalon2.set(speed);
 		}
 		else
 		{
-			this.m_Rtalon1.set(speed);
-			this.m_Rtalon2.set(speed);
-			this.m_Rtalon3.set(speed);
+			m_Rtalon1.set(speed);
+			m_Rtalon2.set(speed);
+			m_Rtalon3.set(speed);
 		}
 	}
 
@@ -109,51 +109,51 @@ implements PIDOutput
 
 	public void highGear()
 	{
-		this.m_Rtalon1.setVoltageRampRate(this.highgear);
-		this.m_Rtalon2.setVoltageRampRate(this.highgear);
-//		this.m_Rtalon3.setVoltageRampRate(this.highgear);
-		this.m_Ltalon1.setVoltageRampRate(this.highgear);
-		this.m_Ltalon2.setVoltageRampRate(this.highgear);
-//		this.m_Ltalon3.setVoltageRampRate(this.highgear);
+		m_Rtalon1.setVoltageRampRate(highgear);
+		m_Rtalon2.setVoltageRampRate(highgear);
+//		m_Rtalon3.setVoltageRampRate(highgear);
+		m_Ltalon1.setVoltageRampRate(highgear);
+		m_Ltalon2.setVoltageRampRate(highgear);
+//		m_Ltalon3.setVoltageRampRate(highgear);
 	}
 
 	public void lowGear()
 	{
-		this.m_Rtalon1.setVoltageRampRate(this.lowgear);
-		this.m_Rtalon2.setVoltageRampRate(this.lowgear);
-//		this.m_Rtalon3.setVoltageRampRate(this.lowgear);
-		this.m_Ltalon1.setVoltageRampRate(this.lowgear);
-		this.m_Ltalon2.setVoltageRampRate(this.lowgear);
-//		this.m_Ltalon3.setVoltageRampRate(this.lowgear);
+		m_Rtalon1.setVoltageRampRate(lowgear);
+		m_Rtalon2.setVoltageRampRate(lowgear);
+//		m_Rtalon3.setVoltageRampRate(lowgear);
+		m_Ltalon1.setVoltageRampRate(lowgear);
+		m_Ltalon2.setVoltageRampRate(lowgear);
+//		m_Ltalon3.setVoltageRampRate(lowgear);
 	}
 
 	public void offGear()
 	{
-		this.m_Rtalon1.setVoltageRampRate(1200.0D);
-		this.m_Rtalon2.setVoltageRampRate(1200.0D);
-//		this.m_Rtalon3.setVoltageRampRate(1200.0D);
-		this.m_Ltalon1.setVoltageRampRate(1200.0D);
-		this.m_Ltalon2.setVoltageRampRate(1200.0D);
-//		this.m_Ltalon3.setVoltageRampRate(1200.0D);
+		m_Rtalon1.setVoltageRampRate(1200.0D);
+		m_Rtalon2.setVoltageRampRate(1200.0D);
+//		m_Rtalon3.setVoltageRampRate(1200.0D);
+		m_Ltalon1.setVoltageRampRate(1200.0D);
+		m_Ltalon2.setVoltageRampRate(1200.0D);
+//		m_Ltalon3.setVoltageRampRate(1200.0D);
 	}
 
 	public void pivot()
 	{
-		this.m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		this.m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-//		this.m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		this.m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		this.m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-//		this.m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
+//		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
+		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
+//		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
 	}
 
 	public void unpivot()
 	{
-		this.m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		this.m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		this.m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		this.m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		this.m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		this.m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 	}
 }

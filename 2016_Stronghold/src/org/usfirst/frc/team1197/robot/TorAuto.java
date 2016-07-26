@@ -2,6 +2,7 @@ package org.usfirst.frc.team1197.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
+
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
@@ -9,8 +10,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.io.PrintStream;
 
 public class TorAuto
 {
@@ -57,12 +56,12 @@ public class TorAuto
 		this.stick = stick;
 		this.drive = drive;
 		this.shift = shift;
-		this.auto_input = cypress;
-		this.auto_input = new Joystick(2);
+		auto_input = cypress;
+		auto_input = new Joystick(2);
 		this.stick2 = stick2;
-		this.m_encoder = encoder;
-		this.gyro = ahrs;
-		this.m_cans = cans;
+		m_encoder = encoder;
+		gyro = ahrs;
+		m_cans = cans;
 		this.siege = siege;
 		this.intake = intake;
 		this.shoot = shoot;
@@ -72,58 +71,58 @@ public class TorAuto
 
 	public int throttle()
 	{
-		double val = (this.stick.getThrottle() + 1.0D) * 4.0D;
+		double val = (stick.getThrottle() + 1.0D) * 4.0D;
 		return (int)val;
 	}
 
 	public int[] initialize()
 	{
 		int[] laneDefense = new int[2];
-		if ((!this.auto_input.getRawButton(1)) && (this.auto_input.getRawButton(2))) {
-			this.lane = 1;
-		} else if ((!this.auto_input.getRawButton(1)) && (!this.auto_input.getRawButton(2))) {
-			this.lane = 3;
-		} else if (!this.auto_input.getRawButton(2)) {
-			this.lane = 2;
-		} else if (!this.auto_input.getRawButton(3)) {
-			this.lane = 4;
+		if ((!auto_input.getRawButton(1)) && (auto_input.getRawButton(2))) {
+			lane = 1;
+		} else if ((!auto_input.getRawButton(1)) && (!auto_input.getRawButton(2))) {
+			lane = 3;
+		} else if (!auto_input.getRawButton(2)) {
+			lane = 2;
+		} else if (!auto_input.getRawButton(3)) {
+			lane = 4;
 		} else {
 			DriverStation.reportError("You have selected the wrong lane!", false);
 		}
-		if ((!this.auto_input.getRawButton(5)) && (this.auto_input.getRawButton(6)) && 
-				(this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
-			this.defense = 1;
-		} else if ((this.auto_input.getRawButton(5)) && (!this.auto_input.getRawButton(6)) && 
-				(this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
-			this.defense = 2;
-		} else if ((!this.auto_input.getRawButton(5)) && (!this.auto_input.getRawButton(6)) && 
-				(this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
-			this.defense = 3;
-		} else if ((this.auto_input.getRawButton(5)) && (this.auto_input.getRawButton(6)) && 
-				(!this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
-			this.defense = 4;
-		} else if ((!this.auto_input.getRawButton(5)) && (this.auto_input.getRawButton(6)) && 
-				(!this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
-			this.defense = 5;
-		} else if ((this.auto_input.getRawButton(5)) && (!this.auto_input.getRawButton(6)) && 
-				(!this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
-			this.defense = 6;
-		} else if ((!this.auto_input.getRawButton(5)) && (!this.auto_input.getRawButton(6)) && 
-				(!this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
-			this.defense = 7;
-		} else if ((this.auto_input.getRawButton(5)) && (this.auto_input.getRawButton(6)) && 
-				(this.auto_input.getRawButton(7)) && (!this.auto_input.getRawButton(8))) {
-			this.defense = 8;
-		} else if ((this.auto_input.getRawButton(5)) && (this.auto_input.getRawButton(6)) && 
-				(this.auto_input.getRawButton(7)) && (this.auto_input.getRawButton(8))) {
-			this.defense = 0;
+		if ((!auto_input.getRawButton(5)) && (auto_input.getRawButton(6)) && 
+				(auto_input.getRawButton(7)) && (auto_input.getRawButton(8))) {
+			defense = 1;
+		} else if ((auto_input.getRawButton(5)) && (!auto_input.getRawButton(6)) && 
+				(auto_input.getRawButton(7)) && (auto_input.getRawButton(8))) {
+			defense = 2;
+		} else if ((!auto_input.getRawButton(5)) && (!auto_input.getRawButton(6)) && 
+				(auto_input.getRawButton(7)) && (auto_input.getRawButton(8))) {
+			defense = 3;
+		} else if ((auto_input.getRawButton(5)) && (auto_input.getRawButton(6)) && 
+				(!auto_input.getRawButton(7)) && (auto_input.getRawButton(8))) {
+			defense = 4;
+		} else if ((!auto_input.getRawButton(5)) && (auto_input.getRawButton(6)) && 
+				(!auto_input.getRawButton(7)) && (auto_input.getRawButton(8))) {
+			defense = 5;
+		} else if ((auto_input.getRawButton(5)) && (!auto_input.getRawButton(6)) && 
+				(!auto_input.getRawButton(7)) && (auto_input.getRawButton(8))) {
+			defense = 6;
+		} else if ((!auto_input.getRawButton(5)) && (!auto_input.getRawButton(6)) && 
+				(!auto_input.getRawButton(7)) && (auto_input.getRawButton(8))) {
+			defense = 7;
+		} else if ((auto_input.getRawButton(5)) && (auto_input.getRawButton(6)) && 
+				(auto_input.getRawButton(7)) && (!auto_input.getRawButton(8))) {
+			defense = 8;
+		} else if ((auto_input.getRawButton(5)) && (auto_input.getRawButton(6)) && 
+				(auto_input.getRawButton(7)) && (auto_input.getRawButton(8))) {
+			defense = 0;
 		} else {
 			DriverStation.reportError("Incorrect Defense", false);
 		}
 		SmartDashboard.putNumber("Lane selected", laneDefense[0]);
 		SmartDashboard.putNumber("Defense selected", laneDefense[1]);
-		laneDefense[0] = this.lane;
-		laneDefense[1] = this.defense;
+		laneDefense[0] = lane;
+		laneDefense[1] = defense;
 		return laneDefense;
 	}
 
@@ -152,77 +151,76 @@ public class TorAuto
 
 	public void telePortcullis()
 	{
-		this.intake.portcullis();
+		intake.portcullis();
 	}
 
 	public void turnToTheta(double theta, double turnSpeed)
 	{
 		this.turnSpeed = turnSpeed;
-		double currentAngle = this.gyro.getAngle();
-		this.turnAngle = 0.0D;
-		while (currentAngle != this.turnAngle) {
-			this.m_cans.SetDrive(-this.turnSpeed, -this.turnSpeed);
+		double currentAngle = gyro.getAngle();
+		turnAngle = 0.0D;
+		while (currentAngle != turnAngle) {
+			m_cans.SetDrive(-turnSpeed, -turnSpeed);
 		}
 	}
 
 	public void touchAuto()
 	{
-		this.m_encoder.reset();
-		this.drive.driveDistance(57.0F, 0.5F, true);
-		this.m_cans.SetDrive(0.0D, 0.0D);
+		m_encoder.reset();
+		drive.driveDistance(57.0F, 0.5F, true);
+		m_cans.SetDrive(0.0D, 0.0D);
 	}
 
 	public void Moat()
 	{
-		this.m_encoder.reset();
-		this.siege.setDegrees(this.sallyPort);
-		this.siege.highGear();
-		this.drive.driveDistance(15.0F, 0.5F, true);
-		this.drive.driveDistance(45.0F, 1.0F, true);
-		this.drive.driveDistance(90.0F, 0.5F, true);
-		this.m_cans.SetDrive(0.0D, 0.0D);
-		this.siege.setDegrees(0.0D);
+		m_encoder.reset();
+		siege.setDegrees(sallyPort);
+		siege.highGear();
+		drive.driveDistance(15.0F, 0.5F, true);
+		drive.driveDistance(45.0F, 1.0F, true);
+		drive.driveDistance(90.0F, 0.5F, true);
+		m_cans.SetDrive(0.0D, 0.0D);
+		siege.setDegrees(0.0D);
 	}
 
 	public void RoughTerrain()
 	{
-		this.m_encoder.reset();
-		this.siege.setDegrees(this.sallyPort);
-		this.drive.driveDistance(130.0F, 0.5F, true);
-		this.m_cans.SetDrive(0.0D, 0.0D);
+		m_encoder.reset();
+		siege.setDegrees(sallyPort);
+		drive.driveDistance(130.0F, 0.5F, true);
+		m_cans.SetDrive(0.0D, 0.0D);
 	}
 
 	public void RockWall()
 	{
-		this.m_encoder.reset();
-		this.siege.setDegrees(this.sallyPort);
-		this.siege.highGear();
-		this.drive.driveDistance(15.0F, 0.5F, true);
-		this.drive.driveDistance(45.0F, 1.0F, true);
-		this.drive.driveDistance(90.0F, 0.5F, true);
-		this.m_cans.SetDrive(0.0D, 0.0D);
-		this.siege.setDegrees(0.0D);
+		m_encoder.reset();
+		siege.setDegrees(sallyPort);
+		siege.highGear();
+		drive.driveDistance(15.0F, 0.5F, true);
+		drive.driveDistance(45.0F, 1.0F, true);
+		drive.driveDistance(90.0F, 0.5F, true);
+		m_cans.SetDrive(0.0D, 0.0D);
+		siege.setDegrees(0.0D);
 	}
 
 	public void Ramparts()
 	{
-		this.m_encoder.reset();
-		this.siege.setDegrees(this.sallyPort);
-		this.drive.driveDistance(140.0F, 1.0F, true);
-		this.m_cans.SetDrive(0.0D, 0.0D);
-		this.siege.setDegrees(0.0D);
+		m_encoder.reset();
+		siege.setDegrees(sallyPort);
+		drive.driveDistance(140.0F, 1.0F, true);
+		m_cans.SetDrive(0.0D, 0.0D);
+		siege.setDegrees(0.0D);
 	}
 
 	public void DrawBridge()
 	{
-		this.m_encoder.reset();
-		this.drive.driveDistance(62.0F, 0.5F, true); //65
-		this.m_cans.SetDrive(0.0D, 0.0D);
-		this.siege.DrawBridge();
-		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
-			this.siege.SiegeArmUpdate();
+		m_encoder.reset();
+		drive.driveDistance(62.0F, 0.5F, true); //65
+		m_cans.SetDrive(0.0D, 0.0D);
+		siege.DrawBridge();
+		while ((robot.isEnabled()) && (robot.isAutonomous())) {
+			siege.SiegeArmUpdate();
 			if(siege.m_states == TorSiege.DRAWBRIDGE.IDLE) {
-//				System.out.println("Breaking");
 				break;
 			}
 		}
@@ -231,14 +229,13 @@ public class TorAuto
 	public void ChevelDeFrise()
 	{
 		
-		this.m_encoder.reset();
-		this.drive.driveDistance(60.0F, 0.5F, true);
-		this.m_cans.SetDrive(0.0D, 0.0D);
-		this.siege.Cheve();
-		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
-			this.siege.SiegeArmUpdate();
+		m_encoder.reset();
+		drive.driveDistance(60.0F, 0.5F, true);
+		m_cans.SetDrive(0.0D, 0.0D);
+		siege.Cheve();
+		while ((robot.isEnabled()) && (robot.isAutonomous())) {
+			siege.SiegeArmUpdate();
 			if(siege.m_chev == TorSiege.CHEVEL.IDLE) {
-//				System.out.println("Breaking");
 				break;
 			}
 		}
@@ -247,20 +244,18 @@ public class TorAuto
 	public void Sallyport()
 	{
 		
-		this.m_encoder.reset();
-		this.drive.driveDistance(60.0F, 0.5F, true);
-		this.m_cans.SetDrive(0.0D, 0.0D);
-		this.siege.SallyPort();
-		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
-			this.siege.SiegeArmUpdate();
+		m_encoder.reset();
+		drive.driveDistance(60.0F, 0.5F, true);
+		m_cans.SetDrive(0.0D, 0.0D);
+		siege.SallyPort();
+		while ((robot.isEnabled()) && (robot.isAutonomous())) {
+			siege.SiegeArmUpdate();
 			if(siege.m_sally == TorSiege.SALLYPORT.IDLE) {
-//				System.out.println("Breaking");
 				break;
 			}
 		}
 	}
 	
-	//testShoot 1, 2, 3, 4 is just a test function for autoshooting in the shop.
 	public void testShoot3()
 	{
 		AutoDriving();
@@ -287,100 +282,91 @@ public class TorAuto
 		turnLane1();
 		ShootAuto();
 	}
-	//ShootAuto is a function that will shoot automatically.
+
 	public void ShootAuto()
 	{
 		double breakTime = System.currentTimeMillis()+1000;
-//		System.out.println("AUTO SHOOTING");
-		siege.setDegrees(siege.intakeVal);
+		siege.setDegrees(siege.intakeVal1);
 		while(siege.siegeOnTarget(2)){
 			if(System.currentTimeMillis()<breakTime)
 				break;
 	}
 		Timer.delay(1.0D);
-		double value = this.camera.GetValue();
-		this.gyro.reset();
-		this.camera.AutonomousShoot(value);
+		double value = camera.GetValue();
+		gyro.reset();
+		camera.AutonomousShoot(value);
 	}
-	//AutoDriving was just for testing auto in the shop.
+
 	public void AutoDriving()
 	{
-		this.siege.setDegrees(-50.0D);
-		while (this.m_encoder.getDistance() < 120.0D) {
-			this.m_cans.SetDrive(0.6D, -0.6D);
+		siege.setDegrees(-50.0D);
+		while (m_encoder.getDistance() < 120.0D) {
+			m_cans.SetDrive(0.6D, -0.6D);
 		}
-		this.m_cans.SetDrive(0.0D, 0.0D);
+		m_cans.SetDrive(0.0D, 0.0D);
 	}
-	
-	//turnLane1, 3, 4 is a pre-turn function for the autonomous.
-	//lane 2 does not require pre-turn.
-	//we might need to adjust the pre-turn.
-	
+
 	public void turnLane1()
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
-		this.gyro.reset();
-//		System.out.println("GYRO: " + this.gyro.getAngle());
-		this.m_cans.pivot();
-		while (!this.siege.turnToShoot(-15.0D)) {
+		gyro.reset();
+		m_cans.pivot();
+		while (!siege.turnToShoot(-15.0D)) {
 			if (timeout < System.currentTimeMillis()) {
 				break;
 			}
 		}
-		this.m_cans.unpivot();
-		this.m_cans.SetDrive(0.0D, 0.0D);
+		m_cans.unpivot();
+		m_cans.SetDrive(0.0D, 0.0D);
 	}
 
 	public void turnLane3()
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
-		this.gyro.reset();
-//		System.out.println("GYRO: " + this.gyro.getAngle());
-		this.m_cans.pivot();
-		while (!this.siege.turnToShoot(10.0D)) {
+		gyro.reset();
+		m_cans.pivot();
+		while (!siege.turnToShoot(10.0D)) {
 			if (timeout < System.currentTimeMillis()) {
 				break;
 			}
 		}
-		this.m_cans.unpivot();
-		this.m_cans.SetDrive(0.0D, 0.0D);
+		m_cans.unpivot();
+		m_cans.SetDrive(0.0D, 0.0D);
 	}
 
 	public void turnLane4()
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
-		this.gyro.reset();
-//		System.out.println("GYRO: " + this.gyro.getAngle());
-		this.m_cans.pivot();
-		while (!this.siege.turnToShoot(30.0D)) {
+		gyro.reset();
+		m_cans.pivot();
+		while (!siege.turnToShoot(30.0D)) {
 			if (timeout < System.currentTimeMillis()) {
 				break;
 			}
 		}
-		this.m_cans.unpivot();
-		this.m_cans.SetDrive(0.0D, 0.0D);
+		m_cans.unpivot();
+		m_cans.SetDrive(0.0D, 0.0D);
 	}
 
 	public void Portcullis()
 	{
-		this.m_encoder.reset();
-		while (this.m_encoder.getDistance() < 44.0D)
+		m_encoder.reset();
+		while (m_encoder.getDistance() < 44.0D)
 		{
-			this.m_cans.SetDrive(0.7D, -0.7D);
-			this.siege.setDegrees(this.siege.portcullisBot + 14.0D);
+			m_cans.SetDrive(0.7D, -0.7D);
+			siege.setDegrees(siege.portcullisBot + 14.0D);
 		}
-		while ((this.m_encoder.getDistance() >= 44.0D) && 
-				(this.m_encoder.getDistance() < 60.0D))
+		while ((m_encoder.getDistance() >= 44.0D) && 
+				(m_encoder.getDistance() < 60.0D))
 		{
-			this.m_cans.SetDrive(0.3D, -0.3D);
-			this.siege.setDegrees(this.siege.portcullisBot);
+			m_cans.SetDrive(0.3D, -0.3D);
+			siege.setDegrees(siege.portcullisBot);
 		}
-		this.m_cans.SetDrive(0.0D, 0.0D);
-		this.siege.Portcullis();
-		while ((this.robot.isEnabled()) && (this.robot.isAutonomous())) {
-			this.siege.SiegeArmUpdate();
+		m_cans.SetDrive(0.0D, 0.0D);
+		siege.Portcullis();
+		while ((robot.isEnabled()) && (robot.isAutonomous())) {
+			siege.SiegeArmUpdate();
 			if(siege.m_port == TorSiege.PORTCULLIS.IDLE) {
-//				System.out.println("Beaking");
 				break;
 			}
 		}

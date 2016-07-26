@@ -27,32 +27,32 @@ public class TorDrive
 
 	public TorDrive(Joystick stick, TorCAN jagDrive)
 	{
-		this.stepValue = -1.0D;
-		this.dec = 0.02D;
-		this.previousStick = 0.0D;
+		stepValue = -1.0D;
+		dec = 0.02D;
+		previousStick = 0.0D;
 
-		this.m_stick = stick;
+		m_stick = stick;
 
-		this.m_jagDrive = jagDrive;
+		m_jagDrive = jagDrive;
 
-		this.table = NetworkTable.getTable("GRIP/myContoursReport");
+		table = NetworkTable.getTable("GRIP/myContoursReport");
 	}
 
 	public TorDrive(Joystick stick, Joystick stick2, TorCAN cans, Encoder encoder, Solenoid shift)
 	{
-		this.m_stick = stick;
-		this.overrideStick = stick2;
-		this.m_jagDrive = cans;
-		this.m_encoder = encoder;
-		this.m_solenoidshift = shift;
+		m_stick = stick;
+		overrideStick = stick2;
+		m_jagDrive = cans;
+		m_encoder = encoder;
+		m_solenoidshift = shift;
 	}
 
 	public void ArcadeDrive(boolean squaredInputs)
 	{
 		boolean shiftButton = false;
 
-		double stickX = this.m_stick.getX();
-		double stickY = this.m_stick.getY();
+		double stickX = m_stick.getX();
+		double stickY = m_stick.getY();
 
 		stickX = -stickX;
 		stickY = -stickY;
@@ -62,17 +62,12 @@ public class TorDrive
 		if (Math.abs(stickY) <= 0.2D) {
 			stickY = 0.0D;
 		}
-		if (!this.m_solenoidshift.get())
+		if (!m_solenoidshift.get())
 		{
-//			if ((this.m_jagDrive.m_state != TorCAN.DRIVE_STATE.PIVOTING) && (Math.abs(stickX) > 0.0D) && (Math.abs(stickY) == 0.0D))
-//			{
-//				this.m_jagDrive.m_state = TorCAN.DRIVE_STATE.PIVOTING;
-//				this.m_jagDrive.offGear();
-//			}
-			if (this.m_jagDrive.m_state == TorCAN.DRIVE_STATE.PIVOTING)
+			if (m_jagDrive.m_state == TorCAN.DRIVE_STATE.PIVOTING)
 			{
-				this.m_jagDrive.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				this.m_jagDrive.lowGear();
+				m_jagDrive.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+				m_jagDrive.lowGear();
 			}
 			stickX *= 0.9D;
 		}
@@ -130,10 +125,10 @@ public class TorDrive
 				rightMotorSpeed = -Math.max(-stickY, -stickX);
 			}
 		}
-		if (this.m_solenoidshift.get()) {
-			this.m_jagDrive.SetDrive(rightMotorSpeed * 0.65D, -leftMotorSpeed * 0.65D);
+		if (m_solenoidshift.get()) {
+			m_jagDrive.SetDrive(rightMotorSpeed * 0.65D, -leftMotorSpeed * 0.65D);
 		} else {
-			this.m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+			m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
 		}
 	}
 
@@ -141,12 +136,12 @@ public class TorDrive
 	{
 		boolean shiftButton = false;
 
-		double stickX = this.m_stick.getX();
-		double stickY = this.m_stick.getY();
+		double stickX = m_stick.getX();
+		double stickY = m_stick.getY();
 
 		stickX = -stickX;
 		stickY = -stickY;
-		shiftButton = this.m_stick.getRawButton(1);
+		shiftButton = m_stick.getRawButton(1);
 		if (Math.abs(stickX) <= 0.2D) {
 			stickX = 0.0D;
 		}
@@ -165,11 +160,6 @@ public class TorDrive
 		if (stickY < -1.0D) {
 			stickY = -1.0D;
 		}
-//		if (shiftButton) {
-//			this.m_solenoidshift.set(true);
-//		} else {
-//			this.m_solenoidshift.set(false);
-//		}
 		if (squaredInputs)
 		{
 			if (stickX >= 0.0D) {
@@ -212,35 +202,35 @@ public class TorDrive
 				rightMotorSpeed = -Math.max(-stickY, -stickX) * 20.0D;
 			}
 		}
-		this.m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
 	}
 
 	public void driveDistance(float distance, float speed, boolean forward)
 	{
-		this.m_encoder.reset();
+		m_encoder.reset();
 		if (forward == true)
 		{
 			if (distance < 20.0F) {
-				this.negOvershoot = 0.0F;
+				negOvershoot = 0.0F;
 			} else {
-				this.negOvershoot = 11.0F;
+				negOvershoot = 11.0F;
 			}
-			distance -= this.negOvershoot;
+			distance -= negOvershoot;
 			do
 			{
-				if (this.m_encoder.getDistance() > distance) {
+				if (m_encoder.getDistance() > distance) {
 					break;
 				}
-				this.m_jagDrive.SetDrive(speed, -speed);
-			} while (!this.overrideStick.getRawButton(10)); //??? 4/29 hotel pmn
+				m_jagDrive.SetDrive(speed, -speed);
+			} while (!overrideStick.getRawButton(10)); 
 		}
 		else
 		{
-			distance += this.negOvershoot;
-			while (this.m_encoder.getDistance() >= distance)
+			distance += negOvershoot;
+			while (m_encoder.getDistance() >= distance)
 			{
-				this.m_jagDrive.SetDrive(-speed, speed);
-				if (this.overrideStick.getRawButton(10)) {
+				m_jagDrive.SetDrive(-speed, speed);
+				if (overrideStick.getRawButton(10)) {
 					break;
 				}
 			}
@@ -249,16 +239,16 @@ public class TorDrive
 
 	public void highGear()
 	{
-		this.m_jagDrive.highGear();
+		m_jagDrive.highGear();
 	}
 
 	public void lowGear()
 	{
-		this.m_jagDrive.lowGear();
+		m_jagDrive.lowGear();
 	}
 
 	public void offGear()
 	{
-		this.m_jagDrive.offGear();
+		m_jagDrive.offGear();
 	}
 }

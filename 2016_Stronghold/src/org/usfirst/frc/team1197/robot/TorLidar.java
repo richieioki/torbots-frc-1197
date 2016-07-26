@@ -9,15 +9,15 @@ public class TorLidar
   
   public TorLidar(SerialPort sp)
   {
-    this.m_port = sp;
+    m_port = sp;
   }
   
   public int getDistance()
   {
-    this.m_port.writeString("r\n");
+    m_port.writeString("r\n");
     Timer.delay(0.05D);
     
-    String distance = this.m_port.readString();
+    String distance = m_port.readString();
     if (distance.length() == 0) {
       return -1;
     }

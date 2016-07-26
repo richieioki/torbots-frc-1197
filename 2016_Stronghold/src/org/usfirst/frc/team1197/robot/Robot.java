@@ -2,6 +2,7 @@ package org.usfirst.frc.team1197.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
+
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
@@ -75,29 +76,23 @@ extends SampleRobot
 	private TorShooter shoot;
 	private TorCamera camera;
 	private NetworkTable table;
-	private double closeHood = 1690.0D;
-	private double midHood = 1150.0D;
-	private double farHood = 440.0D;
-	private double leftHood = 702.0D;
 	double hoodPosition;
 
 	public Robot()
 	{
-		//this.lidar = new TorLidar(new SerialPort(38400, SerialPort.Port.kOnboard));
-
 		gyro = new AHRS(SPI.Port.kMXP);
 		stick = new Joystick(0);
-		this.stick2 = new Joystick(1);
-		this.cypress = new Joystick(2);
-		this.stick3 = new Joystick(3);
+		stick2 = new Joystick(1);
+		cypress = new Joystick(2);
+		stick3 = new Joystick(3);
 
 		R1 = new CANTalon(1);
 		R2 = new CANTalon(2);
 
-		this.L1 = new CANTalon(5);
-		this.L2 = new CANTalon(6);
+		L1 = new CANTalon(5);
+		L2 = new CANTalon(6);
 
-		this.T1 = new CANTalon(7);
+		T1 = new CANTalon(7);
 
 		
 
@@ -110,66 +105,63 @@ extends SampleRobot
 		RampRate = 0.0D;
 		profile = 0;
 		
-		this.T1.changeControlMode(CANTalon.TalonControlMode.Position);
-		this.T1.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
-//		this.T1.reverseOutput(true);
+		T1.changeControlMode(CANTalon.TalonControlMode.Position);
+		T1.setFeedbackDevice(CANTalon.FeedbackDevice.AnalogPot);
+//		T1.reverseOutput(true);
 		
-		this.T1.setPID(20.0D, 0.0D, 0.0D, 0.0D, 0, RampRate, 1);
-		this.T1.setPID(16.0D, 0.0D, 0.0D, 0.0D, 0, RampRate, 0);
+		T1.setPID(20.0D, 0.0D, 0.0D, 0.0D, 0, RampRate, 1);
+		T1.setPID(16.0D, 0.0D, 0.0D, 0.0D, 0, RampRate, 0);
 		//profile 1 = 20 profile 0 = 16
-		this.P1 = new CANTalon(8);
-		this.P2 = new CANTalon(9);
+		P1 = new CANTalon(8);
+		P2 = new CANTalon(9);
 	
 		P3 = new CANTalon(4);
 		P4 = new CANTalon(3);
-		this.S1 = new Solenoid(0);
+		S1 = new Solenoid(0);
 
-		this.shooter1 = new CANTalon(11);
-		this.shooter2 = new CANTalon(12);
+		shooter1 = new CANTalon(11);
+		shooter2 = new CANTalon(12);
 		
 
-		this.hood = new CANTalon(10);
-//		this.hood.setFeedbackDevice(CANTalon.FeedbackDevice.CtreMagEncoder_Absolute);
+		hood = new CANTalon(10);
 
-//		this.hoodPosition = this.hood.getPulseWidthPosition();
+		breakBeam = new DigitalInput(4);
+		breakBeam2 = new DigitalInput(5);
+		gyro = new AHRS(SerialPort.Port.kMXP);
+		pot = new AnalogPotentiometer(0);
+		encoder = new Encoder(0, 1);
+		encoder.setDistancePerPulse(0.017857142857142856D);
+		driveCANS = new TorCAN(R1, R2, L1, L2);
 
-		this.breakBeam = new DigitalInput(4);
-		this.breakBeam2 = new DigitalInput(5);
-		this.gyro = new AHRS(SerialPort.Port.kMXP);
-		this.pot = new AnalogPotentiometer(0);
-		this.encoder = new Encoder(0, 1);
-		this.encoder.setDistancePerPulse(0.017857142857142856D);
-		this.driveCANS = new TorCAN(this.R1, this.R2, this.L1, this.L2);
+		intakee = new TorIntake(stick2, P1, P2, P3, P4, breakBeam, breakBeam2, siege, shoot); //stick2 -> stick
 
-		this.intakee = new TorIntake(this.stick2, this.P1, this.P2, P3, P4, this.breakBeam, this.breakBeam2, this.siege, this.shoot);
+		drive = new TorDrive(stick, stick2, driveCANS, encoder, S1); //switch stick and stick2
 
-		this.drive = new TorDrive(this.stick, this.stick2, this.driveCANS, this.encoder, this.S1);
+		siege = new TorSiege(T1, stick2, pot, driveCANS, S1, stick, intakee, drive, encoder, gyro, camera);
 
-		this.siege = new TorSiege(this.T1, this.stick2, this.pot, this.driveCANS, this.S1, this.stick, this.intakee, this.drive, this.encoder, this.gyro, camera);
+		camera = new TorCamera(table, gyro, driveCANS, siege, intakee, stick2);
 
-		this.camera = new TorCamera(this.table, this.gyro, this.driveCANS, this.siege, this.intakee, stick2);
+		shoot = new TorShooter(intakee, shooter1, shooter2, hood, P2, P1, stick2, gyro, driveCANS, camera);
 
-		this.shoot = new TorShooter(this.intakee, this.shooter1, this.shooter2, this.hood, this.P2, this.P1, this.stick2, this.gyro, this.driveCANS, this.camera);
-
-		this.auto = new TorAuto(this.cypress, this.stick, this.stick2, this.gyro, this.encoder, this.driveCANS, this.S1, this.siege, this.intakee, this.drive, this.shoot, this, this.camera);
+		auto = new TorAuto(cypress, stick, stick2, gyro, encoder, driveCANS, S1, siege, intakee, drive, shoot, this, camera);
 	}
 
 	public void robotInit()
 	{
-		this.hood.set(this.hood.get());
+		hood.set(hood.get());
 	}
 
 	public void autonomous()
 	{
 		shooter1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
 		shooter2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		this.shooter1.set(1);
-		this.shooter2.set(1);
-		this.encoder.reset();
-		this.siege.PID();
-		this.driveCANS.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+		shooter1.set(1);
+		shooter2.set(1);
+		encoder.reset();
+		siege.PID();
+		driveCANS.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 		drive.lowGear();
-		this.auto.ModeChooser();
+		auto.ModeChooser();
 		shooter1.changeControlMode(CANTalon.TalonControlMode.Voltage);
 		shooter2.changeControlMode(CANTalon.TalonControlMode.Voltage);
 	}
@@ -178,36 +170,36 @@ extends SampleRobot
 	{
 		shooter1.changeControlMode(CANTalon.TalonControlMode.Voltage);
 		shooter2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		boolean shootEnabled = false;
-		this.encoder.reset();
-		this.gyro.reset();
-		this.siege.PID();
+		encoder.reset();
+		gyro.reset();
+		siege.PID();
 
 		float rampRate = 15.0F;
 
-		this.driveCANS.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
-		this.drive.highGear();
+		driveCANS.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+		drive.highGear();
 		while (isEnabled())
 		{
-			this.siege.SiegeArmUpdate();
-			this.siege.intakeTele();
-			this.intakee.intake();
-			if (!this.siege.enabled) {
-				this.drive.ArcadeDrive(true);
+			System.out.println("POT: " + T1.getAnalogInRaw());
+			siege.SiegeArmUpdate();
+			siege.intakeTele();
+			intakee.intake();
+			if (!siege.enabled) {
+				drive.ArcadeDrive(true);
 			}
-			this.shoot.shooter();
+			shoot.shooter();
 		}
 	}
 
 	public void disabled()
 	{
-		this.T1.disableControl();
+		T1.disableControl();
 	}
 
 	public void test()
 	{
-		this.compressor = new Compressor();
-		this.compressor.start();
+		compressor = new Compressor();
+		compressor.start();
 		
 		gyro.reset();
 		

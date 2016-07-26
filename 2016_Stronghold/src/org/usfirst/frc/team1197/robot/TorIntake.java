@@ -30,88 +30,82 @@ public class TorIntake
 			CANTalon cantalon4, DigitalInput breakBeam, DigitalInput breakBeam2, TorSiege siege, 
 			TorShooter shoot)
 	{
-		this.armTalon = cantalon;
-		this.elevatorTalon = cantalon2;
+		armTalon = cantalon;
+		elevatorTalon = cantalon2;
 		verticalTalon = cantalon3;
-		this.bottomBreakBeam = breakBeam;
-		this.shooterBreakBeam = breakBeam2;
+		bottomBreakBeam = breakBeam;
+		shooterBreakBeam = breakBeam2;
 		this.siege = siege;
 		this.stick = stick;
-		this.m_state = IntakeState.IDLE;
-		this.m_shoot = shoot;
+		m_state = IntakeState.IDLE;
+		m_shoot = shoot;
 		verticalTalon1 = cantalon4;
 	}
 
 	public void intake()
 	{
-		if (this.stick.getRawButton(4))
+		if (stick.getRawButton(4)) //11
 		{
-			this.m_state = IntakeState.IDLE;
-			this.elevatorTalon.set(1);
+			m_state = IntakeState.IDLE;
+			elevatorTalon.set(1);
 			verticalTalon.set(0.95);
 			verticalTalon1.set(0.95);
-			this.armTalon.set(1);
+			armTalon.set(1);
 		}
-		else if (this.stick.getRawButton(6)||this.stick.getRawButton(5))
+		else if (stick.getRawButton(5)) //12
 		{
-			this.m_state = IntakeState.IDLE;
-			this.armTalon.set(-1);
+			m_state = IntakeState.IDLE;
+			armTalon.set(-1);
 			verticalTalon.set(-0.95);
 			verticalTalon1.set(-0.95);
-			this.elevatorTalon.set(-1);
+			elevatorTalon.set(-1);
 		}
-//		else if (this.stick.getRawButton(7))
-//		{
-//			this.m_state = IntakeState.IDLE;
-//			armTalon.set(0.0);
-//			this.elevatorTalon.set(-1);
-//		}
-		else if ((this.stick.getRawButton(3)) && (this.m_state == IntakeState.IDLE))
+		else if ((stick.getRawButton(3)) && (m_state == IntakeState.IDLE)) //1
 		{
-			if (this.shooterBreakBeam.get() != true)
+			if (shooterBreakBeam.get() != true)
 			{
-				this.m_state = IntakeState.BOTH;
+				m_state = IntakeState.BOTH;
 
-				this.elevatorTalon.set(-1);
+				elevatorTalon.set(-1);
 				verticalTalon.set(-0.95);
 				verticalTalon1.set(-0.95);
-				this.armTalon.set(-1);
+				armTalon.set(-1);
 			}
 		}
-		else if (this.m_state == IntakeState.BOTH)
+		else if (m_state == IntakeState.BOTH)
 		{
-			if (this.bottomBreakBeam.get() == true)
+			if (bottomBreakBeam.get() == true)
 			{
 				armTalon.set(0.0);
-				this.m_state = IntakeState.ELEVATOR;
+				m_state = IntakeState.ELEVATOR;
 			}
 		}
-		else if (this.m_state == IntakeState.ELEVATOR)
+		else if (m_state == IntakeState.ELEVATOR)
 		{
-			if (this.shooterBreakBeam.get() == true)
+			if (shooterBreakBeam.get() == true)
 			{
-				this.elevatorTalon.set(0.0D);
+				elevatorTalon.set(0.0D);
 				verticalTalon.set(0);
 				verticalTalon1.set(0);
-				this.m_state = IntakeState.IDLE;
+				m_state = IntakeState.IDLE;
 			}
 		}
-		else if (this.m_state == IntakeState.PORT)
+		else if (m_state == IntakeState.PORT)
 		{
-			this.armTalon.set(0.75D);
+			armTalon.set(0.75D);
 			verticalTalon.set(0.95);
-			this.elevatorTalon.set(0.0D);
+			elevatorTalon.set(0.0D);
 		}
-//		else if ((!this.stick3.getRawButton(2)) && (this.m_state == IntakeState.SHOOTING) && (!this.shooterBreakBeam.get()))
+//		else if ((!stick3.getRawButton(2)) && (m_state == IntakeState.SHOOTING) && (!shooterBreakBeam.get()))
 //		{
-//			this.m_state = IntakeState.IDLE;
+//			m_state = IntakeState.IDLE;
 //		}
-		else if (this.m_state == IntakeState.IDLE)
+		else if (m_state == IntakeState.IDLE)
 		{
-			this.elevatorTalon.set(0.0D);
+			elevatorTalon.set(0.0D);
 			verticalTalon.set(0);
 			verticalTalon1.set(0);
-			this.armTalon.set(0.0D);
+			armTalon.set(0.0D);
 		}
 		else if (m_state == IntakeState.ARM ){
 			armTalon.set(-1);
@@ -124,50 +118,45 @@ public class TorIntake
 
 	public void portcullis()
 	{
-		this.m_state = IntakeState.PORT;
+		m_state = IntakeState.PORT;
 	}
 
 	public void portStop()
 	{
-		this.m_state = IntakeState.IDLE;
+		m_state = IntakeState.IDLE;
 	}
 
 	public void portcullisTele(double val)
 	{
-		this.armTalon.set(val);
+		armTalon.set(val);
 	}
 
 	public void armIntakeStop(boolean bool)
 	{
 		if (bool == true) {
-			this.armTalon.set(0.0D);
+			armTalon.set(0.0D);
 		}
-	}
-
-	public void printCurrentOutput()
-	{
-//		System.out.println("Current: " + this.armTalon.getOutputCurrent());
 	}
 
 	public double intakeOutputCurrent()
 	{
-		return this.armTalon.getOutputCurrent();
+		return armTalon.getOutputCurrent();
 	}
 
 	public void intakeStop(boolean bool)
 	{
 		if (bool == true) {
-			this.elevatorTalon.set(0.0D);
+			elevatorTalon.set(0.0D);
 		}
 	}
 
 	public void stopElevator()
 	{
-		if (this.m_state == IntakeState.SHOOTING)
+		if (m_state == IntakeState.SHOOTING)
 		{
-			this.m_state = IntakeState.IDLE;
+			m_state = IntakeState.IDLE;
 
-			this.elevatorTalon.set(0.0D);
+			elevatorTalon.set(0.0D);
 		}
 	}
 	public void armtalon(){
@@ -179,17 +168,17 @@ public class TorIntake
 
 	public void fire()
 	{
-		this.m_state = IntakeState.SHOOTING;
-		this.elevatorTalon.set(-1);
+		m_state = IntakeState.SHOOTING;
+		elevatorTalon.set(-1);
 	}
 
 	public boolean shooterBreakBeam()
 	{
-		return this.shooterBreakBeam.get();
+		return shooterBreakBeam.get();
 	}
 
 	public boolean shooterMotor()
 	{
-		return this.elevatorTalon.get() == 0.0D;
+		return elevatorTalon.get() == 0.0D;
 	}
 }
