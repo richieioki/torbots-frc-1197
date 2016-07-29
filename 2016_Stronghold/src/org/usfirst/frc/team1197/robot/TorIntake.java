@@ -44,7 +44,7 @@ public class TorIntake
 
 	public void intake()
 	{
-		if (stick.getRawButton(4)) //11
+		if (stick.getRawButton(11)) //11
 		{
 			m_state = IntakeState.IDLE;
 			elevatorTalon.set(1);
@@ -52,7 +52,7 @@ public class TorIntake
 			verticalTalon1.set(0.95);
 			armTalon.set(1);
 		}
-		else if (stick.getRawButton(5)) //12
+		else if (stick.getRawButton(12)) //12
 		{
 			m_state = IntakeState.IDLE;
 			armTalon.set(-1);
@@ -60,7 +60,7 @@ public class TorIntake
 			verticalTalon1.set(-0.95);
 			elevatorTalon.set(-1);
 		}
-		else if ((stick.getRawButton(3)) && (m_state == IntakeState.IDLE)) //1
+		else if ((stick.getRawButton(9)) && (m_state == IntakeState.IDLE)) //1
 		{
 			if (shooterBreakBeam.get() != true)
 			{

@@ -263,16 +263,16 @@ public class TorSiege
 			{
 				Portcullis();
 			}
-			else if (siegeStick.getY() < -0.025D) //siegeStick.getY() -> stick.getY()
+			else if (stick.getY() < -0.025D) //siegeStick.getY() -> stick.getY()
 			{
 				siegeTalon.setProfile(1);
-				siegeTalon.set(siegeStick.getY() * 30.0D + siegeTalon
+				siegeTalon.set(stick.getY() * 30.0D + siegeTalon
 						.getAnalogInRaw());
 			}
-			else if (siegeStick.getY() > 0.025D)
+			else if (stick.getY() > 0.025D)
 			{
 				siegeTalon.setProfile(1);
-				siegeTalon.set(siegeStick.getY() * 30.0D + siegeTalon
+				siegeTalon.set(stick.getY() * 30.0D + siegeTalon
 						.getAnalogInRaw());
 			}
 			else
