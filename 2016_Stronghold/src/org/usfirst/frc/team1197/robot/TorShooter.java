@@ -120,8 +120,8 @@ public class TorShooter
 		}
 		else
 		{
-			shooter1.set(10.0); //10
-			shooter2.set(10.0); //10
+			shooter1.set(7.0); //10
+			shooter2.set(7.0); //10
 		}
 	}
 }

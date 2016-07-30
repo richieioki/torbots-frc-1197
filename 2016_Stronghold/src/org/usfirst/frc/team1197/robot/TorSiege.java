@@ -183,8 +183,8 @@ public class TorSiege
 		drawbridgeArmUp = 12.0D;
 		drawbridgeDist = 122.0D;
 
-		bottomArm = 543;//543 practice //447 competition
-		int rest = 315;//315 practice //789 competition
+		bottomArm = 447;//543 practice //447 competition
+		int rest = 789;//315 practice //789 competition
 
 		setDegreesSlope = ((bottomArm - rest) / (degreesBot - degreesTop));
 		setDegreesInter = (rest - setDegreesSlope * degreesTop);
@@ -192,14 +192,14 @@ public class TorSiege
 		readDegreesInter = (-setDegreesInter / setDegreesSlope);
 
 		siegeTalon.setSetpoint(armTop);
-		drawbridgeTop = 36.0D;
+		drawbridgeTop = 35.0D; //36
 		drawbridgeBot = -56.0D;
 		sallyPort = 0.0D;
 		chevelTop = -50.0D;
 		portcullisTop = 5.0D;
 		portcullisBot = -69.0D;
-		intakeVal1 = -45.0D; //-50 comp //-45proto
-		intakeVal2 = -35.0; //?? comp //-35proto
+		intakeVal1 = -50.0D; //-50 comp //-45proto
+		intakeVal2 = -40.0; //?? comp //-35proto
 		siegeTalon.setSetpoint(rest);
 		drawbridgeConstant = ((drawbridgeTop - drawbridgeBot) / (-1.0D * drawbridgeBack));
 		degreeCommand = 0.0;

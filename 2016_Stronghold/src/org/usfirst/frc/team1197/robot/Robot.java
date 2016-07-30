@@ -179,7 +179,7 @@ extends SampleRobot
 		drive.highGear();
 		while (isEnabled())
 		{
-			System.out.println("POT: " + T1.getAnalogInRaw());
+//			System.out.println("POT: " + T1.getAnalogInRaw());
 			siege.SiegeArmUpdate();
 			siege.intakeTele();
 			intakee.intake();
