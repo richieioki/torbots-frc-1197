@@ -11,6 +11,7 @@ public class TorIntake
 	private CANTalon elevatorTalon;
 	private CANTalon verticalTalon, verticalTalon1;
 	private Joystick stick;
+	private Joystick siegeStick;
 	private DigitalInput bottomBreakBeam;
 	private DigitalInput shooterBreakBeam;
 	private TorSiege siege;
@@ -26,7 +27,7 @@ public class TorIntake
 		private IntakeState() {}
 	}
 
-	public TorIntake(Joystick stick, CANTalon cantalon, CANTalon cantalon2, CANTalon cantalon3, 
+	public TorIntake(Joystick stick, Joystick siegeStick, CANTalon cantalon, CANTalon cantalon2, CANTalon cantalon3, 
 			CANTalon cantalon4, DigitalInput breakBeam, DigitalInput breakBeam2, TorSiege siege, 
 			TorShooter shoot)
 	{
@@ -37,6 +38,7 @@ public class TorIntake
 		shooterBreakBeam = breakBeam2;
 		this.siege = siege;
 		this.stick = stick;
+		this.siegeStick = siegeStick;
 		m_state = IntakeState.IDLE;
 		m_shoot = shoot;
 		verticalTalon1 = cantalon4;
@@ -44,7 +46,7 @@ public class TorIntake
 
 	public void intake()
 	{
-		if (stick.getRawButton(11)) //11
+		if (stick.getRawButton(6)) //11
 		{
 			m_state = IntakeState.IDLE;
 			elevatorTalon.set(1);
@@ -52,7 +54,7 @@ public class TorIntake
 			verticalTalon1.set(0.95);
 			armTalon.set(1);
 		}
-		else if (stick.getRawButton(12)) //12
+		else if (stick.getRawButton(5) || siegeStick.getRawButton(6)) //12
 		{
 			m_state = IntakeState.IDLE;
 			armTalon.set(-1);
@@ -60,7 +62,7 @@ public class TorIntake
 			verticalTalon1.set(-0.95);
 			elevatorTalon.set(-1);
 		}
-		else if ((stick.getRawButton(9)) && (m_state == IntakeState.IDLE)) //1
+		else if ((stick.getRawButton(8)) && (m_state == IntakeState.IDLE)) //1
 		{
 			if (shooterBreakBeam.get() != true)
 			{

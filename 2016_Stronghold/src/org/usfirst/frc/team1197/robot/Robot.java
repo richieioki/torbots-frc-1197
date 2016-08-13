@@ -133,7 +133,7 @@ extends SampleRobot
 		encoder.setDistancePerPulse(0.017857142857142856D);
 		driveCANS = new TorCAN(R1, R2, L1, L2);
 
-		intakee = new TorIntake(stick, P1, P2, P3, P4, breakBeam, breakBeam2, siege, shoot); //stick2 -> stick
+		intakee = new TorIntake(stick, stick2, P1, P2, P3, P4, breakBeam, breakBeam2, siege, shoot); //stick2 -> stick
 
 		drive = new TorDrive(stick2, stick, driveCANS, encoder, S1); //switch stick and stick22
 		siege = new TorSiege(T1, stick2, pot, driveCANS, S1, stick, intakee, drive, encoder, gyro, camera);
@@ -205,7 +205,7 @@ extends SampleRobot
 		while (isEnabled())
 		{
 			drive.ArcadeDrive(true);
-//			System.out.println("POT: " + T1.getAnalogInRaw());
+			System.out.println("POT: " + T1.getAnalogInRaw());
 //			System.out.println("ENCODER: " + encoder.getDistance());
 		}
 	}

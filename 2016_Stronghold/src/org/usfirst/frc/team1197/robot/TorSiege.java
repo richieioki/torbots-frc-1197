@@ -183,8 +183,8 @@ public class TorSiege
 		drawbridgeArmUp = 12.0D;
 		drawbridgeDist = 122.0D;
 
-		bottomArm = 447;//543 practice //447 competition
-		int rest = 789;//315 practice //789 competition
+		bottomArm = 470;//543 practice //470 competition
+		int rest = 813;//315 practice //813 competition
 
 		setDegreesSlope = ((bottomArm - rest) / (degreesBot - degreesTop));
 		setDegreesInter = (rest - setDegreesSlope * degreesTop);
@@ -192,14 +192,14 @@ public class TorSiege
 		readDegreesInter = (-setDegreesInter / setDegreesSlope);
 
 		siegeTalon.setSetpoint(armTop);
-		drawbridgeTop = 35.0D; //36
+		drawbridgeTop = 34.0D; 
 		drawbridgeBot = -56.0D;
 		sallyPort = 0.0D;
-		chevelTop = -50.0D;
+		chevelTop = -47.0D;
 		portcullisTop = 5.0D;
 		portcullisBot = -69.0D;
-		intakeVal1 = -45.0D; //-50 comp //-45proto
-		intakeVal2 = -35.0; //-40 comp //-35proto
+		intakeVal1 = -52.0D; //-52 comp //-45proto
+		intakeVal2 = -42.0; //-42 comp //-35proto
 		siegeTalon.setSetpoint(rest);
 		drawbridgeConstant = ((drawbridgeTop - drawbridgeBot) / (-1.0D * drawbridgeBack));
 		degreeCommand = 0.0;
@@ -228,10 +228,10 @@ public class TorSiege
 
 	public void intakeTele()
 	{
-		if(stick.getRawButton(1)){
+		if(stick.getRawButton(7)){
 			setDegrees(intakeVal1);
 		}
-		if(stick.getRawButton(10)){
+		if(stick.getRawButton(9)){
 			setDegrees(intakeVal2);
 		}
 	}
@@ -248,19 +248,19 @@ public class TorSiege
 	{
 		if (!enabled)
 		{
-			if (stick.getRawButton(3))
+			if (stick.getRawButton(1))
 			{
 				DrawBridge();
 			}
-			else if (stick.getRawButton(4))
+			else if (stick.getRawButton(2))
 			{
 				SallyPort();
 			}
-			else if (stick.getRawButton(5))
+			else if (stick.getRawButton(3))
 			{
 				Cheve();
 			}
-			else if (stick.getRawButton(6))
+			else if (stick.getRawButton(4))
 			{
 				Portcullis();
 			}
@@ -280,7 +280,7 @@ public class TorSiege
 			{
 				siegeTalon.setProfile(0);
 			}
-			if ((siegeStick.getRawButton(6)) && (torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
+			if ((siegeStick.getRawButton(1)) && (torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
 			{
 				if ((torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
 				{
@@ -358,7 +358,7 @@ public class TorSiege
 
 	private void update()
 	{
-		if (stick.getRawButton(2))
+		if (stick.getRawButton(10))
 		{
 			m_states = DRAWBRIDGE.IDLE;
 			m_sally = SALLYPORT.IDLE;
@@ -435,7 +435,7 @@ public class TorSiege
 				torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
 				drive.lowGear();
 				setDegrees(chevelTop);
-				if (siegeOnTarget(2))
+				if (siegeOnTarget(4))
 				{
 					m_chev = CHEVEL.POS2;
 					encoder.reset();
@@ -573,7 +573,7 @@ public class TorSiege
 			case POS1: 
 				setDegrees(drawbridgeTop);
 				haltDrive(0.5D);
-				if (siegeOnTarget(3)) {
+				if (siegeOnTarget(4)) {
 					m_states = DRAWBRIDGE.POS2;
 				}
 				break;
@@ -691,8 +691,8 @@ public class TorSiege
 			turnSpeed = Math.max(error * 0.04 * 12.0D, -4.0D); //originally -4.0 and 4.0  - (stdev(errorHistory) * 1.0)
 		} 
 		
-		if (Math.abs(turnSpeed) < 3.0) { //originally 2.1 for both
-			turnSpeed = (3.0 * (turnSpeed / Math.abs(turnSpeed)));
+		if (Math.abs(turnSpeed) < 1.7) { //originally 3.0
+			turnSpeed = (1.7 * (turnSpeed / Math.abs(turnSpeed)));
 		}
 		
 		
