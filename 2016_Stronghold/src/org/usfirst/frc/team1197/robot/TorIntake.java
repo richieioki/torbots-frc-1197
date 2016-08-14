@@ -62,7 +62,7 @@ public class TorIntake
 			verticalTalon1.set(-0.95);
 			elevatorTalon.set(-1);
 		}
-		else if ((stick.getRawButton(8)) && (m_state == IntakeState.IDLE)) //1
+		else if ((stick.getRawButton(7)) && (m_state == IntakeState.IDLE)) //1
 		{
 			if (shooterBreakBeam.get() != true)
 			{

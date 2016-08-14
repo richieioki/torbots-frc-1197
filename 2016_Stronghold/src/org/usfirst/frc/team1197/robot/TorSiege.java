@@ -198,8 +198,8 @@ public class TorSiege
 		chevelTop = -47.0D;
 		portcullisTop = 5.0D;
 		portcullisBot = -69.0D;
-		intakeVal1 = -52.0D; //-52 comp //-45proto
-		intakeVal2 = -42.0; //-42 comp //-35proto
+		intakeVal1 = -48.0D; //-52 comp //-45proto
+		intakeVal2 = 54.0; //-42 comp //-35proto
 		siegeTalon.setSetpoint(rest);
 		drawbridgeConstant = ((drawbridgeTop - drawbridgeBot) / (-1.0D * drawbridgeBack));
 		degreeCommand = 0.0;
@@ -228,10 +228,10 @@ public class TorSiege
 
 	public void intakeTele()
 	{
-		if(stick.getRawButton(7)){
+		if(stick.getRawButton(9)){
 			setDegrees(intakeVal1);
 		}
-		if(stick.getRawButton(9)){
+		if(stick.getRawButton(10)){
 			setDegrees(intakeVal2);
 		}
 	}
@@ -358,7 +358,7 @@ public class TorSiege
 
 	private void update()
 	{
-		if (stick.getRawButton(10))
+		if (stick.getRawButton(8))
 		{
 			m_states = DRAWBRIDGE.IDLE;
 			m_sally = SALLYPORT.IDLE;
