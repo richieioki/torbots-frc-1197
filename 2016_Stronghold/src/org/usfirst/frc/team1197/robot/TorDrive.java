@@ -28,24 +28,33 @@ public class TorDrive
 	int sign;
 	private double rightMotorSpeed;
 	private double leftMotorSpeed;
+	private boolean isHighGear = true;
+	private double targetSpeed;
 	
 	private double trackWidth = 0.5525; //meters, in inches 21.75
 	private double halfTrackWidth = trackWidth / 2;
-	private double steeringDeadBand = 0.02;
-	private double minTurnRadius = halfTrackWidth;
-	private double maxTurnRadius = 20.0;
+	private double steeringDeadBand = 0.1;
+	private double minTurnRadius = 0.5;
+	private double maxTurnRadius = 10.0;
 	private double steeringConstant = (maxTurnRadius - minTurnRadius) / 
 			Math.tan((Math.PI / 2) * (1 - steeringDeadBand));
 	private double maxThrottle = 0.417;
 	private double rightRadius;
 	private double leftRadius;
 	private double centerRadius = 0.0;
+	
+	private double b = (steeringDeadBand * minTurnRadius - maxTurnRadius) / (steeringDeadBand - 1);
+	private double m = (maxTurnRadius - b) / steeringDeadBand;
+	
+	private double k = 0.3;
+	
+	private double previousSteer;
 
 	public TorDrive(Joystick stick, TorCAN jagDrive)
 	{
 		stepValue = -1.0D;
 		dec = 0.02D;
-		previousStick = 0.0D;
+		previousSteer = 0.0D;
 
 		m_stick = stick;
 
@@ -62,18 +71,30 @@ public class TorDrive
 		m_encoder = encoder;
 		m_solenoidshift = shift;
 	}
-	public void driving(double throttleAxis, double arcadeSteerAxis, double carSteerAxis){
-		if(m_solenoidshift.get() == false){
-			ArcadeDrive(throttleAxis, arcadeSteerAxis);
+	public void driving(double throttleAxis, double arcadeSteerAxis, double carSteerAxis, boolean shiftButton){
+		
+		if(isHighGear){
+			carDrive(throttleAxis, carSteerAxis + (carSteerAxis - previousSteer) * 100);
+			previousSteer = carSteerAxis;
+			if(shiftButton){
+				m_solenoidshift.set(true);
+				m_jagDrive.choosePercentVbus();
+				isHighGear = false;
+			}
 		}
 		else{
-			carDrive(throttleAxis, carSteerAxis);
+			ArcadeDrive(throttleAxis, arcadeSteerAxis);
+			if(!shiftButton){
+				m_solenoidshift.set(false);
+				m_jagDrive.chooseVelocityControl();
+				isHighGear = true;
+			}
 		}
 	}
 
 	public void ArcadeDrive(double throttleAxis, double arcadeSteerAxis)
 	{
-		arcadeSteerAxis = -arcadeSteerAxis;
+//		arcadeSteerAxis = -arcadeSteerAxis;
 		throttleAxis = -throttleAxis;
 		if (Math.abs(arcadeSteerAxis) <= 0.1D) {
 			arcadeSteerAxis = 0.0D;
@@ -153,22 +174,25 @@ public class TorDrive
 	public void carDrive(double throttleAxis, double carSteeringAxis){
 		
 		throttleAxis = -throttleAxis;
+		carSteeringAxis = -carSteeringAxis;
 		
-		if (Math.abs(throttleAxis) <= 0.02) {
+		if (Math.abs(throttleAxis) < 0.1) {
 			throttleAxis = 0.0D;
 		}
-		
-		throttleAxis *= maxThrottle;
 
+		targetSpeed = findSpeed(throttleAxis) * 4550; //* 2500.0; //* 1150.0; 
+		
+		targetSpeed *= maxThrottle;
+		
 		if (Math.abs(carSteeringAxis) > steeringDeadBand)
 		{
-			centerRadius = findRadius(carSteeringAxis);
-			rightMotorSpeed = throttleAxis * ((centerRadius - halfTrackWidth) / centerRadius);
-			leftMotorSpeed = throttleAxis * ((centerRadius + halfTrackWidth) / centerRadius);
+			centerRadius = (findRadiusLinear(carSteeringAxis) + findRadius(carSteeringAxis)) / 2;
+			rightMotorSpeed = targetSpeed * ((centerRadius - halfTrackWidth) / centerRadius);
+			leftMotorSpeed = targetSpeed * ((centerRadius + halfTrackWidth) / centerRadius);
 		}
 		else {
-			leftMotorSpeed = throttleAxis;
-			rightMotorSpeed = throttleAxis;
+			leftMotorSpeed = targetSpeed;
+			rightMotorSpeed = targetSpeed;
 		}
 
 		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
@@ -228,6 +252,22 @@ public class TorDrive
 		else{
 			return steeringConstant * (Math.tan((Math.PI / 2) * (1 - carSteeringAxis))) + 
 					(minTurnRadius * (Math.abs(carSteeringAxis) / carSteeringAxis));
+		}
+	}
+	public double findRadiusLinear(double carSteeringAxis){
+		if(carSteeringAxis == 0.0){
+			return 0.0;
+		}
+		else{
+			return m * carSteeringAxis + (b * (Math.abs(carSteeringAxis) / carSteeringAxis));
+		}
+	}
+	public double findSpeed(double throttleAxis){
+		if(throttleAxis >= 0){
+			return ((k * k) / (1 - (2 * k))) * (Math.pow(((k - 1) * (k - 1) / (k * k)), throttleAxis) - 1);
+		}
+		else{
+			return -((k * k) / (1 - (2 * k))) * (Math.pow(((k - 1) * (k - 1) / (k * k)), -throttleAxis) - 1);
 		}
 	}
 }

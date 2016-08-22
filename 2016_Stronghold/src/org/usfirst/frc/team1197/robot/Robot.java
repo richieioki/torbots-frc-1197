@@ -76,6 +76,8 @@ extends SampleRobot
 	private TorShooter shoot;
 	private TorCamera camera;
 	private NetworkTable table;
+    StringBuilder _sb = new StringBuilder();
+	private int _loops = 0;
 	double hoodPosition;
 
 	public Robot()
@@ -86,11 +88,11 @@ extends SampleRobot
 		cypress = new Joystick(2);
 		stick3 = new Joystick(3);
 
-		R1 = new CANTalon(1);
-		R2 = new CANTalon(2);
+		L1 = new CANTalon(1);
+		L2 = new CANTalon(2);
 
-		L1 = new CANTalon(5);
-		L2 = new CANTalon(6);
+		R1 = new CANTalon(5);
+		R2 = new CANTalon(6);
 
 		T1 = new CANTalon(7);
 
@@ -127,8 +129,10 @@ extends SampleRobot
 
 		breakBeam = new DigitalInput(4);
 		breakBeam2 = new DigitalInput(5);
+		
 		gyro = new AHRS(SerialPort.Port.kMXP);
 		pot = new AnalogPotentiometer(0);
+		
 		encoder = new Encoder(0, 1);
 		encoder.setDistancePerPulse(0.017857142857142856D);
 		driveCANS = new TorCAN(R1, R2, L1, L2);
@@ -147,6 +151,38 @@ extends SampleRobot
 
 	public void robotInit()
 	{
+	  drive.driving(0, 0, 0, true);
+      /* first choose the sensor */
+      R1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+      R1.reverseSensor(false);
+      //R1.configEncoderCodesPerRev(XXX), // if using FeedbackDevice.QuadEncoder
+      //R1.configPotentiometerTurns(XXX), // if using FeedbackDevice.AnalogEncoder or AnalogPot
+
+      /* set the peak and nominal outputs, 12V means full */
+      R1.configNominalOutputVoltage(+0.0f, -0.0f);
+      R1.configPeakOutputVoltage(+12.0f, -12.0f);
+      /* set closed loop gains in slot0 */
+      R1.setProfile(0);
+      R1.setF(0.263); 
+      R1.setP(1); //1.5
+      R1.setI(0.00000001 * 0); 
+      R1.setD(10); //28.9
+      
+      /* first choose the sensor */
+      L1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+      L1.reverseSensor(true);
+      //L1.configEncoderCodesPerRev(XXX), // if using FeedbackDevice.QuadEncoder
+      //L1.configPotentiometerTurns(XXX), // if using FeedbackDevice.AnalogEncoder or AnalogPot
+
+      /* set the peak and nominal outputs, 12V means full */
+      L1.configNominalOutputVoltage(+0.0f, -0.0f);
+      L1.configPeakOutputVoltage(+12.0f, -12.0f);
+      /* set closed loop gains in slot0 */
+      L1.setProfile(0);
+      L1.setF(0.263); 
+      L1.setP(1); //1.5
+      L1.setI(0.00000001 * 0); 
+      L1.setD(10); //28.9
 
 	}
 
@@ -175,13 +211,45 @@ extends SampleRobot
 
 		driveCANS.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
 		drive.highGear();
+		
 		while (isEnabled())
 		{
+			double targetSpeed = getLeftY() * 0.417 * 4550;
+			double RmotorOutput = R1.getOutputVoltage() / R1.getBusVoltage();
+	    	double LmotorOutput = L1.getOutputVoltage() / L1.getBusVoltage();
+	    	
+//			_sb.append("\tRout:");
+//			_sb.append(RmotorOutput);
+//	        _sb.append("\tRspd:");
+//	        _sb.append(R1.getSpeed());
+//	        
+//	        _sb.append("\tRerr:");
+//            _sb.append(R1.getClosedLoopError());
+//            _sb.append("\tRtrg:");
+//            _sb.append(targetSpeed);
+//	        
+//	        _sb.append("\tLout:");
+//			_sb.append(LmotorOutput);
+//	        _sb.append("\tLspd:");
+//	        _sb.append(L1.getSpeed() );
+//            
+//            _sb.append("\tLerr:");
+//            _sb.append(L1.getClosedLoopError());
+//            _sb.append("\tLtrg:");
+//            _sb.append(targetSpeed);
+            
+//            if(++_loops >= 10) {
+//	        	_loops = 0;
+//	        	System.out.println(_sb.toString());
+//	        }
+//	        _sb.setLength(0);
+            
+//			System.out.println("LeftY: " + getLeftY());
 			siege.SiegeArmUpdate();
 			siege.intakeTele();
 			intakee.intake();
 			if (!siege.enabled) {
-				drive.driving(getLeftY(), getLeftX(), getRightX());
+				drive.driving(getLeftY(), getLeftX(), getRightX(), getShiftButton());
 			}
 			shoot.shooter();
 		}
@@ -203,6 +271,62 @@ extends SampleRobot
 		{
 //			System.out.println("POT: " + T1.getAnalogInRaw());
 //			System.out.println("ENCODER: " + encoder.getDistance());
+	    	/* get gamepad axis */
+	    	double leftYstick = getLeftY();
+	    	double RmotorOutput = R1.getOutputVoltage() / R1.getBusVoltage();
+	    	double LmotorOutput = L1.getOutputVoltage() / L1.getBusVoltage();
+	    	/* prepare line to print */
+			_sb.append("\tRout:");
+			_sb.append(RmotorOutput);
+	        _sb.append("\tRspd:");
+	        _sb.append(R1.getSpeed() );
+	        
+	        _sb.append("\tLout:");
+			_sb.append(LmotorOutput);
+	        _sb.append("\tLspd:");
+	        _sb.append(L1.getSpeed() );
+	        
+	        if(stick2.getRawButton(3)){
+	        	S1.set(true);
+	        }
+	        else{
+	        	S1.set(false);
+	        }
+	        
+	        
+	        if(stick2.getRawButton(1)){
+	        	/* Speed mode */
+	        	double targetSpeed = leftYstick * 1150.0; /* 1500 RPM in either direction */
+	        	R1.changeControlMode(TalonControlMode.Speed);
+	        	R1.set(targetSpeed); /* 1500 RPM in either direction */
+	        	
+	        	L1.changeControlMode(TalonControlMode.Speed);
+	        	L1.set(targetSpeed);
+	
+	        	/* append more signals to print when in speed mode. */
+	            _sb.append("\tRerr:");
+	            _sb.append(R1.getClosedLoopError());
+	            _sb.append("\tRtrg:");
+	            _sb.append(targetSpeed);
+	            
+	            _sb.append("\tLerr:");
+	            _sb.append(L1.getClosedLoopError());
+	            _sb.append("\tLtrg:");
+	            _sb.append(targetSpeed);
+	        } else {
+	        	/* Percent voltage mode */
+	        	R1.changeControlMode(TalonControlMode.PercentVbus);
+	        	R1.set(leftYstick);
+	        	
+	        	L1.changeControlMode(TalonControlMode.PercentVbus);
+	        	L1.set(leftYstick);
+	        }
+	
+	        if(++_loops >= 10) {
+	        	_loops = 0;
+	        	System.out.println(_sb.toString());
+	        }
+	        _sb.setLength(0);
 		}
 	}
 	public double getLeftX(){
@@ -217,4 +341,105 @@ extends SampleRobot
 	public double getRightY(){
 		return stick2.getRawAxis(5);
 	}
+	public boolean getShiftButton(){
+		return stick2.getRawButton(5);
+	}
 }
+
+
+///**
+// * Example demonstrating the velocity closed-loop servo.
+// * Tested with Logitech F350 USB Gamepad inserted into Driver Station]
+// * 
+// * Be sure to select the correct feedback sensor using SetFeedbackDevice() below.
+// *
+// * After deploying/debugging this to your RIO, first use the left Y-stick 
+// * to throttle the Talon manually.  This will confirm your hardware setup.
+// * Be sure to confirm that when the Talon is driving forward (green) the 
+// * position sensor is moving in a positive direction.  If this is not the cause
+// * flip the boolena input to the SetSensorDirection() call below.
+// *
+// * Once you've ensured your feedback device is in-phase with the motor,
+// * use the button shortcuts to servo to target velocity.  
+// *
+// * Tweak the PID gains accordingly.
+// */
+//package org.usfirst.frc.team1197.robot;
+//import edu.wpi.first.wpilibj.CANTalon;
+//import edu.wpi.first.wpilibj.IterativeRobot;
+//import edu.wpi.first.wpilibj.Joystick;
+//import edu.wpi.first.wpilibj.Joystick.AxisType;
+//import edu.wpi.first.wpilibj.Solenoid;
+//import edu.wpi.first.wpilibj.CANTalon.FeedbackDevice;
+//import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
+//
+//public class Robot extends IterativeRobot {
+//  
+//	CANTalon _talon = new CANTalon(1);	
+//	Joystick _joy = new Joystick(0);	
+//	Solenoid shift = new Solenoid(0);
+//	StringBuilder _sb = new StringBuilder();
+//	int _loops = 0;
+//	
+//	public void robotInit() {
+//        /* first choose the sensor */
+//        _talon.setFeedbackDevice(FeedbackDevice.QuadEncoder);
+//        _talon.reverseSensor(true);
+//        //_talon.configEncoderCodesPerRev(XXX), // if using FeedbackDevice.QuadEncoder
+//        //_talon.configPotentiometerTurns(XXX), // if using FeedbackDevice.AnalogEncoder or AnalogPot
+//
+//        /* set the peak and nominal outputs, 12V means full */
+//        _talon.configNominalOutputVoltage(+0.0f, -0.0f);
+//        _talon.configPeakOutputVoltage(+12.0f, -12.0f);
+//        /* set closed loop gains in slot0 */
+//        _talon.setProfile(0);
+//        _talon.setF(0.917);
+//        _talon.setP(2.0);
+//        _talon.setI(0); 
+//        _talon.setD(0);
+//	}
+//    /**
+//     * This function is called periodically during operator control
+//     */
+//    public void teleopPeriodic() {
+//    	/* get gamepad axis */
+//    	double leftYstick = _joy.getAxis(AxisType.kY);
+//    	double motorOutput = _talon.getOutputVoltage() / _talon.getBusVoltage();
+//    	/* prepare line to print */
+//		_sb.append("\tout:");
+//		_sb.append(motorOutput);
+//        _sb.append("\tspd:");
+//        _sb.append(_talon.getSpeed() );
+//        
+//        if(_joy.getRawButton(3)){
+//        	shift.set(true);
+//        }
+//        else{
+//        	shift.set(false);
+//        }
+//        
+//        
+//        if(_joy.getRawButton(1)){
+//        	/* Speed mode */
+//        	double targetSpeed = leftYstick * 1100.0; /* 1500 RPM in either direction */
+//        	_talon.changeControlMode(TalonControlMode.Speed);
+//        	_talon.set(targetSpeed); /* 1500 RPM in either direction */
+//
+//        	/* append more signals to print when in speed mode. */
+//            _sb.append("\terr:");
+//            _sb.append(_talon.getClosedLoopError());
+//            _sb.append("\ttrg:");
+//            _sb.append(targetSpeed);
+//        } else {
+//        	/* Percent voltage mode */
+//        	_talon.changeControlMode(TalonControlMode.PercentVbus);
+//        	_talon.set(leftYstick);
+//        }
+//
+//        if(++_loops >= 10) {
+//        	_loops = 0;
+//        	System.out.println(_sb.toString());
+//        }
+//        _sb.setLength(0);
+//    }
+//}

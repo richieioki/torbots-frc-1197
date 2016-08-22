@@ -96,6 +96,16 @@ implements PIDOutput
 		SetRight(output);
 		SetLeft(-output);
 	}
+	
+	public void choosePercentVbus(){
+		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+	}
+	
+	public void chooseVelocityControl(){
+		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.Speed);
+		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.Speed);
+	}
 
 	public void highGear()
 	{

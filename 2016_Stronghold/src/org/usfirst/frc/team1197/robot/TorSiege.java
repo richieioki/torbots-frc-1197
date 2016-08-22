@@ -280,21 +280,21 @@ public class TorSiege
 			{
 				siegeTalon.setProfile(0);
 			}
-			if ((siegeStick.getRawButton(5)) && (torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
-			{
-				if ((torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
-				{
-					shift.set(false);
-//					torcan.lowGear();
-					torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				}
-			}
-			else if ((torcan.m_state != TorCAN.DRIVE_STATE.HIGHGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
-			{
-				shift.set(true);
-//				torcan.highGear();
-				torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
-			}
+//			if ((siegeStick.getRawButton(5)) && (torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
+//			{
+//				if ((torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
+//				{
+//					shift.set(false);
+////					torcan.lowGear();
+//					torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+//				}
+//			}
+//			else if ((torcan.m_state != TorCAN.DRIVE_STATE.HIGHGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
+//			{
+//				shift.set(true);
+////				torcan.highGear();
+//				torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
+//			}
 		}
 		else
 		{
@@ -313,15 +313,15 @@ public class TorSiege
 		}
 	}
 
-	public void highGear()
-	{
-		shift.set(true);
-	}
-
-	public void lowGear()
-	{
-		shift.set(false);
-	}
+//	public void highGear()
+//	{
+//		shift.set(true);
+//	}
+//
+//	public void lowGear()
+//	{
+//		shift.set(false);
+//	}
 
 	public void Portcullis()
 	{

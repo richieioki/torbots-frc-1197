@@ -175,7 +175,7 @@ public class TorAuto
 	{
 		m_encoder.reset();
 		siege.setDegrees(sallyPort);
-		siege.highGear();
+//		siege.highGear();
 		drive.driveDistance(15.0F, 0.5F, true);
 		drive.driveDistance(45.0F, 1.0F, true);
 		drive.driveDistance(90.0F, 0.5F, true);
@@ -195,7 +195,7 @@ public class TorAuto
 	{
 		m_encoder.reset();
 		siege.setDegrees(sallyPort);
-		siege.highGear();
+//		siege.highGear();
 		drive.driveDistance(15.0F, 0.5F, true);
 		drive.driveDistance(45.0F, 1.0F, true);
 		drive.driveDistance(90.0F, 0.5F, true);
