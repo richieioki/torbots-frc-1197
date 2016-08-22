@@ -147,7 +147,7 @@ extends SampleRobot
 
 	public void robotInit()
 	{
-		hood.set(hood.get());
+
 	}
 
 	public void autonomous()
@@ -173,18 +173,15 @@ extends SampleRobot
 		gyro.reset();
 		siege.PID();
 
-		float rampRate = 15.0F;
-
 		driveCANS.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
 		drive.highGear();
 		while (isEnabled())
 		{
-//			System.out.println("POT: " + T1.getAnalogInRaw());
 			siege.SiegeArmUpdate();
 			siege.intakeTele();
 			intakee.intake();
 			if (!siege.enabled) {
-				drive.ArcadeDrive(true);
+				drive.driving(getLeftY(), getLeftX(), getRightX());
 			}
 			shoot.shooter();
 		}
@@ -204,9 +201,20 @@ extends SampleRobot
 		
 		while (isEnabled())
 		{
-			drive.ArcadeDrive(true);
-			System.out.println("POT: " + T1.getAnalogInRaw());
+//			System.out.println("POT: " + T1.getAnalogInRaw());
 //			System.out.println("ENCODER: " + encoder.getDistance());
 		}
+	}
+	public double getLeftX(){
+		return stick2.getRawAxis(0);
+	}
+	public double getLeftY(){
+		return stick2.getRawAxis(1);
+	}
+	public double getRightX(){
+		return stick2.getRawAxis(4);
+	}
+	public double getRightY(){
+		return stick2.getRawAxis(5);
 	}
 }

@@ -183,8 +183,8 @@ public class TorSiege
 		drawbridgeArmUp = 12.0D;
 		drawbridgeDist = 122.0D;
 
-		bottomArm = 470;//543 practice //470 competition
-		int rest = 813;//315 practice //813 competition
+		bottomArm = 497;//543 practice //470 competition
+		int rest = 841;//315 practice //813 competition
 
 		setDegreesSlope = ((bottomArm - rest) / (degreesBot - degreesTop));
 		setDegreesInter = (rest - setDegreesSlope * degreesTop);
@@ -280,7 +280,7 @@ public class TorSiege
 			{
 				siegeTalon.setProfile(0);
 			}
-			if ((siegeStick.getRawButton(1)) && (torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
+			if ((siegeStick.getRawButton(5)) && (torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
 			{
 				if ((torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
 				{

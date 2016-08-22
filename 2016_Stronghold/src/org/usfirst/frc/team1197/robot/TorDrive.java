@@ -1,6 +1,8 @@
 package org.usfirst.frc.team1197.robot;
 
 import edu.wpi.first.wpilibj.Encoder;
+
+import java.math.*;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -24,6 +26,20 @@ public class TorDrive
 	double stepValue;
 	double dec;
 	int sign;
+	private double rightMotorSpeed;
+	private double leftMotorSpeed;
+	
+	private double trackWidth = 0.5525; //meters, in inches 21.75
+	private double halfTrackWidth = trackWidth / 2;
+	private double steeringDeadBand = 0.02;
+	private double minTurnRadius = halfTrackWidth;
+	private double maxTurnRadius = 20.0;
+	private double steeringConstant = (maxTurnRadius - minTurnRadius) / 
+			Math.tan((Math.PI / 2) * (1 - steeringDeadBand));
+	private double maxThrottle = 0.417;
+	private double rightRadius;
+	private double leftRadius;
+	private double centerRadius = 0.0;
 
 	public TorDrive(Joystick stick, TorCAN jagDrive)
 	{
@@ -46,163 +62,117 @@ public class TorDrive
 		m_encoder = encoder;
 		m_solenoidshift = shift;
 	}
-
-	public void ArcadeDrive(boolean squaredInputs)
-	{
-		boolean shiftButton = false;
-
-		double stickX = m_stick.getX();
-		double stickY = m_stick.getY();
-
-		stickX = -stickX;
-		stickY = -stickY;
-		if (Math.abs(stickX) <= 0.1D) {
-			stickX = 0.0D;
+	public void driving(double throttleAxis, double arcadeSteerAxis, double carSteerAxis){
+		if(m_solenoidshift.get() == false){
+			ArcadeDrive(throttleAxis, arcadeSteerAxis);
 		}
-		if (Math.abs(stickY) <= 0.2D) {
-			stickY = 0.0D;
-		}
-		if (!m_solenoidshift.get())
-		{
-			if (m_jagDrive.m_state == TorCAN.DRIVE_STATE.PIVOTING)
-			{
-				m_jagDrive.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-				m_jagDrive.lowGear();
-			}
-			stickX *= 0.9D;
-		}
-		if (stickX > 1.0D) {
-			stickX = 1.0D;
-		}
-		if (stickX < -1.0D) {
-			stickX = -1.0D;
-		}
-		if (stickY > 1.0D) {
-			stickY = 1.0D;
-		}
-		if (stickY < -1.0D) {
-			stickY = -1.0D;
-		}
-		if (squaredInputs)
-		{
-			if (stickX >= 0.0D) {
-				stickX *= stickX;
-			} else {
-				stickX = -(stickX * stickX);
-			}
-			if (stickY >= 0.0D) {
-				stickY *= stickY;
-			} else {
-				stickY = -(stickY * stickY);
-			}
-		}
-		double rightMotorSpeed;
-		double leftMotorSpeed;
-
-		if (stickY > 0.0D)
-		{
-			if (stickX > 0.0D)
-			{
-				leftMotorSpeed = stickY - stickX;
-				rightMotorSpeed = Math.max(stickY, stickX);
-			}
-			else
-			{
-				leftMotorSpeed = Math.max(stickY, -stickX);
-				rightMotorSpeed = stickY + stickX;
-			}
-		}
-		else
-		{
-			if (stickX > 0.0D)
-			{
-				leftMotorSpeed = -Math.max(-stickY, stickX);
-				rightMotorSpeed = stickY + stickX;
-			}
-			else
-			{
-				leftMotorSpeed = stickY - stickX;
-				rightMotorSpeed = -Math.max(-stickY, -stickX);
-			}
-		}
-		if (m_solenoidshift.get()) {
-			m_jagDrive.SetDrive(rightMotorSpeed * 0.65D, -leftMotorSpeed * 0.65D);
-		} else {
-			m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+		else{
+			carDrive(throttleAxis, carSteerAxis);
 		}
 	}
 
-	public void ReverseArcadeDrive(boolean squaredInputs)
+	public void ArcadeDrive(double throttleAxis, double arcadeSteerAxis)
 	{
-		boolean shiftButton = false;
+		arcadeSteerAxis = -arcadeSteerAxis;
+		throttleAxis = -throttleAxis;
+		if (Math.abs(arcadeSteerAxis) <= 0.1D) {
+			arcadeSteerAxis = 0.0D;
+		}
+		if (Math.abs(throttleAxis) <= 0.2D) {
+			throttleAxis = 0.0D;
+		}
+//		if (!m_solenoidshift.get()){
+//			if (m_jagDrive.m_state == TorCAN.DRIVE_STATE.PIVOTING)
+//			{
+//				m_jagDrive.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
+//				m_jagDrive.lowGear();
+//			}
+//			arcadeSteerAxis *= 0.9D;
+//		}
+//		if (arcadeSteerAxis > 1.0D) {
+//			arcadeSteerAxis = 1.0D;
+//		}
+//		if (arcadeSteerAxis < -1.0D) {
+//			arcadeSteerAxis = -1.0D;
+//		}
+//		if (throttleAxis > 1.0D) {
+//			throttleAxis = 1.0D;
+//		}
+//		if (throttleAxis < -1.0D) {
+//			throttleAxis = -1.0D;
+//		}
 
-		double stickX = m_stick.getX();
-		double stickY = m_stick.getY();
-
-		stickX = -stickX;
-		stickY = -stickY;
-		shiftButton = m_stick.getRawButton(1);
-		if (Math.abs(stickX) <= 0.2D) {
-			stickX = 0.0D;
+		if (arcadeSteerAxis >= 0.0D) {
+			arcadeSteerAxis *= arcadeSteerAxis;
+		} else {
+			arcadeSteerAxis = -(arcadeSteerAxis * arcadeSteerAxis);
 		}
-		if (Math.abs(stickY) <= 0.2D) {
-			stickY = 0.0D;
+		if (throttleAxis >= 0.0D) {
+			throttleAxis *= throttleAxis;
+		} else {
+			throttleAxis = -(throttleAxis * throttleAxis);
 		}
-		if (stickX > 1.0D) {
-			stickX = 1.0D;
-		}
-		if (stickX < -1.0D) {
-			stickX = -1.0D;
-		}
-		if (stickY > 1.0D) {
-			stickY = 1.0D;
-		}
-		if (stickY < -1.0D) {
-			stickY = -1.0D;
-		}
-		if (squaredInputs)
-		{
-			if (stickX >= 0.0D) {
-				stickX *= stickX;
-			} else {
-				stickX = -(stickX * stickX);
-			}
-			if (stickY >= 0.0D) {
-				stickY = -(stickY * stickY);
-			} else {
-				stickY *= stickY;
-			}
-		}
+		
 		double rightMotorSpeed;
 		double leftMotorSpeed;
-		if (stickY > 0.0D)
+
+		if (throttleAxis > 0.0D)
 		{
-			if (stickX > 0.0D)
+			if (arcadeSteerAxis > 0.0D)
 			{
-				leftMotorSpeed = stickY - stickX;
-				rightMotorSpeed = Math.max(stickY, stickX) * 20.0D;
+				leftMotorSpeed = throttleAxis - arcadeSteerAxis;
+				rightMotorSpeed = Math.max(throttleAxis, arcadeSteerAxis);
 			}
 			else
 			{
-				leftMotorSpeed = Math.max(stickY, -stickX) * 20.0D;
-				rightMotorSpeed = stickY + stickX;
+				leftMotorSpeed = Math.max(throttleAxis, -arcadeSteerAxis);
+				rightMotorSpeed = throttleAxis + arcadeSteerAxis;
 			}
 		}
 		else
 		{
-
-			if (stickX > 0.0D)
+			if (arcadeSteerAxis > 0.0D)
 			{
-				leftMotorSpeed = -Math.max(-stickY, stickX) * 20.0D;
-				rightMotorSpeed = stickY + stickX;
+				leftMotorSpeed = -Math.max(-throttleAxis, arcadeSteerAxis);
+				rightMotorSpeed = throttleAxis + arcadeSteerAxis;
 			}
 			else
 			{
-				leftMotorSpeed = stickY - stickX;
-				rightMotorSpeed = -Math.max(-stickY, -stickX) * 20.0D;
+				leftMotorSpeed = throttleAxis - arcadeSteerAxis;
+				rightMotorSpeed = -Math.max(-throttleAxis, -arcadeSteerAxis);
 			}
 		}
+//		if (m_solenoidshift.get()) {
+//			m_jagDrive.SetDrive(rightMotorSpeed * 0.65D, -leftMotorSpeed * 0.65D);
+//		} else {
 		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+//		}
+	}
+
+	
+	public void carDrive(double throttleAxis, double carSteeringAxis){
+		
+		throttleAxis = -throttleAxis;
+		
+		if (Math.abs(throttleAxis) <= 0.02) {
+			throttleAxis = 0.0D;
+		}
+		
+		throttleAxis *= maxThrottle;
+
+		if (Math.abs(carSteeringAxis) > steeringDeadBand)
+		{
+			centerRadius = findRadius(carSteeringAxis);
+			rightMotorSpeed = throttleAxis * ((centerRadius - halfTrackWidth) / centerRadius);
+			leftMotorSpeed = throttleAxis * ((centerRadius + halfTrackWidth) / centerRadius);
+		}
+		else {
+			leftMotorSpeed = throttleAxis;
+			rightMotorSpeed = throttleAxis;
+		}
+
+		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
+		
 	}
 
 	public void driveDistance(float distance, float speed, boolean forward)
@@ -250,5 +220,14 @@ public class TorDrive
 	public void offGear()
 	{
 		m_jagDrive.offGear();
+	}
+	public double findRadius(double carSteeringAxis){
+		if(carSteeringAxis == 0.0){
+			return 0.0;
+		}
+		else{
+			return steeringConstant * (Math.tan((Math.PI / 2) * (1 - carSteeringAxis))) + 
+					(minTurnRadius * (Math.abs(carSteeringAxis) / carSteeringAxis));
+		}
 	}
 }

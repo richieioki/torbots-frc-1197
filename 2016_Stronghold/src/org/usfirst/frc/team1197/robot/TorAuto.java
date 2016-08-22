@@ -310,13 +310,11 @@ public class TorAuto
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
 		gyro.reset();
-		m_cans.pivot();
 		while (!siege.turnToShoot(-15.0D)) {
 			if (timeout < System.currentTimeMillis()) {
 				break;
 			}
 		}
-		m_cans.unpivot();
 		m_cans.SetDrive(0.0D, 0.0D);
 	}
 
@@ -324,13 +322,11 @@ public class TorAuto
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
 		gyro.reset();
-		m_cans.pivot();
 		while (!siege.turnToShoot(10.0D)) {
 			if (timeout < System.currentTimeMillis()) {
 				break;
 			}
 		}
-		m_cans.unpivot();
 		m_cans.SetDrive(0.0D, 0.0D);
 	}
 
@@ -338,13 +334,11 @@ public class TorAuto
 	{
 		double timeout = System.currentTimeMillis() + 1000L;
 		gyro.reset();
-		m_cans.pivot();
 		while (!siege.turnToShoot(30.0D)) {
 			if (timeout < System.currentTimeMillis()) {
 				break;
 			}
 		}
-		m_cans.unpivot();
 		m_cans.SetDrive(0.0D, 0.0D);
 	}
 

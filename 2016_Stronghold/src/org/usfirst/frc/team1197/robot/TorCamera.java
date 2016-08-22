@@ -126,13 +126,13 @@ public class TorCamera
 //			System.out.println("CURRENT ANGLE " + ahrs.getAngle());
 
 			double timeout = System.currentTimeMillis() + 5000L;
-			torcan.pivot();
+//			torcan.pivot();
 			while (!siege.turnToShoot(TargetAngle)) { //check - 4/29 hotel pm
 				if (timeout < System.currentTimeMillis() || !stick2.getRawButton(2)) {
 					break;
 				}
 			}
-			torcan.unpivot();
+//			torcan.unpivot();
 			torcan.SetDrive(0.0D, 0.0D);
 
 			counter += 1;
@@ -150,13 +150,13 @@ public class TorCamera
 //			System.out.println("CURRENT ANGLE " + ahrs.getAngle());
 			boolean breakout = false;
 			double timeout = System.currentTimeMillis() + 5000L;
-			torcan.pivot();
+//			torcan.pivot();
 			while (!siege.turnToShoot(TargetAngle)) {
 				if (timeout < System.currentTimeMillis()) {
 					breakout = true;
 				}
 			}
-			torcan.unpivot();
+//			torcan.unpivot();
 			if (!breakout)
 			{
 				torcan.SetDrive(0.0D, 0.0D);

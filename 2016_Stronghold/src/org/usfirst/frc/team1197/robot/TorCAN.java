@@ -25,17 +25,7 @@ implements PIDOutput
 
 		private DRIVE_STATE() {}
 	}
-
-	public TorCAN(CANTalon R1, CANTalon R2, CANTalon L1, CANTalon L2)
-	{
-		numOfJags = 4;
-		m_Rtalon1 = R1;
-		m_Rtalon2 = R2;
-
-		m_Ltalon1 = L1;
-		m_Ltalon2 = L2;
-	}
-
+	
 	public TorCAN(CANTalon R1, CANTalon L1)
 	{
 		numOfJags = 2;
@@ -43,18 +33,46 @@ implements PIDOutput
 		m_Ltalon1 = L1;
 	}
 
+	public TorCAN(CANTalon R1, CANTalon R2, CANTalon L1, CANTalon L2)
+	{
+		numOfJags = 4;
+		m_Rtalon1 = R1; //Master Right Talon
+		
+		m_Rtalon2 = R2;
+		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.Follower);
+		m_Rtalon2.set(m_Rtalon1.getDeviceID());
+
+		m_Ltalon1 = L1; //Master Left Talon
+		
+		m_Ltalon2 = L2;
+		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.Follower);
+		m_Ltalon2.set(m_Ltalon1.getDeviceID());
+	}
+
 	public TorCAN(CANTalon R1, CANTalon R2, CANTalon R3, CANTalon L1, CANTalon L2, CANTalon L3)
 	{
 		numOfJags = 6;
 		m_state = DRIVE_STATE.LOWGEAR;
 
-		m_Rtalon1 = R1;
+		m_Rtalon1 = R1; //Master Right Talon
+		
 		m_Rtalon2 = R2;
+		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.Follower);
+		m_Rtalon2.set(m_Rtalon1.getDeviceID());
+		
 		m_Rtalon3 = R3;
+		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.Follower);
+		m_Rtalon3.set(m_Rtalon1.getDeviceID());
 
-		m_Ltalon1 = L1;
+		m_Ltalon1 = L1; //Master Left Talon
+		
 		m_Ltalon2 = L2;
+		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.Follower);
+		m_Ltalon2.set(m_Ltalon1.getDeviceID());
+		
 		m_Ltalon3 = L3;
+		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.Follower);
+		m_Ltalon3.set(m_Ltalon1.getDeviceID());
 	}
 
 	public void SetDrive(double leftSpeed, double rightSpeed)
@@ -65,40 +83,12 @@ implements PIDOutput
 
 	public void SetLeft(double speed)
 	{
-		if (numOfJags == 2)
-		{
-			m_Ltalon1.set(-speed);
-		}
-		else if (numOfJags == 4)
-		{
-			m_Ltalon1.set(-speed);
-			m_Ltalon2.set(-speed);
-		}
-		else
-		{
-			m_Ltalon1.set(-speed);
-			m_Ltalon2.set(-speed);
-			m_Ltalon3.set(-speed);
-		}
+		m_Ltalon1.set(-speed);
 	}
 
 	public void SetRight(double speed)
 	{
-		if (numOfJags == 2)
-		{
-			m_Rtalon1.set(speed);
-		}
-		else if (numOfJags == 4)
-		{
-			m_Rtalon1.set(speed);
-			m_Rtalon2.set(speed);
-		}
-		else
-		{
-			m_Rtalon1.set(speed);
-			m_Rtalon2.set(speed);
-			m_Rtalon3.set(speed);
-		}
+		m_Rtalon1.set(speed);
 	}
 
 	public void pidWrite(double output)
@@ -137,23 +127,23 @@ implements PIDOutput
 //		m_Ltalon3.setVoltageRampRate(1200.0D);
 	}
 
-	public void pivot()
-	{
-		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-//		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
-		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-//		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
-	}
-
-	public void unpivot()
-	{
-		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-	}
+//	public void pivot()
+//	{
+//		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
+//		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
+////		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
+//		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
+//		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
+////		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
+//	}
+//
+//	public void unpivot()
+//	{
+//		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+////		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+////		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
+//	}
 }
