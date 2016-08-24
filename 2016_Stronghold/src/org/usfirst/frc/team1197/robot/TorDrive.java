@@ -2,6 +2,7 @@ package org.usfirst.frc.team1197.robot;
 
 import edu.wpi.first.wpilibj.Encoder;
 
+
 import java.math.*;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PIDController;
@@ -26,6 +27,9 @@ public class TorDrive
 	double stepValue;
 	double dec;
 	int sign;
+	
+	private TorJoystickProfiles profiles;
+
 	private double rightMotorSpeed;
 	private double leftMotorSpeed;
 	private boolean isHighGear = true;
@@ -34,27 +38,14 @@ public class TorDrive
 	private double trackWidth = 0.5525; //meters, in inches 21.75
 	private double halfTrackWidth = trackWidth / 2;
 	private double steeringDeadBand = 0.1;
-	private double minTurnRadius = 0.5;
-	private double maxTurnRadius = 10.0;
-	private double steeringConstant = (maxTurnRadius - minTurnRadius) / 
-			Math.tan((Math.PI / 2) * (1 - steeringDeadBand));
-	private double maxThrottle = 0.417;
-	private double rightRadius;
-	private double leftRadius;
 	private double centerRadius = 0.0;
-	
-	private double b = (steeringDeadBand * minTurnRadius - maxTurnRadius) / (steeringDeadBand - 1);
-	private double m = (maxTurnRadius - b) / steeringDeadBand;
-	
-	private double k = 0.3;
-	
-	private double previousSteer;
+	private double minTurnRadius = 0.5;
+	private double maxThrottle = (5.0/6.0) * (minTurnRadius / (minTurnRadius + halfTrackWidth));
 
 	public TorDrive(Joystick stick, TorCAN jagDrive)
 	{
 		stepValue = -1.0D;
 		dec = 0.02D;
-		previousSteer = 0.0D;
 
 		m_stick = stick;
 
@@ -65,6 +56,7 @@ public class TorDrive
 
 	public TorDrive(Joystick stick, Joystick stick2, TorCAN cans, Encoder encoder, Solenoid shift)
 	{
+		profiles = new TorJoystickProfiles();
 		m_stick = stick;
 		overrideStick = stick2;
 		m_jagDrive = cans;
@@ -74,8 +66,7 @@ public class TorDrive
 	public void driving(double throttleAxis, double arcadeSteerAxis, double carSteerAxis, boolean shiftButton){
 		
 		if(isHighGear){
-			carDrive(throttleAxis, carSteerAxis + (carSteerAxis - previousSteer) * 100);
-			previousSteer = carSteerAxis;
+			carDrive(throttleAxis, carSteerAxis);
 			if(shiftButton){
 				m_solenoidshift.set(true);
 				m_jagDrive.choosePercentVbus();
@@ -177,16 +168,16 @@ public class TorDrive
 		carSteeringAxis = -carSteeringAxis;
 		
 		if (Math.abs(throttleAxis) < 0.1) {
-			throttleAxis = 0.0D;
+			throttleAxis = 0.0;
 		}
 
-		targetSpeed = findSpeed(throttleAxis) * 4550; //* 2500.0; //* 1150.0; 
+		targetSpeed = profiles.findSpeed(throttleAxis) * 4550; //* 2500.0; //* 1150.0; 
 		
 		targetSpeed *= maxThrottle;
 		
 		if (Math.abs(carSteeringAxis) > steeringDeadBand)
 		{
-			centerRadius = (findRadiusLinear(carSteeringAxis) + findRadius(carSteeringAxis)) / 2;
+			centerRadius = (Math.abs(throttleAxis) / throttleAxis) * profiles.findRadiusExponential(carSteeringAxis);
 			rightMotorSpeed = targetSpeed * ((centerRadius - halfTrackWidth) / centerRadius);
 			leftMotorSpeed = targetSpeed * ((centerRadius + halfTrackWidth) / centerRadius);
 		}
@@ -245,29 +236,5 @@ public class TorDrive
 	{
 		m_jagDrive.offGear();
 	}
-	public double findRadius(double carSteeringAxis){
-		if(carSteeringAxis == 0.0){
-			return 0.0;
-		}
-		else{
-			return steeringConstant * (Math.tan((Math.PI / 2) * (1 - carSteeringAxis))) + 
-					(minTurnRadius * (Math.abs(carSteeringAxis) / carSteeringAxis));
-		}
-	}
-	public double findRadiusLinear(double carSteeringAxis){
-		if(carSteeringAxis == 0.0){
-			return 0.0;
-		}
-		else{
-			return m * carSteeringAxis + (b * (Math.abs(carSteeringAxis) / carSteeringAxis));
-		}
-	}
-	public double findSpeed(double throttleAxis){
-		if(throttleAxis >= 0){
-			return ((k * k) / (1 - (2 * k))) * (Math.pow(((k - 1) * (k - 1) / (k * k)), throttleAxis) - 1);
-		}
-		else{
-			return -((k * k) / (1 - (2 * k))) * (Math.pow(((k - 1) * (k - 1) / (k * k)), -throttleAxis) - 1);
-		}
-	}
+
 }

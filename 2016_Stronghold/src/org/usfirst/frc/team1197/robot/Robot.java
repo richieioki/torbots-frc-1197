@@ -79,6 +79,8 @@ extends SampleRobot
     StringBuilder _sb = new StringBuilder();
 	private int _loops = 0;
 	double hoodPosition;
+	
+//	int x = 5/0;
 
 	public Robot()
 	{
@@ -123,8 +125,7 @@ extends SampleRobot
 
 		shooter1 = new CANTalon(11);
 		shooter2 = new CANTalon(12);
-		
-
+	
 		hood = new CANTalon(10);
 
 		breakBeam = new DigitalInput(4);
@@ -135,17 +136,13 @@ extends SampleRobot
 		
 		encoder = new Encoder(0, 1);
 		encoder.setDistancePerPulse(0.017857142857142856D);
+		
 		driveCANS = new TorCAN(R1, R2, L1, L2);
-
 		intakee = new TorIntake(stick, stick2, P1, P2, P3, P4, breakBeam, breakBeam2, siege, shoot); //stick2 -> stick
-
 		drive = new TorDrive(stick2, stick, driveCANS, encoder, S1); //switch stick and stick22
 		siege = new TorSiege(T1, stick2, pot, driveCANS, S1, stick, intakee, drive, encoder, gyro, camera);
-
 		camera = new TorCamera(table, gyro, driveCANS, siege, intakee, stick2);
-
 		shoot = new TorShooter(intakee, shooter1, shooter2, hood, P2, P1, stick2, gyro, driveCANS, camera);
-
 		auto = new TorAuto(cypress, stick, stick2, gyro, encoder, driveCANS, S1, siege, intakee, drive, shoot, this, camera);
 	}
 
@@ -164,9 +161,9 @@ extends SampleRobot
       /* set closed loop gains in slot0 */
       R1.setProfile(0);
       R1.setF(0.263); 
-      R1.setP(1); //1.5
-      R1.setI(0.00000001 * 0); 
-      R1.setD(10); //28.9
+      R1.setP(1); //1
+      R1.setI(0); 
+      R1.setD(10); //10
       
       /* first choose the sensor */
       L1.setFeedbackDevice(FeedbackDevice.QuadEncoder);
@@ -180,9 +177,9 @@ extends SampleRobot
       /* set closed loop gains in slot0 */
       L1.setProfile(0);
       L1.setF(0.263); 
-      L1.setP(1); //1.5
-      L1.setI(0.00000001 * 0); 
-      L1.setD(10); //28.9
+      L1.setP(1); //1
+      L1.setI(0); 
+      L1.setD(10); //10
 
 	}
 
@@ -214,9 +211,9 @@ extends SampleRobot
 		
 		while (isEnabled())
 		{
-			double targetSpeed = getLeftY() * 0.417 * 4550;
-			double RmotorOutput = R1.getOutputVoltage() / R1.getBusVoltage();
-	    	double LmotorOutput = L1.getOutputVoltage() / L1.getBusVoltage();
+//			double targetSpeed = getLeftY() * 0.417 * 4550;
+//			double RmotorOutput = R1.getOutputVoltage() / R1.getBusVoltage();
+//	    	double LmotorOutput = L1.getOutputVoltage() / L1.getBusVoltage();
 	    	
 //			_sb.append("\tRout:");
 //			_sb.append(RmotorOutput);
