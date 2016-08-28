@@ -2,23 +2,15 @@ package org.usfirst.frc.team1197.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
-
-import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Ultrasonic;
-import edu.wpi.first.wpilibj.smartdashboard.*;
 
 public class TorSiege
 {
 	private CANTalon siegeTalon;
-	private TorOnTarget target;
 	private Joystick siegeStick;
 	private Joystick stick;
-	private AnalogPotentiometer pot;
 	private TorCAN torcan;
 	private TorDrive drive;
 	private TorIntake intakeSiege;
@@ -27,9 +19,7 @@ public class TorSiege
 	public boolean enabled;
 	public static final double SONAR = 10.0D;
 	public DRAWBRIDGE m_states;
-	private HALT m_halt;
 	private double[] errorHistory = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-	private TorCamera camera;
 
 	public static enum HALT
 	{
@@ -69,7 +59,6 @@ public class TorSiege
 	public SALLYPORT m_sally = SALLYPORT.IDLE;
 	public PORTCULLIS m_port = PORTCULLIS.IDLE;
 	public CHEVEL m_chev = CHEVEL.IDLE;
-	private Solenoid shift;
 	double ratio = 0.6799999999999999D;
 	double armTop = 0.0D;
 	double drawbridgeTop = 0.0D;
@@ -109,32 +98,26 @@ public class TorSiege
 	double sallyStartAngle;
 	double degreeCommand;
 
-	public TorSiege(CANTalon T1, Joystick stick2, AnalogPotentiometer pot, 
-			TorCAN torcan, Solenoid shift, Joystick stick, TorIntake intakee, TorDrive drive, 
+	public TorSiege(CANTalon T1, Joystick stick2, 
+			TorCAN torcan, Joystick stick, TorIntake intakee, TorDrive drive, 
 			Encoder encoder, AHRS gyro, TorCamera camera)
 	{
 		siegeTalon = T1;
 		siegeStick = stick2;
-		this.pot = pot;
 		this.torcan = torcan;
-		this.shift = shift;
 		this.stick = stick;
 		intakeSiege = intakee;
 		this.drive = drive;
 		this.encoder = encoder;
 		this.gyro = gyro;
-//		stick3 = stick3;
-		this.camera = camera;
 
 		calc();
 
 		enabled = false;
-		target = new TorOnTarget(siegeTalon, 2);
 		m_states = DRAWBRIDGE.NULL;
 		m_port = PORTCULLIS.NULL;
 		m_chev = CHEVEL.NULL;
 		m_sally = SALLYPORT.NULL;
-		m_halt = HALT.POS1;
 	}
 
 	public boolean siegeOnTarget(int tolerance)
@@ -183,8 +166,8 @@ public class TorSiege
 		drawbridgeArmUp = 12.0D;
 		drawbridgeDist = 122.0D;
 
-		bottomArm = 497;//543 practice //470 competition
-		int rest = 841;//315 practice //813 competition
+		bottomArm = 526;//543 practice //526 competition
+		int rest = 871;//315 practice //871 competition
 
 		setDegreesSlope = ((bottomArm - rest) / (degreesBot - degreesTop));
 		setDegreesInter = (rest - setDegreesSlope * degreesTop);
@@ -192,7 +175,7 @@ public class TorSiege
 		readDegreesInter = (-setDegreesInter / setDegreesSlope);
 
 		siegeTalon.setSetpoint(armTop);
-		drawbridgeTop = 34.0D; 
+		drawbridgeTop = 30.0D; 
 		drawbridgeBot = -56.0D;
 		sallyPort = 0.0D;
 		chevelTop = -47.0D;
@@ -280,21 +263,6 @@ public class TorSiege
 			{
 				siegeTalon.setProfile(0);
 			}
-//			if ((siegeStick.getRawButton(5)) && (torcan.m_state != TorCAN.DRIVE_STATE.PIVOTING))
-//			{
-//				if ((torcan.m_state != TorCAN.DRIVE_STATE.LOWGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
-//				{
-//					shift.set(false);
-////					torcan.lowGear();
-//					torcan.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-//				}
-//			}
-//			else if ((torcan.m_state != TorCAN.DRIVE_STATE.HIGHGEAR) && (torcan.m_state != TorCAN.DRIVE_STATE.OFF))
-//			{
-//				shift.set(true);
-////				torcan.highGear();
-//				torcan.m_state = TorCAN.DRIVE_STATE.HIGHGEAR;
-//			}
 		}
 		else
 		{
@@ -312,17 +280,6 @@ public class TorSiege
 			m_chev = CHEVEL.POS1;
 		}
 	}
-
-//	public void highGear()
-//	{
-//		shift.set(true);
-//	}
-//
-//	public void lowGear()
-//	{
-//		shift.set(false);
-//	}
-
 	public void Portcullis()
 	{
 		if (!enabled)
@@ -573,7 +530,7 @@ public class TorSiege
 			case POS1: 
 				setDegrees(drawbridgeTop);
 				haltDrive(0.5D);
-				if (siegeOnTarget(4)) {
+				if (siegeOnTarget(2)) {
 					m_states = DRAWBRIDGE.POS2;
 				}
 				break;

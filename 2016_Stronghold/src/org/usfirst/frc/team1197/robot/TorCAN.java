@@ -1,7 +1,6 @@
 package org.usfirst.frc.team1197.robot;
 
 import edu.wpi.first.wpilibj.CANTalon;
-import edu.wpi.first.wpilibj.CANTalon.TalonControlMode;
 import edu.wpi.first.wpilibj.PIDOutput;
 
 public class TorCAN
@@ -137,23 +136,4 @@ implements PIDOutput
 //		m_Ltalon3.setVoltageRampRate(1200.0D);
 	}
 
-//	public void pivot()
-//	{
-//		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
-//		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-////		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
-//		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.Voltage);
-//		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.Voltage);
-////		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.Voltage);
-//	}
-//
-//	public void unpivot()
-//	{
-//		m_Rtalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		m_Rtalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-////		m_Rtalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		m_Ltalon1.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//		m_Ltalon2.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-////		m_Ltalon3.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
-//	}
 }

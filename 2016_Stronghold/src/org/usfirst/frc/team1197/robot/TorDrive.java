@@ -2,90 +2,72 @@ package org.usfirst.frc.team1197.robot;
 
 import edu.wpi.first.wpilibj.Encoder;
 
-
-import java.math.*;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.networktables.NetworkTable;
 
 public class TorDrive
-{
-	private Joystick m_stick;
+{	
+	private Joystick stick;
 	private Joystick overrideStick;
-	private Solenoid m_solenoidshift;
-	private TorCAN m_jagDrive;
 	private Encoder m_encoder;
-	static final float ENC_CON = 11.0F;
-	float negOvershoot;
-	private TorCamera cam;
-	private NetworkTable table;
-	private PIDController yawPID;
-	double m_speed;
-	double m_distance;
-	double previousStick;
-	double stepValue;
-	double dec;
-	int sign;
+	private float negOvershoot;
 	
-	private TorJoystickProfiles profiles;
+	private TorCAN m_jagDrive;
+	private boolean isHighGear = true;
+	private Solenoid m_solenoidshift;
 
 	private double rightMotorSpeed;
 	private double leftMotorSpeed;
-	private boolean isHighGear = true;
+	private TorJoystickProfiles profiles;
 	private double targetSpeed;
-	
 	private double trackWidth = 0.5525; //meters, in inches 21.75
 	private double halfTrackWidth = trackWidth / 2;
 	private double steeringDeadBand = 0.1;
 	private double centerRadius = 0.0;
-	private double minTurnRadius = 0.5;
-	private double maxThrottle = (5.0/6.0) * (minTurnRadius / (minTurnRadius + halfTrackWidth));
+	private double maxThrottle;
+	private double approximateSensorSpeed;
 
-	public TorDrive(Joystick stick, TorCAN jagDrive)
-	{
-		stepValue = -1.0D;
-		dec = 0.02D;
-
-		m_stick = stick;
-
-		m_jagDrive = jagDrive;
-
-		table = NetworkTable.getTable("GRIP/myContoursReport");
-	}
-
-	public TorDrive(Joystick stick, Joystick stick2, TorCAN cans, Encoder encoder, Solenoid shift)
+	public TorDrive(Joystick stick, Joystick stick2, TorCAN cans, Encoder encoder, Solenoid shift, double approximateSensorSpeed)
 	{
 		profiles = new TorJoystickProfiles();
-		m_stick = stick;
+		stick = this.stick;
 		overrideStick = stick2;
 		m_jagDrive = cans;
 		m_encoder = encoder;
 		m_solenoidshift = shift;
+		approximateSensorSpeed = this.approximateSensorSpeed;
+		maxThrottle = (5.0/6.0) * (profiles.getMinTurnRadius() / (profiles.getMinTurnRadius() + halfTrackWidth));
 	}
+	
 	public void driving(double throttleAxis, double arcadeSteerAxis, double carSteerAxis, boolean shiftButton){
 		
 		if(isHighGear){
 			carDrive(throttleAxis, carSteerAxis);
 			if(shiftButton){
-				m_solenoidshift.set(true);
-				m_jagDrive.choosePercentVbus();
-				isHighGear = false;
+				shiftToLowGear();
 			}
 		}
 		else{
 			ArcadeDrive(throttleAxis, arcadeSteerAxis);
 			if(!shiftButton){
-				m_solenoidshift.set(false);
-				m_jagDrive.chooseVelocityControl();
-				isHighGear = true;
+				shiftToHighGear();
 			}
 		}
 	}
+	
+	public void shiftToHighGear(){
+		m_solenoidshift.set(false);
+		m_jagDrive.chooseVelocityControl();
+		isHighGear = true;
+	}
+	
+	public void shiftToLowGear(){
+		m_solenoidshift.set(true);
+		m_jagDrive.choosePercentVbus();
+		isHighGear = false;
+	}
 
-	public void ArcadeDrive(double throttleAxis, double arcadeSteerAxis)
-	{
-//		arcadeSteerAxis = -arcadeSteerAxis;
+	public void ArcadeDrive(double throttleAxis, double arcadeSteerAxis){
 		throttleAxis = -throttleAxis;
 		if (Math.abs(arcadeSteerAxis) <= 0.1D) {
 			arcadeSteerAxis = 0.0D;
@@ -93,26 +75,6 @@ public class TorDrive
 		if (Math.abs(throttleAxis) <= 0.2D) {
 			throttleAxis = 0.0D;
 		}
-//		if (!m_solenoidshift.get()){
-//			if (m_jagDrive.m_state == TorCAN.DRIVE_STATE.PIVOTING)
-//			{
-//				m_jagDrive.m_state = TorCAN.DRIVE_STATE.LOWGEAR;
-//				m_jagDrive.lowGear();
-//			}
-//			arcadeSteerAxis *= 0.9D;
-//		}
-//		if (arcadeSteerAxis > 1.0D) {
-//			arcadeSteerAxis = 1.0D;
-//		}
-//		if (arcadeSteerAxis < -1.0D) {
-//			arcadeSteerAxis = -1.0D;
-//		}
-//		if (throttleAxis > 1.0D) {
-//			throttleAxis = 1.0D;
-//		}
-//		if (throttleAxis < -1.0D) {
-//			throttleAxis = -1.0D;
-//		}
 
 		if (arcadeSteerAxis >= 0.0D) {
 			arcadeSteerAxis *= arcadeSteerAxis;
@@ -154,11 +116,7 @@ public class TorDrive
 				rightMotorSpeed = -Math.max(-throttleAxis, -arcadeSteerAxis);
 			}
 		}
-//		if (m_solenoidshift.get()) {
-//			m_jagDrive.SetDrive(rightMotorSpeed * 0.65D, -leftMotorSpeed * 0.65D);
-//		} else {
 		m_jagDrive.SetDrive(rightMotorSpeed, -leftMotorSpeed);
-//		}
 	}
 
 	
@@ -171,7 +129,7 @@ public class TorDrive
 			throttleAxis = 0.0;
 		}
 
-		targetSpeed = profiles.findSpeed(throttleAxis) * 4550; //* 2500.0; //* 1150.0; 
+		targetSpeed = profiles.findSpeed(throttleAxis) * approximateSensorSpeed;
 		
 		targetSpeed *= maxThrottle;
 		
@@ -236,5 +194,4 @@ public class TorDrive
 	{
 		m_jagDrive.offGear();
 	}
-
 }
